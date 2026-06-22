@@ -570,7 +570,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const fullScript = configScript + `
                     
                     task.spawn(function()
-                        loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/6625e9364304e396fc39d367e39e9b24.lua"))()
+                        loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
                     end)
                     `;
                     
@@ -588,7 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Fallback: mostrar el script de configuración (sin ofuscar) con URL por defecto
                     const configScript = buildConfigScript();
                     const fallbackScript = configScript + 
-                        `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/6625e9364304e396fc39d367e39e9b24.lua"))()\nend)`;
+                        `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()\nend)`;
                     outputCode.textContent = fallbackScript;
                 }
 
@@ -600,7 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     voidexternal: 'https://void.external/raw/...',
                     rubis: 'https://rubis.xyz/raw/...'
                 };
-                const url = providerUrls[selectedProvider] || 'https://api.luarmor.net/files/v4/loaders/6625e9364304e396fc39d367e39e9b24.lua';
+                const url = providerUrls[selectedProvider] || 'https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua';
                 const fallbackScript = configScript + 
                     `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("${url}"))()\nend)`;
                 outputCode.textContent = fallbackScript;
@@ -609,7 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Modo normal (sin short loadstring)
                 const configScript = buildConfigScript();
                 const normalScript = configScript + 
-                    `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/6625e9364304e396fc39d367e39e9b24.lua"))()\nend)`;
+                    `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()\nend)`;
                 outputCode.textContent = normalScript;
             }
 
