@@ -440,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- OFUSCAR CON WeAreDevs (URL CORREGIDA) ---
     async function obfuscateWithWeAreDevs(script) {
-        const response = await fetch('https://wearedevs.net/api/obfuscate', {
+        const response = await fetch('/api/obfuscate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
