@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const PASTEFY_API_TOKEN = '7yGnlCgnDuzQVPMjBt90RIiv031jzwA6CMLt7VBYlx5LN4VceDW2EOcHQ7lR';
 
     // ============================================================
-    //  MODO DE EJECUCIÓN
+    //  MODO DE EJECUxCIÓN
     // ============================================================
     const modeNormal = document.getElementById('modeNormal');
     const modeCustom = document.getElementById('modeCustom');
