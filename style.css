@@ -53,7 +53,6 @@ header h1 {
     z-index: -1;
 }
 
-/* ===== Sign In Button ===== */
 .sign-in-btn {
     position: absolute;
     top: 0;
@@ -87,7 +86,7 @@ header h1 {
     background: rgba(34, 197, 94, 0.1);
 }
 
-/* ===== Inputs ===== */
+/* === Inputs y secciones === */
 .input-section {
     margin-bottom: 1.8rem;
 }
@@ -402,7 +401,6 @@ header h1 {
     box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
 }
 
-/* ===== Short Loadstring ===== */
 .short-loadstring-section {
     background: rgba(13, 13, 13, 0.7);
     backdrop-filter: blur(6px);
@@ -455,7 +453,6 @@ header h1 {
     display: none;
 }
 
-/* ===== Toggle Switch ===== */
 .toggle-switch {
     display: flex;
     align-items: center;
@@ -515,7 +512,6 @@ header h1 {
     color: #dc2626;
 }
 
-/* ===== Generate Button ===== */
 #generateBtn {
     width: 100%;
     padding: 1.2rem 0;
@@ -566,7 +562,6 @@ header h1 {
     transform: none !important;
 }
 
-/* ===== Output Section ===== */
 #outputSection {
     margin-top: 2rem;
     background: rgba(13, 13, 13, 0.8);
@@ -655,7 +650,7 @@ header h1 {
     line-height: 1.6;
 }
 
-/* ===== Login Modal ===== */
+/* Login Modal */
 .login-modal {
     position: fixed;
     top: 0;
@@ -809,46 +804,37 @@ header h1 {
     margin-top: 0.8rem;
 }
 
-/* ===== Responsive ===== */
 @media (max-width: 600px) {
     header h1 {
         font-size: 2.8rem;
     }
-
     .mode-buttons {
         flex-direction: column;
         gap: 0.5rem;
     }
-
     .search-bar input {
         min-width: 100%;
     }
-
     .search-bar button {
         flex: 1;
         text-align: center;
     }
-
     .items-container {
         max-height: 140px;
     }
-
     .target-section,
     .short-loadstring-section,
     #outputSection {
         padding: 1rem;
     }
-
     .short-header {
         flex-direction: column;
         align-items: stretch;
         gap: 0.5rem;
     }
-
     .toggle-switch {
         justify-content: flex-end;
     }
-
     .rarity-filters {
         gap: 0.3rem;
     }
@@ -856,7 +842,6 @@ header h1 {
         font-size: 0.6rem;
         padding: 0.2rem 0.6rem;
     }
-
     .output-header {
         flex-direction: column;
         align-items: stretch;
@@ -865,7 +850,6 @@ header h1 {
     #copyBtn {
         align-self: flex-end;
     }
-
     .login-modal-content {
         padding: 1.8rem 1.2rem;
         margin: 1rem;
@@ -876,12 +860,10 @@ header h1 {
     header h1 {
         font-size: 2.2rem;
     }
-
     .pill {
         font-size: 0.7rem;
         padding: 0.25rem 0.9rem;
     }
-
     .sign-in-btn {
         font-size: 0.6rem;
         padding: 0.3rem 0.8rem;
