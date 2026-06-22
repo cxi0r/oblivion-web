@@ -1,6 +1,39 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ============================================================
+    //  SISTEMA DE NOTIFICACIONES
+    // ============================================================
+    function showNotification(message, type = 'info', duration = 4000) {
+        const container = document.getElementById('notificationContainer');
+        if (!container) return;
+
+        const icons = {
+            success: '✅',
+            error: '❌',
+            warning: '⚠️',
+            info: 'ℹ️'
+        };
+
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <span class="notification-icon">${icons[type] || 'ℹ️'}</span>
+            <span class="notification-content">${message}</span>
+        `;
+
+        container.appendChild(notification);
+
+        setTimeout(() => {
+            notification.classList.add('hiding');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }, duration);
+    }
+
+    // ============================================================
     //  CONFIGURACIÓN DE DISCORD OAUTH
     // ============================================================
     const DISCORD_CLIENT_ID = '1518709938333941770';
@@ -71,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userData = { username: 'Guest', avatar: null };
         loginModal.classList.add('hidden');
         updateUIForAuth();
-        alert('You are now using OBLIVION as Guest. Short Loadstring (Pastefy + obfuscation) is disabled.');
+        showNotification('You are now using OBLIVION as Guest. Short Loadstring is disabled.', 'info');
     }
 
     function loginWithDiscord() {
@@ -79,17 +112,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleDiscordCallback() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const authSuccess = urlParams.get('auth') === 'success';
-    const username = urlParams.get('username') || 'Discord User';
-    
+        const urlParams = new URLSearchParams(window.location.search);
+        const authSuccess = urlParams.get('auth') === 'success';
+        const username = urlParams.get('username') || 'Discord User';
+        
         if (authSuccess) {
             isAuthenticated = true;
             userData = { username: username, avatar: null };
             localStorage.setItem('oblivion_auth', JSON.stringify({ isAuthenticated, userData }));
             window.history.replaceState({}, document.title, window.location.pathname);
             updateUIForAuth();
-            alert(`✅ Bienvenido ${username}! Has sido añadido al servidor automáticamente.`);
+            showNotification(`✅ Welcome ${username}! You have been added to the server automatically.`, 'success');
         }
     }
 
@@ -103,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 userData = null;
                 localStorage.removeItem('oblivion_auth');
                 updateUIForAuth();
-                alert('Logged out.');
+                showNotification('Logged out.', 'info');
             }
         } else {
             loginModal.classList.remove('hidden');
@@ -148,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     shortToggle.addEventListener('click', (e) => {
         if (!isAuthenticated) {
-            alert('⚠️ You must sign in with Discord to use Short Loadstring.');
+            showNotification('⚠️ You must sign in with Discord to use Short Loadstring.', 'warning');
             return;
         }
         shortEnabled = !shortEnabled;
@@ -652,7 +685,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (shortEnabled) {
                 if (!isAuthenticated) {
-                    alert('⚠️ Short Loadstring requires Discord authentication. Please sign in.');
+                    showNotification('⚠️ Short Loadstring requires Discord authentication. Please sign in.', 'warning');
                     generateBtn.textContent = 'GENERATE SCRIPT';
                     generateBtn.disabled = false;
                     return;
@@ -671,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     outputCode.textContent = finalScript;
 
                 } catch (apiError) {
-                    alert(`Error en el proceso automático: ${apiError.message}\n\nSe usará la URL por defecto.`);
+                    showNotification(`Error en el proceso automático: ${apiError.message}\n\nSe usará la URL por defecto.`, 'error');
                     const fallbackScript = configScript + 
                         `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()\nend)`;
                     outputCode.textContent = fallbackScript;
@@ -688,7 +721,7 @@ document.addEventListener('DOMContentLoaded', () => {
             copyBtn.classList.remove('copied');
 
         } catch (error) {
-            alert(`Error al generar el script: ${error.message}`);
+            showNotification(`Error al generar el script: ${error.message}`, 'error');
         } finally {
             generateBtn.textContent = 'GENERATE SCRIPT';
             generateBtn.disabled = false;
