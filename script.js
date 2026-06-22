@@ -565,6 +565,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("SCRIPT BASE:");
             console.log(baseScript);
             console.log('Ofuscando...');
+            console.log("=== SCRIPT ENVIADO A WEAREDEVS ===");
+            console.log(baseScript);
+            console.log("=== FIN SCRIPT ===");
             const obfuscatedScript = await obfuscateWithWeAreDevs(baseScript);
 
             // Si el usuario ha activado "Short Loadstring" y seleccionado "PASTEFY"
