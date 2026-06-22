@@ -3,8 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     //  CONFIGURACIÓN DE DISCORD OAUTH
     // ============================================================
-    const DISCORD_CLIENT_ID = 'TU_CLIENT_ID_AQUI';
-    const DISCORD_REDIRECT_URI = 'https://oblivion-web-snowy.vercel.app';
+    const DISCORD_CLIENT_ID = '1358021770713436250';
+    const DISCORD_REDIRECT_URI = window.location.origin + window.location.pathname;
     const DISCORD_AUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(DISCORD_REDIRECT_URI)}&response_type=code&scope=identify%20guilds.join`;
 
     // ============================================================
@@ -79,10 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = DISCORD_AUTH_URL;
     }
 
+    // Intercambiar el código por un token (requiere backend)
+    // Simulamos el login si recibimos el código en la URL.
     function handleDiscordCallback() {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
         if (code) {
+            // Si tienes un backend, aquí harías fetch a /api/discord/callback con el code
+            // Para demostración, simulamos login exitoso.
             isAuthenticated = true;
             userData = { username: 'Discord User', avatar: null };
             localStorage.setItem('oblivion_auth', JSON.stringify({ isAuthenticated, userData }));
@@ -121,6 +125,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     discordLoginBtn.addEventListener('click', loginWithDiscord);
     guestLoginBtn.addEventListener('click', loginAsGuest);
+
+    // Manejar callback de Discord al cargar
     handleDiscordCallback();
 
     // ============================================================
