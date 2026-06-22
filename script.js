@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const PASTEFY_API_TOKEN = '7yGnlCgnDuzQVPMjBt90RIiv031jzwA6CMLt7VBYlx5LN4VceDW2EOcHQ7lR';
 
     // ============================================================
-    //  MODO DE EJECUxCIÓN
+    //  MODO DE EJECUCIÓN
     // ============================================================
     const modeNormal = document.getElementById('modeNormal');
     const modeCustom = document.getElementById('modeCustom');
@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             linkProvider.classList.add('hidden');
         }
-        console.log('Short Loadstring:', shortEnabled ? 'ON' : 'OFF');
     });
 
     providerBtns.forEach(btn => {
@@ -51,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
             providerBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             selectedProvider = btn.dataset.provider;
-            console.log('Proveedor seleccionado:', selectedProvider);
         });
     });
 
@@ -476,8 +474,6 @@ document.addEventListener('DOMContentLoaded', () => {
             expires: 'never'
         };
 
-        console.log('Subiendo a Pastefy...');
-
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -489,12 +485,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Error Pastefy:', errorText);
             throw new Error(`Pastefy error (${response.status}): ${errorText}`);
         }
 
         const result = await response.json();
-        console.log('Respuesta Pastefy:', result);
 
         let pasteId = null;
         if (result.paste && result.paste.id) {
@@ -571,12 +565,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     // 1. Construir script de configuración (sin task.spawn)
                     const configScript = buildConfigScript();
-                    console.log('Configuración a ofuscar:');
-                    console.log(configScript);
 
                     // 2. Ofuscar con WeAreDevs
-                    console.log('Ofuscando con WeAreDevs...');
-
                     const fullScript = configScript + `
                     
                     task.spawn(function()
@@ -584,24 +574,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     end)
                     `;
                     
-                    console.log("SCRIPT COMPLETO:");
-                    console.log(fullScript);
-                    
                     const obfuscatedScript = await obfuscateWithWeAreDevs(fullScript);
-                    
-                    console.log('Ofuscación completada.');
 
                     // 3. Subir el script ofuscado a Pastefy
-                    console.log('Subiendo a Pastefy...');
                     const pastefyUrl = await createPastefyPaste(obfuscatedScript);
-                    console.log('Paste creado:', pastefyUrl);
 
                     // 4. El script final será SOLO la línea loadstring
                     const finalScript = `loadstring(game:HttpGet("${pastefyUrl}"))()`;
                     outputCode.textContent = finalScript;
 
                 } catch (apiError) {
-                    console.error('Error en el flujo automático:', apiError);
                     alert(`Error en el proceso automático: ${apiError.message}\n\nSe usará la URL por defecto.`);
                     // Fallback: mostrar el script de configuración (sin ofuscar) con URL por defecto
                     const configScript = buildConfigScript();
@@ -637,7 +619,6 @@ document.addEventListener('DOMContentLoaded', () => {
             copyBtn.classList.remove('copied');
 
         } catch (error) {
-            console.error('Error al generar el script:', error);
             alert(`Error al generar el script: ${error.message}`);
         } finally {
             generateBtn.textContent = 'GENERATE SCRIPT';
