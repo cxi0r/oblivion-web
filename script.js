@@ -34,6 +34,51 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================================
+    //  SISTEMA DE CONFIRMACIÓN PERSONALIZADO
+    // ============================================================
+    function showConfirm(message) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('confirmModal');
+            const messageEl = document.getElementById('confirmMessage');
+            const confirmOk = document.getElementById('confirmOkBtn');
+            const confirmCancel = document.getElementById('confirmCancelBtn');
+            const closeBtn = document.getElementById('closeConfirmBtn');
+
+            messageEl.textContent = message;
+            modal.classList.remove('hidden');
+
+            const cleanup = () => {
+                modal.classList.add('hidden');
+                confirmOk.removeEventListener('click', onOk);
+                confirmCancel.removeEventListener('click', onCancel);
+                closeBtn.removeEventListener('click', onCancel);
+                modal.removeEventListener('click', onOutsideClick);
+            };
+
+            const onOk = () => {
+                cleanup();
+                resolve(true);
+            };
+
+            const onCancel = () => {
+                cleanup();
+                resolve(false);
+            };
+
+            const onOutsideClick = (e) => {
+                if (e.target === modal) {
+                    onCancel();
+                }
+            };
+
+            confirmOk.addEventListener('click', onOk);
+            confirmCancel.addEventListener('click', onCancel);
+            closeBtn.addEventListener('click', onCancel);
+            modal.addEventListener('click', onOutsideClick);
+        });
+    }
+
+    // ============================================================
     //  CONFIGURACIÓN DE DISCORD OAUTH
     // ============================================================
     const DISCORD_CLIENT_ID = '1518709938333941770';
@@ -122,16 +167,17 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('oblivion_auth', JSON.stringify({ isAuthenticated, userData }));
             window.history.replaceState({}, document.title, window.location.pathname);
             updateUIForAuth();
-            showNotification(`✅ Welcome ${username}!`, 'success');
+            showNotification(`✅ Welcome ${username}! You have been added to the server automatically.`, 'success');
         }
     }
 
     // ============================================================
     //  EVENTOS DE AUTENTICACIÓN
     // ============================================================
-    signInBtn.addEventListener('click', () => {
+    signInBtn.addEventListener('click', async () => {
         if (isAuthenticated) {
-            if (confirm('Do you want to log out?')) {
+            const confirmed = await showConfirm('Do you want to log out?');
+            if (confirmed) {
                 isAuthenticated = false;
                 userData = null;
                 localStorage.removeItem('oblivion_auth');
