@@ -485,7 +485,25 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- CORRECCIÓN: URL en el formato correcto ---
         return `https://pastefy.app/${pasteId}/raw`;
     }
-
+        async function obfuscateWithWeAreDevs(script) {
+            const response = await fetch('/api/obfuscate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    script: script
+                })
+            });
+        
+            const data = await response.json();
+        
+            if (!data.success) {
+                throw new Error(data.error || 'Obfuscation failed');
+            }
+        
+            return data.obfuscated;
+        }
     // ============================================================
     //  GENERAR SCRIPT (SOLO PASTEFY, SIN OFUSCAR)
     // ============================================================
@@ -544,12 +562,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const baseScript = buildBaseScript();
+            console.log('Ofuscando...');
+            const obfuscatedScript = await obfuscateWithWeAreDevs(baseScript);
 
             // Si el usuario ha activado "Short Loadstring" y seleccionado "PASTEFY"
             if (shortEnabled && selectedProvider === 'pastefy') {
                 try {
                     // 1. Subir el script completo a Pastefy (sin ofuscar)
-                    const pastefyUrl = await createPastefyPaste(baseScript);
+                    const pastefyUrl = await createPastefyPaste(obfuscatedScript);
                     console.log('Script subido a Pastefy:', pastefyUrl);
 
                     // 2. El script final será SOLO la línea loadstring
