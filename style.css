@@ -18,6 +18,7 @@ body {
 #app {
     max-width: 700px;
     width: 100%;
+    position: relative;
 }
 
 header {
@@ -52,6 +53,41 @@ header h1 {
     z-index: -1;
 }
 
+/* ===== Sign In Button ===== */
+.sign-in-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: transparent;
+    border: 1px solid #1f1f1f;
+    border-radius: 8px;
+    padding: 0.4rem 1.2rem;
+    color: #aaaaaa;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: 'Inter', sans-serif;
+}
+
+.sign-in-btn:hover {
+    border-color: #dc2626;
+    color: #ffffff;
+    background: rgba(220, 38, 38, 0.1);
+}
+
+.sign-in-btn.logged-in {
+    border-color: #22c55e;
+    color: #22c55e;
+}
+
+.sign-in-btn.logged-in:hover {
+    background: rgba(34, 197, 94, 0.1);
+}
+
+/* ===== Inputs ===== */
 .input-section {
     margin-bottom: 1.8rem;
 }
@@ -60,7 +96,8 @@ header h1 {
 .mode-label,
 .target-section h2,
 .short-loadstring-section h2,
-.output-header h2 {
+.output-header h2,
+.login-modal-header h2 {
     display: block;
     font-size: 0.7rem;
     font-weight: 600;
@@ -365,6 +402,7 @@ header h1 {
     box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
 }
 
+/* ===== Short Loadstring ===== */
 .short-loadstring-section {
     background: rgba(13, 13, 13, 0.7);
     backdrop-filter: blur(6px);
@@ -373,6 +411,7 @@ header h1 {
     padding: 1.4rem 1.2rem;
     margin-bottom: 1.8rem;
     transition: border-color 0.3s;
+    position: relative;
 }
 
 .short-loadstring-section:hover {
@@ -401,12 +440,33 @@ header h1 {
     font-weight: 400;
 }
 
+.guest-lock {
+    margin-top: 0.8rem;
+    padding: 0.6rem 1rem;
+    background: rgba(220, 38, 38, 0.1);
+    border: 1px solid #dc2626;
+    border-radius: 8px;
+    color: #dc2626;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.guest-lock.hidden {
+    display: none;
+}
+
+/* ===== Toggle Switch ===== */
 .toggle-switch {
     display: flex;
     align-items: center;
     gap: 0.7rem;
     cursor: pointer;
     user-select: none;
+}
+
+.toggle-switch.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
 .toggle-label {
@@ -455,6 +515,7 @@ header h1 {
     color: #dc2626;
 }
 
+/* ===== Generate Button ===== */
 #generateBtn {
     width: 100%;
     padding: 1.2rem 0;
@@ -499,6 +560,13 @@ header h1 {
     transform: translateY(0px) scale(0.98);
 }
 
+#generateBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* ===== Output Section ===== */
 #outputSection {
     margin-top: 2rem;
     background: rgba(13, 13, 13, 0.8);
@@ -587,6 +655,161 @@ header h1 {
     line-height: 1.6;
 }
 
+/* ===== Login Modal ===== */
+.login-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 5, 5, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.login-modal.hidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.login-modal-content {
+    background: #0d0d0d;
+    border: 1px solid #1f1f1f;
+    border-radius: 20px;
+    padding: 2.5rem 2rem 2rem;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+    animation: slideUp 0.4s ease;
+}
+
+.login-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.login-modal-header h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.05em;
+    margin-bottom: 0;
+}
+
+.close-modal-btn {
+    background: transparent;
+    border: none;
+    color: #888888;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.close-modal-btn:hover {
+    color: #ffffff;
+}
+
+.login-modal-subtitle {
+    color: #888888;
+    font-size: 0.95rem;
+    margin-bottom: 1.8rem;
+    text-align: center;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 0.9rem 0;
+    border: 1px solid #1f1f1f;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.discord-btn {
+    background: #5865F2;
+    color: #ffffff;
+    border-color: #5865F2;
+}
+
+.discord-btn:hover {
+    background: #4752c4;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(88, 101, 242, 0.3);
+}
+
+.discord-icon {
+    font-size: 1.2rem;
+}
+
+.guest-btn {
+    background: rgba(5, 5, 5, 0.6);
+    color: #aaaaaa;
+    border-color: #1f1f1f;
+}
+
+.guest-btn:hover {
+    border-color: #dc2626;
+    color: #ffffff;
+    background: rgba(220, 38, 38, 0.1);
+    transform: translateY(-2px);
+}
+
+.login-divider {
+    display: flex;
+    align-items: center;
+    color: #444444;
+    font-size: 0.75rem;
+    margin: 1.2rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.login-divider::before,
+.login-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #1f1f1f;
+}
+
+.login-divider::before {
+    margin-right: 0.8rem;
+}
+
+.login-divider::after {
+    margin-left: 0.8rem;
+}
+
+.guest-hint {
+    text-align: center;
+    color: #555555;
+    font-size: 0.75rem;
+    margin-top: 0.8rem;
+}
+
+/* ===== Responsive ===== */
 @media (max-width: 600px) {
     header h1 {
         font-size: 2.8rem;
@@ -642,6 +865,11 @@ header h1 {
     #copyBtn {
         align-self: flex-end;
     }
+
+    .login-modal-content {
+        padding: 1.8rem 1.2rem;
+        margin: 1rem;
+    }
 }
 
 @media (max-width: 400px) {
@@ -652,5 +880,10 @@ header h1 {
     .pill {
         font-size: 0.7rem;
         padding: 0.25rem 0.9rem;
+    }
+
+    .sign-in-btn {
+        font-size: 0.6rem;
+        padding: 0.3rem 0.8rem;
     }
 }
