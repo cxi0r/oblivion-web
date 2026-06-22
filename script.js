@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('oblivion_auth', JSON.stringify({ isAuthenticated, userData }));
             window.history.replaceState({}, document.title, window.location.pathname);
             updateUIForAuth();
-            showNotification(`✅ Welcome ${username}! You have been added to the server automatically.`, 'success');
+            showNotification(`✅ Welcome ${username}!`, 'success');
         }
     }
 
