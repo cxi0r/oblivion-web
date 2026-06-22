@@ -562,6 +562,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const baseScript = buildBaseScript();
+            console.log("SCRIPT BASE:");
+            console.log(baseScript);
             console.log('Ofuscando...');
             const obfuscatedScript = await obfuscateWithWeAreDevs(baseScript);
 
