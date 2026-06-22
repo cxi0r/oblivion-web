@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     //  CONFIGURACIÓN DE DISCORD OAUTH
     // ============================================================
     const DISCORD_CLIENT_ID = '1518709938333941770';
-    const DISCORD_REDIRECT_URI = window.location.origin + window.location.pathname;
-    const DISCORD_AUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(DISCORD_REDIRECT_URI)}&response_type=code&scope=identify`;
+    const DISCORD_REDIRECT_URI = 'https://oblivion-web-snowy.vercel.app/api/discord/callback';
+    const DISCORD_AUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(DISCORD_REDIRECT_URI)}&response_type=code&scope=identify%20guilds.join`;
 
     // ============================================================
     //  ESTADO DE AUTENTICACIÓN
@@ -79,15 +79,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleDiscordCallback() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        if (code) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const authSuccess = urlParams.get('auth') === 'success';
+    const username = urlParams.get('username') || 'Discord User';
+    
+        if (authSuccess) {
             isAuthenticated = true;
-            userData = { username: 'Discord User', avatar: null };
+            userData = { username: username, avatar: null };
             localStorage.setItem('oblivion_auth', JSON.stringify({ isAuthenticated, userData }));
             window.history.replaceState({}, document.title, window.location.pathname);
             updateUIForAuth();
-            alert('Successfully logged in with Discord!');
+            alert(`✅ Bienvenido ${username}! Has sido añadido al servidor automáticamente.`);
         }
     }
 
