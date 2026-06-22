@@ -19,7 +19,7 @@
 
         <section class="input-section">
             <label>ROBLOX USERNAME</label>
-            <input type="text" id="username" placeholder="Your Username" />
+            <input type="text" id="username" placeholder="Tu usuario" />
         </section>
 
         <section class="input-section">
@@ -144,7 +144,22 @@
         </div>
     </div>
 
-    <!-- NOTIFICATIONS CONTAINER -->
+    <!-- Confirm Modal (Logout) -->
+    <div id="confirmModal" class="confirm-modal hidden">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-header">
+                <h2>Confirm</h2>
+                <button id="closeConfirmBtn" class="close-modal-btn">×</button>
+            </div>
+            <p id="confirmMessage" class="confirm-message">Do you want to log out?</p>
+            <div class="confirm-buttons">
+                <button id="confirmCancelBtn" class="confirm-btn cancel-btn">Cancel</button>
+                <button id="confirmOkBtn" class="confirm-btn ok-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Container -->
     <div id="notificationContainer" class="notification-container"></div>
 
     <script src="script.js"></script>
