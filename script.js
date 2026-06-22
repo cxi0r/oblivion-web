@@ -1,9 +1,127 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ============================================================
+    //  CONFIGURACIÓN DE DISCORD OAUTH
+    // ============================================================
+    const DISCORD_CLIENT_ID = 'TU_CLIENT_ID_AQUI';
+    const DISCORD_REDIRECT_URI = 'https://oblivion-web-snowy.vercel.app';
+    const DISCORD_AUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(DISCORD_REDIRECT_URI)}&response_type=code&scope=identify%20guilds.join`;
+
+    // ============================================================
+    //  ESTADO DE AUTENTICACIÓN
+    // ============================================================
+    let isAuthenticated = false;
+    let userData = null;
+    let shortEnabled = false;
+
+    // Cargar estado desde localStorage
+    const savedAuth = localStorage.getItem('oblivion_auth');
+    if (savedAuth) {
+        try {
+            const parsed = JSON.parse(savedAuth);
+            isAuthenticated = parsed.isAuthenticated || false;
+            userData = parsed.userData || null;
+        } catch (e) {}
+    }
+
+    // ============================================================
     //  CONFIGURACIÓN
     // ============================================================
     const PASTEFY_API_TOKEN = '7yGnlCgnDuzQVPMjBt90RIiv031jzwA6CMLt7VBYlx5LN4VceDW2EOcHQ7lR';
+
+    // ============================================================
+    //  REFERENCIAS DOM
+    // ============================================================
+    const signInBtn = document.getElementById('signInBtn');
+    const loginModal = document.getElementById('loginModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const discordLoginBtn = document.getElementById('discordLoginBtn');
+    const guestLoginBtn = document.getElementById('guestLoginBtn');
+    const shortToggle = document.getElementById('shortToggle');
+    const guestLockMessage = document.getElementById('guestLockMessage');
+    const generateBtn = document.getElementById('generateBtn');
+
+    // ============================================================
+    //  FUNCIONES DE AUTENTICACIÓN
+    // ============================================================
+    function updateUIForAuth() {
+        if (isAuthenticated) {
+            signInBtn.textContent = userData?.username ? `👤 ${userData.username}` : 'LOGGED IN';
+            signInBtn.classList.add('logged-in');
+            shortToggle.classList.remove('disabled');
+            shortToggle.style.cursor = 'pointer';
+            guestLockMessage.classList.add('hidden');
+        } else {
+            signInBtn.textContent = 'SIGN IN';
+            signInBtn.classList.remove('logged-in');
+            shortToggle.classList.add('disabled');
+            shortToggle.style.cursor = 'not-allowed';
+            if (shortToggle.classList.contains('on')) {
+                shortToggle.classList.remove('on');
+                const label = shortToggle.querySelector('.toggle-label');
+                label.textContent = 'OFF';
+                shortEnabled = false;
+            }
+            guestLockMessage.classList.remove('hidden');
+        }
+        localStorage.setItem('oblivion_auth', JSON.stringify({ isAuthenticated, userData }));
+    }
+
+    function loginAsGuest() {
+        isAuthenticated = false;
+        userData = { username: 'Guest', avatar: null };
+        loginModal.classList.add('hidden');
+        updateUIForAuth();
+        alert('You are now using OBLIVION as Guest. Short Loadstring (Pastefy + obfuscation) is disabled.');
+    }
+
+    function loginWithDiscord() {
+        window.location.href = DISCORD_AUTH_URL;
+    }
+
+    function handleDiscordCallback() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        if (code) {
+            isAuthenticated = true;
+            userData = { username: 'Discord User', avatar: null };
+            localStorage.setItem('oblivion_auth', JSON.stringify({ isAuthenticated, userData }));
+            window.history.replaceState({}, document.title, window.location.pathname);
+            updateUIForAuth();
+            alert('Successfully logged in with Discord!');
+        }
+    }
+
+    // ============================================================
+    //  EVENTOS DE AUTENTICACIÓN
+    // ============================================================
+    signInBtn.addEventListener('click', () => {
+        if (isAuthenticated) {
+            if (confirm('Do you want to log out?')) {
+                isAuthenticated = false;
+                userData = null;
+                localStorage.removeItem('oblivion_auth');
+                updateUIForAuth();
+                alert('Logged out.');
+            }
+        } else {
+            loginModal.classList.remove('hidden');
+        }
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+        loginModal.classList.add('hidden');
+    });
+
+    loginModal.addEventListener('click', (e) => {
+        if (e.target === loginModal) {
+            loginModal.classList.add('hidden');
+        }
+    });
+
+    discordLoginBtn.addEventListener('click', loginWithDiscord);
+    guestLoginBtn.addEventListener('click', loginAsGuest);
+    handleDiscordCallback();
 
     // ============================================================
     //  MODO DE EJECUCIÓN
@@ -27,13 +145,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     //  SHORT LOADSTRING TOGGLE
     // ============================================================
-    const toggleSwitch = document.getElementById('shortToggle');
-    let shortEnabled = false;
-
-    toggleSwitch.addEventListener('click', () => {
+    shortToggle.addEventListener('click', (e) => {
+        if (!isAuthenticated) {
+            alert('⚠️ You must sign in with Discord to use Short Loadstring.');
+            return;
+        }
         shortEnabled = !shortEnabled;
-        toggleSwitch.classList.toggle('on', shortEnabled);
-        const label = toggleSwitch.querySelector('.toggle-label');
+        shortToggle.classList.toggle('on', shortEnabled);
+        const label = shortToggle.querySelector('.toggle-label');
         label.textContent = shortEnabled ? 'ON' : 'OFF';
     });
 
@@ -417,30 +536,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const gearsSelected = renderPills('gearsContainer', gearItems, 'gearsSearch', 'gearsCounter', 'gearsAll', 'gearsNone');
 
     // ============================================================
-    //  FUNCIONES DE API (WeAreDevs + Pastefy)
+    //  FUNCIONES DE API
     // ============================================================
-
-    // --- OFUSCAR CON WeAreDevs ---
     async function obfuscateWithWeAreDevs(script) {
         const response = await fetch('/api/obfuscate', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ script: script })
         });
-
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`WeAreDevs error (${response.status}): ${errorText}`);
         }
-
         const data = await response.json();
-
         if (!data.success) {
             throw new Error(data.error || 'WeAreDevs devolvió success: false');
         }
-
         const obfuscated = data.obfuscated;
         if (!obfuscated) {
             throw new Error(`No se pudo obtener el script ofuscado. Respuesta: ${JSON.stringify(data)}`);
@@ -448,7 +559,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return obfuscated;
     }
 
-    // --- PASTEFY ---
     async function createPastefyPaste(content) {
         const url = 'https://pastefy.app/api/v2/paste';
         const payload = {
@@ -457,7 +567,6 @@ document.addEventListener('DOMContentLoaded', () => {
             syntax: 'lua',
             expires: 'never'
         };
-
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -466,14 +575,11 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             body: JSON.stringify(payload)
         });
-
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`Pastefy error (${response.status}): ${errorText}`);
         }
-
         const result = await response.json();
-
         let pasteId = null;
         if (result.paste && result.paste.id) {
             pasteId = result.paste.id;
@@ -484,18 +590,15 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (result.pasteId) {
             pasteId = result.pasteId;
         }
-
         if (!pasteId) {
             throw new Error(`No se pudo obtener el ID del paste. Respuesta: ${JSON.stringify(result)}`);
         }
-
         return `https://pastefy.app/${pasteId}/raw`;
     }
 
     // ============================================================
     //  GENERAR SCRIPT
     // ============================================================
-    const generateBtn = document.getElementById('generateBtn');
     const outputSection = document.getElementById('outputSection');
     const outputCode = document.getElementById('outputCode');
     const copyBtn = document.getElementById('copyBtn');
@@ -547,6 +650,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const configScript = buildConfigScript();
 
             if (shortEnabled) {
+                if (!isAuthenticated) {
+                    alert('⚠️ Short Loadstring requires Discord authentication. Please sign in.');
+                    generateBtn.textContent = 'GENERATE SCRIPT';
+                    generateBtn.disabled = false;
+                    return;
+                }
                 try {
                     const fullScript = configScript + `
                     
@@ -614,5 +723,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 2000);
         }
     });
+
+    // ============================================================
+    //  INICIALIZAR UI SEGÚN AUTENTICACIÓN
+    // ============================================================
+    updateUIForAuth();
 
 });
