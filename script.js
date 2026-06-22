@@ -569,6 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (shortEnabled && selectedProvider === 'pastefy') {
                 try {
                     // 1. Subir el script completo a Pastefy (sin ofuscar)
+                    console.log(obfuscatedScript);
                     const pastefyUrl = await createPastefyPaste(obfuscatedScript);
                     console.log('Script subido a Pastefy:', pastefyUrl);
 
