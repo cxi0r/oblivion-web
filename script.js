@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //  CONFIGURACIÓN DE DISCORD OAUTH
     // ============================================================
     const DISCORD_CLIENT_ID = '1518709938333941770';
-    const DISCORD_REDIRECT_URI = 'https://oblivion-web-snowy.vercel.app/api/discord/callback';
+    const DISCORD_REDIRECT_URI = 'https://oblivionhub.xyz/api/discord/callback';
     const DISCORD_AUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(DISCORD_REDIRECT_URI)}&response_type=code&scope=identify%20guilds.join`;
 
     // ============================================================
