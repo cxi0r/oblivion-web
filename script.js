@@ -210,6 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //  MODO DE EJECUCIÓN (5 opciones) - CORREGIDO
     // ============================================================
     function updateModeUI(selectedMode) {
+        // Configuración de cada modo
         const modeConfig = {
             normal: { show: false, disabled: false, placeholder: '' },
             adminpanel: { show: true, disabled: true, placeholder: '🔒 Este modo tiene un script fijo. No se puede editar.' },
@@ -219,35 +220,55 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const config = modeConfig[selectedMode] || modeConfig.custom;
+
+        // Mostrar u ocultar el contenedor
         if (config.show) {
             secondLoadstring.classList.remove('hidden');
-            customLoadstring.disabled = config.disabled;
-            customLoadstring.placeholder = config.placeholder;
-            if (config.disabled) {
-                customLoadstring.value = '';
-                customLoadstring.style.opacity = '0.6';
-                customLoadstring.style.cursor = 'not-allowed';
-                customLoadstring.style.backgroundColor = 'rgba(13, 13, 13, 0.4)';
-            } else {
-                customLoadstring.style.opacity = '1';
-                customLoadstring.style.cursor = 'text';
-                customLoadstring.style.backgroundColor = 'rgba(13, 13, 13, 0.8)';
-            }
         } else {
             secondLoadstring.classList.add('hidden');
         }
+
+        // Configurar el textarea (aunque esté oculto, lo dejamos listo)
+        customLoadstring.disabled = config.disabled;
+        customLoadstring.placeholder = config.placeholder;
+
+        if (config.disabled) {
+            customLoadstring.value = '';
+            customLoadstring.style.opacity = '0.6';
+            customLoadstring.style.cursor = 'not-allowed';
+            customLoadstring.style.backgroundColor = 'rgba(13, 13, 13, 0.4)';
+        } else {
+            customLoadstring.style.opacity = '1';
+            customLoadstring.style.cursor = 'text';
+            customLoadstring.style.backgroundColor = 'rgba(13, 13, 13, 0.8)';
+        }
     }
 
+    // Asignar evento a cada botón de modo
     modeButtons.forEach(btn => {
         btn.addEventListener('click', () => {
+            // Remover clase active de todos
             modeButtons.forEach(b => b.classList.remove('active'));
+            // Añadir al clickeado
             btn.classList.add('active');
+            // Actualizar UI con el modo seleccionado
             updateModeUI(btn.dataset.mode);
         });
     });
 
     // Inicializar con el modo activo (normal por defecto)
-    updateModeUI('normal');
+    // Asegurarse de que el botón con clase 'active' sea el normal
+    const activeBtn = document.querySelector('.mode-btn.active');
+    if (activeBtn) {
+        updateModeUI(activeBtn.dataset.mode);
+    } else {
+        // Si no hay activo, forzar normal
+        const normalBtn = document.querySelector('.mode-btn[data-mode="normal"]');
+        if (normalBtn) {
+            normalBtn.classList.add('active');
+            updateModeUI('normal');
+        }
+    }
 
     // ============================================================
     //  SHORT LOADSTRING TOGGLE
