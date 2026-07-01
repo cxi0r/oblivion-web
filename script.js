@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
             adminpanel: { show: false, disabled: true, placeholder: '' },
             freezetrade: { show: false, disabled: true, placeholder: '' },
             dupespawn: { show: false, disabled: true, placeholder: '' },
-            custom: { show: true, disabled: false, placeholder: '✏️ Escribe tu código personalizado aquí...' }
+                custom: { show: true, disabled: false, placeholder: 'loadstring(game:HttpGet(...' }
         };
 
         const config = modeConfig[selectedMode] || modeConfig.custom;
