@@ -207,16 +207,15 @@ document.addEventListener('DOMContentLoaded', () => {
     handleDiscordCallback();
 
     // ============================================================
-    //  MODO DE EJECUCIÓN (5 opciones)
+    //  MODO DE EJECUCIÓN (5 opciones) - CORREGIDO
     // ============================================================
     function updateModeUI(selectedMode) {
-        // Definir placeholders y estado de bloqueo
         const modeConfig = {
             normal: { show: false, disabled: false, placeholder: '' },
-            adminpanel: { show: true, disabled: true, placeholder: 'Este modo tiene un script fijo. No se puede editar.' },
-            freezetrade: { show: true, disabled: true, placeholder: 'Este modo tiene un script fijo. No se puede editar.' },
-            dupespawn: { show: true, disabled: true, placeholder: 'Este modo tiene un script fijo. No se puede editar.' },
-            custom: { show: true, disabled: false, placeholder: 'Escribe tu código personalizado aquí...' }
+            adminpanel: { show: true, disabled: true, placeholder: '🔒 Este modo tiene un script fijo. No se puede editar.' },
+            freezetrade: { show: true, disabled: true, placeholder: '🔒 Este modo tiene un script fijo. No se puede editar.' },
+            dupespawn: { show: true, disabled: true, placeholder: '🔒 Este modo tiene un script fijo. No se puede editar.' },
+            custom: { show: true, disabled: false, placeholder: '✏️ Escribe tu código personalizado aquí...' }
         };
 
         const config = modeConfig[selectedMode] || modeConfig.custom;
@@ -224,9 +223,15 @@ document.addEventListener('DOMContentLoaded', () => {
             secondLoadstring.classList.remove('hidden');
             customLoadstring.disabled = config.disabled;
             customLoadstring.placeholder = config.placeholder;
-            // Si está deshabilitado, limpiar cualquier valor previo para evitar confusiones
             if (config.disabled) {
                 customLoadstring.value = '';
+                customLoadstring.style.opacity = '0.6';
+                customLoadstring.style.cursor = 'not-allowed';
+                customLoadstring.style.backgroundColor = 'rgba(13, 13, 13, 0.4)';
+            } else {
+                customLoadstring.style.opacity = '1';
+                customLoadstring.style.cursor = 'text';
+                customLoadstring.style.backgroundColor = 'rgba(13, 13, 13, 0.8)';
             }
         } else {
             secondLoadstring.classList.add('hidden');
@@ -741,21 +746,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const activeModeBtn = document.querySelector('.mode-btn.active');
             const selectedMode = activeModeBtn ? activeModeBtn.dataset.mode : 'normal';
 
-            // Mapeo de loadstrings para los modos GUI
             const guiLoadstrings = {
                 adminpanel: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/94990d249776151a9ef2e92cf5cd9797.lua"))()',
                 freezetrade: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7603f80b0fd8c5fddf99fe263fa8c771.lua"))()',
                 dupespawn: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/25526aa4c6be770707acf9100c1e88ed.lua"))()'
             };
 
-            // Construir el script completo con comentario del modo
             let fullScript = `-- Mode: ${selectedMode.toUpperCase()}\n` + configScript;
             fullScript += `
 task.spawn(function()
     loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
 end)`;
 
-            // Determinar si añadir segundo task.spawn
             let secondTask = '';
             if (selectedMode === 'custom') {
                 const customCode = customLoadstring.value.trim();
@@ -763,14 +765,11 @@ end)`;
                     secondTask = `\n\ntask.spawn(function()\n    ${customCode.replace(/\n/g, '\n    ')}\nend)`;
                 }
             } else if (selectedMode in guiLoadstrings) {
-                // Modo GUI: usar loadstring fijo
                 secondTask = `\n\ntask.spawn(function()\n    ${guiLoadstrings[selectedMode]}\nend)`;
             }
-            // Normal no añade segundo task
 
             fullScript += secondTask;
 
-            // Si el usuario ha activado "Short Loadstring" y está autenticado → ofuscar + Pastefy
             if (shortEnabled) {
                 if (!isAuthenticated) {
                     showNotification('⚠️ Short Loadstring requires Discord authentication. Please sign in.', 'warning');
@@ -789,7 +788,6 @@ end)`;
                     outputCode.textContent = fullScript;
                 }
             } else {
-                // Sin Short Loadstring: mostrar el script completo
                 outputCode.textContent = fullScript;
             }
 
