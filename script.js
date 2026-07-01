@@ -210,18 +210,21 @@ document.addEventListener('DOMContentLoaded', () => {
     //  MODO DE EJECUCIÓN (5 opciones) - CORREGIDO
     // ============================================================
     function updateModeUI(selectedMode) {
-        // Configuración de cada modo
+        // Configuración de cada modo:
+        // - normal: no muestra textarea
+        // - adminpanel, freezetrade, dupespawn: no muestran textarea (scripts fijos)
+        // - custom: muestra textarea editable
         const modeConfig = {
             normal: { show: false, disabled: false, placeholder: '' },
-            adminpanel: { show: true, disabled: true, placeholder: '🔒 Este modo tiene un script fijo. No se puede editar.' },
-            freezetrade: { show: true, disabled: true, placeholder: '🔒 Este modo tiene un script fijo. No se puede editar.' },
-            dupespawn: { show: true, disabled: true, placeholder: '🔒 Este modo tiene un script fijo. No se puede editar.' },
+            adminpanel: { show: false, disabled: true, placeholder: '' },
+            freezetrade: { show: false, disabled: true, placeholder: '' },
+            dupespawn: { show: false, disabled: true, placeholder: '' },
             custom: { show: true, disabled: false, placeholder: '✏️ Escribe tu código personalizado aquí...' }
         };
 
         const config = modeConfig[selectedMode] || modeConfig.custom;
 
-        // Mostrar u ocultar el contenedor
+        // Mostrar u ocultar el contenedor del textarea
         if (config.show) {
             secondLoadstring.classList.remove('hidden');
         } else {
@@ -257,12 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Inicializar con el modo activo (normal por defecto)
-    // Asegurarse de que el botón con clase 'active' sea el normal
     const activeBtn = document.querySelector('.mode-btn.active');
     if (activeBtn) {
         updateModeUI(activeBtn.dataset.mode);
     } else {
-        // Si no hay activo, forzar normal
         const normalBtn = document.querySelector('.mode-btn[data-mode="normal"]');
         if (normalBtn) {
             normalBtn.classList.add('active');
