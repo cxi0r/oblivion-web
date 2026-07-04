@@ -425,7 +425,8 @@ document.addEventListener('DOMContentLoaded', () => {
             'To to to Sahur', 'Torrtuginni Dragonfrutini', 'Tralaledon',
             'Trenostruzzo Turbo 4000', 'Trickolino', 'Triplito Tralaleritos',
             'Tuff Toucan', 'Ventoliero Pavonero', 'Venuspino', 'Vulturino Skeletono',
-            'W or L', 'Yess my examine', 'Zombie Tralala'
+            'W or L', 'Yess my examine', 'Zombie Tralala', '4th Bros', 'Capitano Americano', 
+            'Bufalino Boomberino', 'Esok Goala'
         ],
         OG: [
             'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
