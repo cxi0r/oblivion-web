@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'Trenostruzzo Turbo 4000', 'Trickolino', 'Triplito Tralaleritos',
             'Tuff Toucan', 'Ventoliero Pavonero', 'Venuspino', 'Vulturino Skeletono',
             'W or L', 'Yess my examine', 'Zombie Tralala', '4th Bros', 'Capitano Americano', 
-            'Bufalino Boomberino', 'Esok Goala', 'Los Tangcitos', 'Los Tictacs', 'Los Admins', 'Moby Bros'
+            'Bufalino Boomberino', 'Esok Goala', 'Los Tangcitos', 'Los Tictacs', 'Los Admins', 'Moby Bros', 'Var Var Var'
         ],
         OG: [
             'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
