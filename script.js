@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
             adminpanel: { show: false, disabled: true, placeholder: '' },
             freezetrade: { show: false, disabled: true, placeholder: '' },
             dupespawn: { show: false, disabled: true, placeholder: '' },
-                custom: { show: true, disabled: false, placeholder: 'loadstring(game:HttpGet(...' }
+            custom: { show: true, disabled: false, placeholder: '✏️ Escribe tu código personalizado aquí...' }
         };
 
         const config = modeConfig[selectedMode] || modeConfig.custom;
@@ -448,13 +448,61 @@ document.addEventListener('DOMContentLoaded', () => {
         Spooky: ['Spooky Lucky Block']
     };
 
+    // ============================================================
+    //  LISTA DE RECOMMENDED (SOLO ESTOS BRAINROTS)
+    // ============================================================
+    const recommendedNames = [
+        'Headless Horseman', 'Signore Carapace', 'Arcadragon', 'Elefanto Frigo',
+        'Strawberry Elephant', 'Pancake and Syrup', 'Love Love Bear', 'Antonio',
+        'Meowl', 'Skibidi Toilet', 'Rico Dinero', 'Griffin', 'Dragon Gingerini',
+        'Fishino Clownino', 'La Supreme Combinasion', 'Ginger Gerat',
+        'Tirilikalika Tirilikalako', 'Kalika Bros', 'Digi Narwhal', 'Hydra Bunny',
+        'Dragon Cannelloni', 'Los Hackers', 'Hydra Dragon Cannelloni',
+        'Bunny and Eggy', 'Duggy Bros', 'Dug Dug Dug', 'Ketupat Bros', 'John Doe',
+        'La Casa Boo', 'Foxini Lanternini', 'Quackini Snackini', 'Los Chillis',
+        'Guest 666', 'Cerberus', 'Rosey and Teddy', 'Reinito Sleighito',
+        'Fragola La La La', 'Gym Bros', 'Spooky and Pumpky', 'Cloverat Clapat',
+        'Cooki and Milki', 'Cash or Card', 'Fortunu and Cashuru', 'Jolly Jolly Sahur',
+        'Capitano Moby', 'Fragrama and Chocrama', 'Chillin Chili', 'Los Sekolahs',
+        'Sammyni Fattini', 'Los Amigos', 'Money Money Reindeer', 'Boppin Bunny',
+        'Festive 67', 'Money Money Bros', 'Tralaledon', 'La Food Combinasion',
+        'Celularcini Viciosini', 'Hopilikalika Hopilikalako', 'Los Tacoritas',
+        'Swaggy Bros', 'Los Spaghettis', 'Popcuru and Fizzuru', 'Garama and Madundung',
+        'Celestial Pegasus', 'La Easter Grande', 'Gold Gold Gold', 'Nacho Spyder',
+        'Orcaledon', 'Los Mariachis', 'Burguro And Fryuro', 'Lovin Rose', 'W or L',
+        'La Ginger Sekolah', 'Chipso and Queso', 'Los Primos', 'Swag Soda',
+        'Los Hotspotsitos', 'La Taco Combinasion', 'La Romantic Grande', 'Eviledon',
+        'Los Bros', 'Las Sis', 'Tictac Sahur', 'La Secret Combinasion',
+        'La Lucky Grande', 'Ketchuru and Musturu', 'Gobblino Uniciclino',
+        'Agarrini la Palini', 'Rosetti Tualetti', 'Tacorita Bicicleta',
+        'Ventoliero Pavonero', 'John Pork', 'Lazy Ducky', 'Pineaplino',
+        'Noo my examine', 'Rhino Helicopterino', 'Brutto Gialutto',
+        'Tob Tobi Tobi', 'Centrucci Nuclucci', 'Caramello Filtrello',
+        'Ganganzelli Trulala', 'Avocadorilla', 'Malame Amarele',
+        'Raccooni Jandelini', 'La Sahur Combinasion', 'Karker Sahur',
+        'Unclito Samito', 'Abyssaloco', 'Rubrikiko', 'La Anniversary Grande',
+        'Jelly Moby', 'Sammyni Cakini', 'Lavadorito Spinito',
+        'Donkeyturbo Express', 'Los Mi Gatitos', 'Telemorte',
+        'Statutino Libertino', 'Los Jolly Combinasionas',
+        'Please my Present', 'Bunito Bunito Spinito',
+        'La Karkerkar Combinasion', 'Extinct Matteo', 'Coco and Mango',
+        'Dragon Aquanini', 'Pretzo Robo', 'Kraken', 'Venuspino',
+        'Bearito Cabinito', 'Sand Sand Sand', 'Globa Steppa',
+        'Frullato Flamingo', 'La Summer Grande', 'Caylusaurus',
+        'Steakini Fattini', 'Stoppo Luminino', 'Buho de Fuego',
+        'Esok Goala', 'Capitano Americano', 'Bufalino Boomberino',
+        'Tuff Toucan', 'Moby Bros', 'Los Admins', 'Los Tictacs',
+        'Los Tangcitos', 'Los Fruits', 'Var Var Var'
+    ];
+
+    // ============================================================
+    //  CONSTRUIR brainrotData CON LA NUEVA LÓGICA DE RECOMMENDED
+    // ============================================================
     const brainrotData = [];
-    const recommendedRarities = ['Secret', 'Brainrot God', 'OG'];
-    const recommendedNames = ['Lucky Block', 'Sigma Boy', 'Sigma Girl'];
 
     for (const [rarity, names] of Object.entries(brainrotLists)) {
         names.forEach(name => {
-            const isRecommended = recommendedRarities.includes(rarity) || recommendedNames.includes(name);
+            const isRecommended = recommendedNames.includes(name);
             brainrotData.push({ name, rarity, recommended: isRecommended });
         });
     }
