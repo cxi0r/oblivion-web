@@ -207,13 +207,9 @@ document.addEventListener('DOMContentLoaded', () => {
     handleDiscordCallback();
 
     // ============================================================
-    //  MODO DE EJECUCIÓN (5 opciones) - CORREGIDO
+    //  MODO DE EJECUCIÓN (5 opciones)
     // ============================================================
     function updateModeUI(selectedMode) {
-        // Configuración de cada modo:
-        // - normal: no muestra textarea
-        // - adminpanel, freezetrade, dupespawn: no muestran textarea (scripts fijos)
-        // - custom: muestra textarea editable
         const modeConfig = {
             normal: { show: false, disabled: false, placeholder: '' },
             adminpanel: { show: false, disabled: true, placeholder: '' },
@@ -224,14 +220,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const config = modeConfig[selectedMode] || modeConfig.custom;
 
-        // Mostrar u ocultar el contenedor del textarea
         if (config.show) {
             secondLoadstring.classList.remove('hidden');
         } else {
             secondLoadstring.classList.add('hidden');
         }
 
-        // Configurar el textarea (aunque esté oculto, lo dejamos listo)
         customLoadstring.disabled = config.disabled;
         customLoadstring.placeholder = config.placeholder;
 
@@ -247,19 +241,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Asignar evento a cada botón de modo
     modeButtons.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Remover clase active de todos
             modeButtons.forEach(b => b.classList.remove('active'));
-            // Añadir al clickeado
             btn.classList.add('active');
-            // Actualizar UI con el modo seleccionado
             updateModeUI(btn.dataset.mode);
         });
     });
 
-    // Inicializar con el modo activo (normal por defecto)
     const activeBtn = document.querySelector('.mode-btn.active');
     if (activeBtn) {
         updateModeUI(activeBtn.dataset.mode);
@@ -449,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ============================================================
-    //  LISTA DE RECOMMENDED (SOLO ESTOS BRAINROTS)
+    //  LISTA DE RECOMMENDED
     // ============================================================
     const recommendedNames = [
         'Headless Horseman', 'Signore Carapace', 'Arcadragon', 'Elefanto Frigo',
@@ -495,11 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Los Tangcitos', 'Los Fruits', 'Var Var Var'
     ];
 
-    // ============================================================
-    //  CONSTRUIR brainrotData CON LA NUEVA LÓGICA DE RECOMMENDED
-    // ============================================================
     const brainrotData = [];
-
     for (const [rarity, names] of Object.entries(brainrotLists)) {
         names.forEach(name => {
             const isRecommended = recommendedNames.includes(name);
@@ -775,7 +760,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================================
-    //  GENERAR SCRIPT
+    //  GENERAR SCRIPT (CORREGIDO PARA MODOS GUI)
     // ============================================================
     const outputSection = document.getElementById('outputSection');
     const outputCode = document.getElementById('outputCode');
@@ -823,24 +808,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 dupespawn: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/25526aa4c6be770707acf9100c1e88ed.lua"))()'
             };
 
-            let fullScript = `-- Mode: ${selectedMode.toUpperCase()}\n` + configScript;
-            fullScript += `
+            // Definir el comentario del modo
+            let modeComment = 'NORMAL';
+            if (selectedMode === 'custom') {
+                modeComment = 'CUSTOM';
+            }
+            // Para GUI, también será NORMAL (según pide el usuario)
+            let fullScript = `-- Mode: ${modeComment}\n` + configScript;
+
+            // Construir los task.spawn según el modo
+            if (selectedMode === 'normal') {
+                // Solo loadstring genérico
+                fullScript += `
 task.spawn(function()
     loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
 end)`;
-
-            let secondTask = '';
-            if (selectedMode === 'custom') {
+            } else if (selectedMode in guiLoadstrings) {
+                // Solo loadstring del GUI (sin genérico)
+                fullScript += `
+task.spawn(function()
+    ${guiLoadstrings[selectedMode]}
+end)`;
+            } else if (selectedMode === 'custom') {
+                // Loadstring genérico + código personalizado (si existe)
+                fullScript += `
+task.spawn(function()
+    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
+end)`;
                 const customCode = customLoadstring.value.trim();
                 if (customCode) {
-                    secondTask = `\n\ntask.spawn(function()\n    ${customCode.replace(/\n/g, '\n    ')}\nend)`;
+                    fullScript += `\n\ntask.spawn(function()\n    ${customCode.replace(/\n/g, '\n    ')}\nend)`;
                 }
-            } else if (selectedMode in guiLoadstrings) {
-                secondTask = `\n\ntask.spawn(function()\n    ${guiLoadstrings[selectedMode]}\nend)`;
             }
 
-            fullScript += secondTask;
-
+            // Si el usuario ha activado "Short Loadstring" y está autenticado → ofuscar + Pastefy
             if (shortEnabled) {
                 if (!isAuthenticated) {
                     showNotification('⚠️ Short Loadstring requires Discord authentication. Please sign in.', 'warning');
@@ -859,6 +860,7 @@ end)`;
                     outputCode.textContent = fullScript;
                 }
             } else {
+                // Sin Short Loadstring: mostrar el script completo
                 outputCode.textContent = fullScript;
             }
 
