@@ -275,6 +275,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ============================================================
+    //  TRADUCCIONES PARA EL MENSAJE DE ADVERTENCIA
+    // ============================================================
+    const allSelectionWarning = {
+        es: "⚠️ Al seleccionar todos los brainrots es muy probable que el script falle y no te llegue invitación. Se recomienda usar el filtro de recomendado y luego buscar los otros faltantes que te puedan servir.",
+        en: "⚠️ Selecting all brainrots is very likely to cause the script to fail and you won't receive an invitation. It is recommended to use the recommended filter and then search for the other missing ones that may be useful.",
+        pt: "⚠️ Selecionar todos os brainrots é muito provável que o script falhe e você não receba um convite. Recomenda-se usar o filtro recomendado e depois procurar os outros que faltam e que podem ser úteis.",
+        fr: "⚠️ Sélectionner tous les brainrots est très susceptible de faire échouer le script et vous ne recevrez pas d'invitation. Il est recommandé d'utiliser le filtre recommandé, puis de rechercher les autres manquants qui pourraient vous être utiles.",
+        de: "⚠️ Die Auswahl aller Brainrots führt sehr wahrscheinlich dazu, dass das Skript fehlschlägt und Sie keine Einladung erhalten. Es wird empfohlen, den empfohlenen Filter zu verwenden und dann nach den anderen fehlenden zu suchen, die nützlich sein könnten.",
+        it: "⚠️ Selezionare tutti i brainrots è molto probabile che lo script fallisca e non riceverai un invito. Si consiglia di utilizzare il filtro consigliato e poi cercare gli altri mancanti che potrebbero esserti utili.",
+        nl: "⚠️ Het selecteren van alle brainrots zal er zeer waarschijnlijk toe leiden dat het script mislukt en je geen uitnodiging ontvangt. Het wordt aanbevolen om het aanbevolen filter te gebruiken en vervolgens te zoeken naar de andere ontbrekende die nuttig kunnen zijn.",
+        ja: "⚠️ すべてのブレインロットを選択すると、スクリプトが失敗し、招待状が届かない可能性が非常に高くなります。推奨フィルターを使用してから、役立つ可能性のある他の不足しているものを検索することをお勧めします。",
+        ko: "⚠️ 모든 브레인롯을 선택하면 스크립트가 실패하고 초대장을 받지 못할 가능성이 매우 높습니다. 권장 필터를 사용한 다음 유용할 수 있는 다른 누락된 항목을 검색하는 것이 좋습니다.",
+        zh: "⚠️ 选择所有脑残片很可能导致脚本失败，您将无法收到邀请。建议使用推荐过滤器，然后搜索其他可能有用的缺失项。",
+        ru: "⚠️ Выбор всех brainrots с большой вероятностью приведет к сбою скрипта, и вы не получите приглашение. Рекомендуется использовать рекомендуемый фильтр, а затем искать другие недостающие, которые могут быть полезны.",
+        ar: "⚠️ تحديد جميع brainrots من المحتمل جدًا أن يتسبب في فشل البرنامج النصي ولن تتلقى دعوة. يوصى باستخدام عامل التصفية الموصى به ثم البحث عن العناصر المفقودة الأخرى التي قد تكون مفيدة.",
+        hi: "⚠️ सभी ब्रेनरोट्स का चयन करने से स्क्रिप्ट के विफल होने की बहुत संभावना है और आपको निमंत्रण नहीं मिलेगा। अनुशंसित फ़िल्टर का उपयोग करने और फिर उपयोगी हो सकने वाले अन्य लापता लोगों को खोजने की सिफारिश की जाती है।"
+    };
+
+    function getUserLanguage() {
+        const lang = navigator.language || navigator.languages?.[0] || 'en';
+        const primary = lang.split('-')[0];
+        return primary;
+    }
+
+    function getTranslatedWarning() {
+        const lang = getUserLanguage();
+        return allSelectionWarning[lang] || allSelectionWarning.en;
+    }
+
+    // ============================================================
     //  TODOS LOS BRAINROTS (COMPLETOS)
     // ============================================================
     const brainrotLists = {
@@ -411,13 +441,15 @@ document.addEventListener('DOMContentLoaded', () => {
             'Spooky and Pumpky', 'Steakini Fattini', 'Strawberrita', 'Sushi Inu',
             'Swag Soda', 'Swaggy Bros', 'Tacorillo Crocodillo', 'Tacorita Bicicleta',
             'Tang Tang Keletang', 'Telemorte', 'Tictac Sahur', 'Tirilikalika Tirilikalako',
-            'To to to Sahur', 'Torrtuginni Dragonfrutini', 'Tralaledon', 'Trickolino', 'Triplito Tralaleritos',
+            'To to to Sahur', 'Torrtuginni Dragonfrutini', 'Tralaledon',
+            'Trenostruzzo Turbo 4000', 'Trickolino', 'Triplito Tralaleritos',
             'Tuff Toucan', 'Ventoliero Pavonero', 'Venuspino', 'Vulturino Skeletono',
             'W or L', 'Yess my examine', 'Zombie Tralala', '4th Bros', 'Capitano Americano', 
             'Bufalino Boomberino', 'Esok Goala', 'Los Tangcitos', 'Los Tictacs', 'Los Admins', 'Moby Bros', 'Var Var Var'
         ],
         OG: [
-            'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet', 'Strawberry Elephant'
+            'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
+            'Spyder Elephant', 'Strawberry Elephant'
         ],
         Easter: [
             'Baskito Egg', 'Bunny Bunny Bunny Sahur Egg', 'Bunny Tralala Egg',
@@ -647,21 +679,17 @@ document.addEventListener('DOMContentLoaded', () => {
             counterSpan.textContent = `${selectedCount} SELECTED`;
         }
 
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentFilter = btn.dataset.rarity;
-                render();
-            });
-        });
-
-        searchInput.addEventListener('input', (e) => {
-            searchTerm = e.target.value;
-            render();
-        });
-
+        // ============================================================
+        //  BOTÓN ALL CON ADVERTENCIA IDIOMÁTICA
+        // ============================================================
         allBtn.addEventListener('click', () => {
+            // Si el filtro actual es 'all' (mostrando todos los brainrots sin filtrar por rareza)
+            if (currentFilter === 'all') {
+                const warningMessage = getTranslatedWarning();
+                showNotification(warningMessage, 'warning', 6000);
+            }
+
+            // Seleccionar todos los items visibles (comportamiento normal)
             const pills = container.querySelectorAll('.pill');
             pills.forEach(pill => {
                 const val = pill.dataset.value;
@@ -679,6 +707,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 pill.classList.remove('selected');
             });
             updateCounter();
+        });
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.rarity;
+                render();
+            });
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            render();
         });
 
         render();
