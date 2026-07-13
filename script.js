@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //  REFERENCIAS DOM
     // ============================================================
     const signInBtn = document.getElementById('signInBtn');
-    const loginModal = document.getElementById('loginModal');
+    const linModal = document.getElementById('loginModal');
     const closeModalBtn = document.getElementById('closeModalBtn');
     const discordLoginBtn = document.getElementById('discordLoginBtn');
     const guestLoginBtn = document.getElementById('guestLoginBtn');
@@ -441,15 +441,14 @@ document.addEventListener('DOMContentLoaded', () => {
             'Spooky and Pumpky', 'Steakini Fattini', 'Strawberrita', 'Sushi Inu',
             'Swag Soda', 'Swaggy Bros', 'Tacorillo Crocodillo', 'Tacorita Bicicleta',
             'Tang Tang Keletang', 'Telemorte', 'Tictac Sahur', 'Tirilikalika Tirilikalako',
-            'To to to Sahur', 'Torrtuginni Dragonfrutini', 'Tralaledon',
-            'Trenostruzzo Turbo 4000', 'Trickolino', 'Triplito Tralaleritos',
+            'To to to Sahur', 'Torrtuginni Dragonfrutini', 'Tralaledon', 'Trickolino', 'Triplito Tralaleritos',
             'Tuff Toucan', 'Ventoliero Pavonero', 'Venuspino', 'Vulturino Skeletono',
             'W or L', 'Yess my examine', 'Zombie Tralala', '4th Bros', 'Capitano Americano', 
             'Bufalino Boomberino', 'Esok Goala', 'Los Tangcitos', 'Los Tictacs', 'Los Admins', 'Moby Bros', 'Var Var Var'
         ],
         OG: [
             'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
-            'Spyder Elephant', 'Strawberry Elephant'
+            'Strawberry Elephant'
         ],
         Easter: [
             'Baskito Egg', 'Bunny Bunny Bunny Sahur Egg', 'Bunny Tralala Egg',
