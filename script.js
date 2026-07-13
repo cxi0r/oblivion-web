@@ -847,7 +847,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (selectedMode === 'custom') {
                 modeComment = 'CUSTOM';
             }
-            let fullScript = `-- Mode: ${modeComment}\n` + configScript;
+            let fullScript = configScript;
 
             if (selectedMode === 'normal') {
                 fullScript += `
