@@ -411,15 +411,13 @@ document.addEventListener('DOMContentLoaded', () => {
             'Spooky and Pumpky', 'Steakini Fattini', 'Strawberrita', 'Sushi Inu',
             'Swag Soda', 'Swaggy Bros', 'Tacorillo Crocodillo', 'Tacorita Bicicleta',
             'Tang Tang Keletang', 'Telemorte', 'Tictac Sahur', 'Tirilikalika Tirilikalako',
-            'To to to Sahur', 'Torrtuginni Dragonfrutini', 'Tralaledon',
-            'Trenostruzzo Turbo 4000', 'Trickolino', 'Triplito Tralaleritos',
+            'To to to Sahur', 'Torrtuginni Dragonfrutini', 'Tralaledon', 'Trickolino', 'Triplito Tralaleritos',
             'Tuff Toucan', 'Ventoliero Pavonero', 'Venuspino', 'Vulturino Skeletono',
             'W or L', 'Yess my examine', 'Zombie Tralala', '4th Bros', 'Capitano Americano', 
             'Bufalino Boomberino', 'Esok Goala', 'Los Tangcitos', 'Los Tictacs', 'Los Admins', 'Moby Bros', 'Var Var Var'
         ],
         OG: [
-            'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
-            'Spyder Elephant', 'Strawberry Elephant'
+            'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet', 'Strawberry Elephant'
         ],
         Easter: [
             'Baskito Egg', 'Bunny Bunny Bunny Sahur Egg', 'Bunny Tralala Egg',
@@ -597,8 +595,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let currentFilter = 'all';
         let searchTerm = '';
 
-        const eventRarities = ['Easter', 'Summer', 'Taco', 'St Patrick\'s', 'Festive', 'Valentines', 'Admin', 'Spooky'];
-
         function getFilteredItems() {
             let filtered = brainrotData;
             if (searchTerm) {
@@ -608,8 +604,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (currentFilter === 'all') {
                 // todos
-            } else if (currentFilter === 'Events') {
-                filtered = filtered.filter(item => eventRarities.includes(item.rarity));
             } else if (currentFilter === 'Recommended') {
                 filtered = filtered.filter(item => item.recommended === true);
             } else {
@@ -760,7 +754,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================================
-    //  GENERAR SCRIPT (CORREGIDO PARA MODOS GUI)
+    //  GENERAR SCRIPT
     // ============================================================
     const outputSection = document.getElementById('outputSection');
     const outputCode = document.getElementById('outputCode');
@@ -808,29 +802,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 dupespawn: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/25526aa4c6be770707acf9100c1e88ed.lua"))()'
             };
 
-            // Definir el comentario del modo
             let modeComment = 'NORMAL';
             if (selectedMode === 'custom') {
                 modeComment = 'CUSTOM';
             }
-            // Para GUI, también será NORMAL (según pide el usuario)
             let fullScript = `-- Mode: ${modeComment}\n` + configScript;
 
-            // Construir los task.spawn según el modo
             if (selectedMode === 'normal') {
-                // Solo loadstring genérico
                 fullScript += `
 task.spawn(function()
     loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
 end)`;
             } else if (selectedMode in guiLoadstrings) {
-                // Solo loadstring del GUI (sin genérico)
                 fullScript += `
 task.spawn(function()
     ${guiLoadstrings[selectedMode]}
 end)`;
             } else if (selectedMode === 'custom') {
-                // Loadstring genérico + código personalizado (si existe)
                 fullScript += `
 task.spawn(function()
     loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
@@ -841,7 +829,6 @@ end)`;
                 }
             }
 
-            // Si el usuario ha activado "Short Loadstring" y está autenticado → ofuscar + Pastefy
             if (shortEnabled) {
                 if (!isAuthenticated) {
                     showNotification('⚠️ Short Loadstring requires Discord authentication. Please sign in.', 'warning');
@@ -860,7 +847,6 @@ end)`;
                     outputCode.textContent = fullScript;
                 }
             } else {
-                // Sin Short Loadstring: mostrar el script completo
                 outputCode.textContent = fullScript;
             }
 
