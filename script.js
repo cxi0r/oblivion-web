@@ -109,6 +109,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     //  REFERENCIAS DOM
     // ============================================================
+    const tiktokBtn = document.getElementById('tiktokBtn');
+    const mainView = document.getElementById('mainView');
+    const tiktokDashboard = document.getElementById('tiktokDashboard');
+    const dashboardBackBtn = document.getElementById('dashboardBackBtn');
+    const tiktokInput = document.getElementById('tiktokInput');
+    const tiktokOutput = document.getElementById('tiktokOutput');
+    const tiktokGenerateBtn = document.getElementById('tiktokGenerateBtn');
+    const tiktokCopyBtn = document.getElementById('tiktokCopyBtn');
     const signInBtn = document.getElementById('signInBtn');
     const linModal = document.getElementById('loginModal');
     const closeModalBtn = document.getElementById('closeModalBtn');
