@@ -109,16 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     //  REFERENCIAS DOM
     // ============================================================
-    const tiktokBtn = document.getElementById('tiktokBtn');
-    const mainView = document.getElementById('mainView');
-    const tiktokDashboard = document.getElementById('tiktokDashboard');
-    const dashboardBackBtn = document.getElementById('dashboardBackBtn');
-    const tiktokInput = document.getElementById('tiktokInput');
-    const tiktokOutput = document.getElementById('tiktokOutput');
-    const tiktokGenerateBtn = document.getElementById('tiktokGenerateBtn');
-    const tiktokCopyBtn = document.getElementById('tiktokCopyBtn');
     const signInBtn = document.getElementById('signInBtn');
-    const linModal = document.getElementById('loginModal');
+    const loginModal = document.getElementById('loginModal');
     const closeModalBtn = document.getElementById('closeModalBtn');
     const discordLoginBtn = document.getElementById('discordLoginBtn');
     const guestLoginBtn = document.getElementById('guestLoginBtn');
@@ -128,6 +120,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const modeButtons = document.querySelectorAll('.mode-btn');
     const secondLoadstring = document.getElementById('secondLoadstring');
     const customLoadstring = document.getElementById('customLoadstring');
+
+    const tiktokBtn = document.getElementById('tiktokBtn');
+    const mainView = document.getElementById('mainView');
+    const tiktokDashboard = document.getElementById('tiktokDashboard');
+    const dashboardBackBtn = document.getElementById('dashboardBackBtn');
+    const tiktokInput = document.getElementById('tiktokInput');
+    const tiktokOutput = document.getElementById('tiktokOutput');
+    const tiktokGenerateBtn = document.getElementById('tiktokGenerateBtn');
+    const tiktokCopyBtn = document.getElementById('tiktokCopyBtn');
 
     // ============================================================
     //  FUNCIONES DE AUTENTICACIÓN
@@ -151,6 +152,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 shortEnabled = false;
             }
             guestLockMessage.classList.remove('hidden');
+            // Si estamos en el dashboard y cerramos sesión, volver a la vista principal
+            if (tiktokDashboard && !tiktokDashboard.classList.contains('hidden')) {
+                showMainView();
+            }
         }
         localStorage.setItem('oblivion_auth', JSON.stringify({ isAuthenticated, userData }));
     }
@@ -281,6 +286,116 @@ document.addEventListener('DOMContentLoaded', () => {
         const label = shortToggle.querySelector('.toggle-label');
         label.textContent = shortEnabled ? 'ON' : 'OFF';
     });
+
+    // ============================================================
+    //  NAVEGACIÓN: MAIN VIEW ↔ TIKTOK DASHBOARD
+    // ============================================================
+    function showMainView() {
+        mainView.style.display = 'block';
+        tiktokDashboard.classList.add('hidden');
+        // Limpiar campos del dashboard al salir
+        if (tiktokInput) tiktokInput.value = '';
+        if (tiktokOutput) tiktokOutput.value = '';
+        if (tiktokCopyBtn) {
+            tiktokCopyBtn.textContent = 'COPY';
+            tiktokCopyBtn.classList.remove('copied');
+        }
+    }
+
+    function showDashboardView() {
+        if (!isAuthenticated) {
+            showNotification('⚠️ You must sign in with Discord to access the TikTok Comment dashboard.', 'warning');
+            return;
+        }
+        mainView.style.display = 'none';
+        tiktokDashboard.classList.remove('hidden');
+        // Limpiar campos al entrar
+        if (tiktokInput) tiktokInput.value = '';
+        if (tiktokOutput) tiktokOutput.value = '';
+        if (tiktokCopyBtn) {
+            tiktokCopyBtn.textContent = 'COPY';
+            tiktokCopyBtn.classList.remove('copied');
+        }
+    }
+
+    // ============================================================
+    //  TIKTOK COMMENT - GENERADOR DE COMENTARIOS OFUSCADOS
+    // ============================================================
+    const SPACE_CHARS = ['ᅠ', '⠀', 'ᅠ', '⠀', 'ᅠ', '⠀', 'ᅠ', '⠀', 'ᅠ', '⠀', 'ᅠ', '⠀', 'ᅠ', '⠀', 'ᅠ', '⠀', 'ᅠ', '⠀', 'ᅠ', '⠀'];
+    const PREFIX_CHAR = '៖';
+
+    function generateObfuscatedComment(script) {
+        if (!script.trim()) {
+            showNotification('⚠️ Please paste a valid script.', 'warning');
+            return null;
+        }
+        let spacer = '';
+        for (let i = 0; i < 500; i++) {
+            spacer += SPACE_CHARS[i % SPACE_CHARS.length];
+        }
+        const result = [
+            script.trim(),
+            spacer,
+            `${PREFIX_CHAR} ${script.trim()}`
+        ].join('\n');
+        return result;
+    }
+
+    // ============================================================
+    //  EVENTOS DE NAVEGACIÓN Y TIKTOK
+    // ============================================================
+    if (tiktokBtn) {
+        tiktokBtn.addEventListener('click', showDashboardView);
+    }
+
+    if (dashboardBackBtn) {
+        dashboardBackBtn.addEventListener('click', showMainView);
+    }
+
+    if (tiktokGenerateBtn) {
+        tiktokGenerateBtn.addEventListener('click', () => {
+            const script = tiktokInput ? tiktokInput.value : '';
+            const result = generateObfuscatedComment(script);
+            if (result && tiktokOutput) {
+                tiktokOutput.value = result;
+                showNotification('✅ Comment generated successfully.', 'success');
+            }
+        });
+    }
+
+    if (tiktokCopyBtn) {
+        tiktokCopyBtn.addEventListener('click', async () => {
+            const text = tiktokOutput ? tiktokOutput.value : '';
+            if (!text) {
+                showNotification('⚠️ Nothing to copy.', 'warning');
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(text);
+                tiktokCopyBtn.textContent = 'COPIED!';
+                tiktokCopyBtn.classList.add('copied');
+                setTimeout(() => {
+                    tiktokCopyBtn.textContent = 'COPY';
+                    tiktokCopyBtn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                const range = document.createRange();
+                if (tiktokOutput) {
+                    range.selectNode(tiktokOutput);
+                    window.getSelection().removeAllRanges();
+                    window.getSelection().addRange(range);
+                    document.execCommand('copy');
+                    window.getSelection().removeAllRanges();
+                    tiktokCopyBtn.textContent = 'COPIED!';
+                    tiktokCopyBtn.classList.add('copied');
+                    setTimeout(() => {
+                        tiktokCopyBtn.textContent = 'COPY';
+                        tiktokCopyBtn.classList.remove('copied');
+                    }, 2000);
+                }
+            }
+        });
+    }
 
     // ============================================================
     //  TRADUCCIONES PARA EL MENSAJE DE ADVERTENCIA
@@ -449,14 +564,15 @@ document.addEventListener('DOMContentLoaded', () => {
             'Spooky and Pumpky', 'Steakini Fattini', 'Strawberrita', 'Sushi Inu',
             'Swag Soda', 'Swaggy Bros', 'Tacorillo Crocodillo', 'Tacorita Bicicleta',
             'Tang Tang Keletang', 'Telemorte', 'Tictac Sahur', 'Tirilikalika Tirilikalako',
-            'To to to Sahur', 'Torrtuginni Dragonfrutini', 'Tralaledon', 'Trickolino', 'Triplito Tralaleritos',
+            'To to to Sahur', 'Torrtuginni Dragonfrutini', 'Tralaledon',
+            'Trenostruzzo Turbo 4000', 'Trickolino', 'Triplito Tralaleritos',
             'Tuff Toucan', 'Ventoliero Pavonero', 'Venuspino', 'Vulturino Skeletono',
             'W or L', 'Yess my examine', 'Zombie Tralala', '4th Bros', 'Capitano Americano', 
             'Bufalino Boomberino', 'Esok Goala', 'Los Tangcitos', 'Los Tictacs', 'Los Admins', 'Moby Bros', 'Var Var Var'
         ],
         OG: [
             'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
-            'Strawberry Elephant'
+            'Spyder Elephant', 'Strawberry Elephant'
         ],
         Easter: [
             'Baskito Egg', 'Bunny Bunny Bunny Sahur Egg', 'Bunny Tralala Egg',
@@ -534,7 +650,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     const skinItems = [
         'Rose', 'Gingerbread', 'Halloween', 'Christmas', 'Bunny Basket',
-        'Pot of Gold', 'Taco', 'Octo', 'Valentines',
+        'Summer', 'Pot of Gold', 'Taco', 'Octo', 'Valentines',
         'Easter', 'Lucky', 'Aquatic'
     ];
 
@@ -686,17 +802,13 @@ document.addEventListener('DOMContentLoaded', () => {
             counterSpan.textContent = `${selectedCount} SELECTED`;
         }
 
-        // ============================================================
-        //  BOTÓN ALL CON ADVERTENCIA IDIOMÁTICA
-        // ============================================================
+        // ALL button with warning
         allBtn.addEventListener('click', () => {
-            // Si el filtro actual es 'all' (mostrando todos los brainrots sin filtrar por rareza)
             if (currentFilter === 'all') {
                 const warningMessage = getTranslatedWarning();
                 showNotification(warningMessage, 'warning', 6000);
             }
 
-            // Seleccionar todos los items visibles (comportamiento normal)
             const pills = container.querySelectorAll('.pill');
             pills.forEach(pill => {
                 const val = pill.dataset.value;
@@ -855,7 +967,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (selectedMode === 'custom') {
                 modeComment = 'CUSTOM';
             }
-            let fullScript = configScript;
+            let fullScript = `-- Mode: ${modeComment}\n` + configScript;
 
             if (selectedMode === 'normal') {
                 fullScript += `
