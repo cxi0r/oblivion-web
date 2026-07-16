@@ -1246,3 +1246,190 @@ header h1 {
         padding: 0.3rem 0.8rem;
     }
 }
+/* ===== TikTok Dashboard ===== */
+#tiktokDashboard {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 0%, #0d0d0d 0%, #050505 100%);
+    z-index: 2000;
+    overflow-y: auto;
+    padding: 2rem 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+#tiktokDashboard.hidden {
+    display: none;
+}
+
+.dashboard-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    background: rgba(13, 13, 13, 0.7);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(31, 31, 31, 0.6);
+    border-radius: 16px;
+    min-height: 80vh;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.dashboard-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    background: linear-gradient(135deg, #ffffff 0%, #ef4444 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px rgba(239, 68, 68, 0.2);
+    text-align: center;
+    flex: 1;
+}
+
+.dashboard-back-btn {
+    background: transparent;
+    border: 1px solid #1f1f1f;
+    border-radius: 8px;
+    padding: 0.4rem 1.2rem;
+    color: #aaaaaa;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: 'Inter', sans-serif;
+}
+
+.dashboard-back-btn:hover {
+    border-color: #dc2626;
+    color: #ffffff;
+    background: rgba(220, 38, 38, 0.1);
+}
+
+.dashboard-content {
+    margin-top: 1rem;
+}
+
+.dashboard-subtitle {
+    color: #888888;
+    font-size: 0.95rem;
+    margin-bottom: 1.8rem;
+    text-align: center;
+}
+
+.tiktok-input-group,
+.tiktok-output-group {
+    margin: 1rem 0;
+}
+
+.tiktok-input-group label,
+.tiktok-output-group label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: #777777;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+}
+
+.tiktok-input-group textarea,
+.tiktok-output-group textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(5, 5, 5, 0.6);
+    border: 1px solid #1f1f1f;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    resize: vertical;
+    outline: none;
+    transition: border 0.2s;
+    box-sizing: border-box;
+}
+
+.tiktok-input-group textarea:focus,
+.tiktok-output-group textarea:focus {
+    border-color: #dc2626;
+}
+
+.tiktok-output-group textarea {
+    background: rgba(5, 5, 5, 0.3);
+    cursor: default;
+    color: #cccccc;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.tiktok-generate-btn,
+.tiktok-copy-btn {
+    width: 100%;
+    padding: 0.7rem 0;
+    border: 1px solid #1f1f1f;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.5rem;
+}
+
+.tiktok-generate-btn {
+    background: #dc2626;
+    color: #ffffff;
+    border-color: #dc2626;
+}
+
+.tiktok-generate-btn:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
+}
+
+.tiktok-copy-btn {
+    background: rgba(5, 5, 5, 0.6);
+    color: #aaaaaa;
+    border-color: #1f1f1f;
+}
+
+.tiktok-copy-btn:hover {
+    border-color: #dc2626;
+    color: #ffffff;
+    background: rgba(220, 38, 38, 0.1);
+}
+
+.tiktok-copy-btn.copied {
+    border-color: #22c55e;
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+}
+
+/* Responsive dashboard */
+@media (max-width: 600px) {
+    .dashboard-header h1 {
+        font-size: 1.4rem;
+    }
+    .dashboard-container {
+        padding: 1rem;
+    }
+    .tiktok-input-group textarea,
+    .tiktok-output-group textarea {
+        font-size: 0.8rem;
+    }
+}
