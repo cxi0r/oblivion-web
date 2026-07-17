@@ -7,6 +7,9 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
+    // ============================================================
+    //  POST: Crear un paste
+    // ============================================================
     if (req.method === 'POST') {
         const { content, title, userId, public: isPublic } = req.body;
 
@@ -33,7 +36,7 @@ export default async function handler(req, res) {
         }
 
         const baseUrl = process.env.BASE_URL || 'https://oblivionhub.xyz';
-        const url = `${baseUrl}/p/${id}`;
+        const url = `${baseUrl}/api/paste?id=${id}`;
 
         return res.status(201).json({
             success: true,
@@ -44,8 +47,11 @@ export default async function handler(req, res) {
         });
     }
 
+    // ============================================================
+    //  GET: Obtener un paste por ID (con soporte para raw)
+    // ============================================================
     if (req.method === 'GET') {
-        const { id } = req.query;
+        const { id, raw } = req.query;
         if (!id) {
             return res.status(400).json({ error: 'ID is required' });
         }
@@ -60,9 +66,19 @@ export default async function handler(req, res) {
             return res.status(404).json({ error: 'Paste not found' });
         }
 
+        // Si se solicita raw, devolver texto plano
+        if (raw === 'true') {
+            res.setHeader('Content-Type', 'text/plain');
+            res.setHeader('Cache-Control', 'public, max-age=31536000');
+            return res.status(200).send(data.content);
+        }
+
         return res.status(200).json(data);
     }
 
+    // ============================================================
+    //  DELETE: Eliminar un paste
+    // ============================================================
     if (req.method === 'DELETE') {
         const { id } = req.query;
         if (!id) {
