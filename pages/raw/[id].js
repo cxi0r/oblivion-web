@@ -1,6 +1,5 @@
 // pages/raw/[id].js
 export default function RawHandler() {
-    // Esta página solo se ejecuta en el servidor (getServerSideProps)
     return null;
 }
 
@@ -9,7 +8,6 @@ export async function getServerSideProps({ params, res }) {
     const baseUrl = process.env.BASE_URL || 'https://oblivionhub.xyz';
 
     try {
-        // Obtener el paste de Supabase a través de la API interna
         const response = await fetch(`${baseUrl}/api/paste?id=${id}`);
 
         if (!response.ok) {
@@ -21,7 +19,6 @@ export async function getServerSideProps({ params, res }) {
 
         const paste = await response.json();
 
-        // Devolver el contenido en texto plano
         res.setHeader('Content-Type', 'text/plain');
         res.setHeader('Cache-Control', 'public, max-age=31536000');
         res.end(paste.content);
