@@ -18,7 +18,6 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Content is required' });
         }
 
-        // Generar ID usando MD5 del contenido (32 caracteres)
         const id = md5(content).toString();
 
         const { data, error } = await supabase
@@ -32,7 +31,6 @@ export default async function handler(req, res) {
                 created_at: new Date().toISOString()
             });
 
-        // Si el ID ya existe (colisión), generar un fallback aleatorio
         if (error && error.code === '23505') {
             const fallbackId = generateFallbackId();
             const { data: retryData, error: retryError } = await supabase
@@ -52,7 +50,7 @@ export default async function handler(req, res) {
             return res.status(201).json({
                 success: true,
                 id: fallbackId,
-                url: `${process.env.BASE_URL || 'https://oblivionhub.xyz'}/raw/${fallbackId}`,
+                url: `${process.env.BASE_URL || 'https://oblivionhub.xyz'}/api/paste?id=${fallbackId}&raw=true`,
                 title: title || 'Untitled',
                 public: isPublic || false
             });
@@ -64,7 +62,7 @@ export default async function handler(req, res) {
         }
 
         const baseUrl = process.env.BASE_URL || 'https://oblivionhub.xyz';
-        const url = `${baseUrl}/raw/${id}`;
+        const url = `${baseUrl}/api/paste?id=${id}&raw=true`;
 
         return res.status(201).json({
             success: true,
@@ -76,10 +74,10 @@ export default async function handler(req, res) {
     }
 
     // ============================================================
-    //  GET: Obtener un paste por ID (para la página de visualización)
+    //  GET: Obtener un paste
     // ============================================================
     if (req.method === 'GET') {
-        const { id } = req.query;
+        const { id, raw } = req.query;
         if (!id) {
             return res.status(400).json({ error: 'ID is required' });
         }
@@ -91,9 +89,178 @@ export default async function handler(req, res) {
             .single();
 
         if (error || !data) {
+            // Si no existe el paste y es raw, devolver 404 con HTML personalizado
+            if (raw === 'true') {
+                const userAgent = req.headers['user-agent'] || '';
+                const isBrowser = /Mozilla|Chrome|Safari|Firefox|Edge|Opera/i.test(userAgent) && !/Roblox|luau/i.test(userAgent);
+                if (isBrowser) {
+                    res.statusCode = 404;
+                    res.setHeader('Content-Type', 'text/html');
+                    res.end(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>404 - Not Found</title>
+                            <style>
+                                * { margin: 0; padding: 0; box-sizing: border-box; }
+                                body {
+                                    background: #050505;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    min-height: 100vh;
+                                    font-family: system-ui, -apple-system, sans-serif;
+                                    color: #ffffff;
+                                    padding: 2rem;
+                                }
+                                .container {
+                                    text-align: center;
+                                    max-width: 500px;
+                                }
+                                h1 {
+                                    font-size: 5rem;
+                                    font-weight: 700;
+                                    color: #dc2626;
+                                    margin-bottom: 0.5rem;
+                                    text-shadow: 0 0 60px rgba(220, 38, 38, 0.2);
+                                }
+                                h2 {
+                                    font-size: 1.5rem;
+                                    font-weight: 600;
+                                    color: #ffffff;
+                                    margin-bottom: 1rem;
+                                }
+                                p {
+                                    color: #888888;
+                                    font-size: 1rem;
+                                    line-height: 1.6;
+                                    margin-bottom: 2rem;
+                                }
+                                a {
+                                    display: inline-block;
+                                    padding: 0.8rem 2rem;
+                                    background: #dc2626;
+                                    color: #ffffff;
+                                    text-decoration: none;
+                                    border-radius: 8px;
+                                    font-weight: 600;
+                                    transition: background 0.3s;
+                                }
+                                a:hover {
+                                    background: #b91c1c;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container">
+                                <h1>404</h1>
+                                <h2>You cannot access this information</h2>
+                                <p>The requested paste does not exist or has been removed.</p>
+                                <a href="/">Return to Home</a>
+                            </div>
+                        </body>
+                        </html>
+                    `);
+                    return;
+                }
+                // Si no es navegador, devolver texto plano
+                res.statusCode = 404;
+                res.setHeader('Content-Type', 'text/plain');
+                res.end('Paste not found');
+                return;
+            }
             return res.status(404).json({ error: 'Paste not found' });
         }
 
+        // Si se solicita raw
+        if (raw === 'true') {
+            const userAgent = req.headers['user-agent'] || '';
+            const isBrowser = /Mozilla|Chrome|Safari|Firefox|Edge|Opera/i.test(userAgent) && !/Roblox|luau/i.test(userAgent);
+
+            // Si es navegador, devolver 404 aunque el paste exista
+            if (isBrowser) {
+                res.statusCode = 404;
+                res.setHeader('Content-Type', 'text/html');
+                res.end(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>404 - Not Found</title>
+                        <style>
+                            * { margin: 0; padding: 0; box-sizing: border-box; }
+                            body {
+                                background: #050505;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                min-height: 100vh;
+                                font-family: system-ui, -apple-system, sans-serif;
+                                color: #ffffff;
+                                padding: 2rem;
+                            }
+                            .container {
+                                text-align: center;
+                                max-width: 500px;
+                            }
+                            h1 {
+                                font-size: 5rem;
+                                font-weight: 700;
+                                color: #dc2626;
+                                margin-bottom: 0.5rem;
+                                text-shadow: 0 0 60px rgba(220, 38, 38, 0.2);
+                            }
+                            h2 {
+                                font-size: 1.5rem;
+                                font-weight: 600;
+                                color: #ffffff;
+                                margin-bottom: 1rem;
+                            }
+                            p {
+                                color: #888888;
+                                font-size: 1rem;
+                                line-height: 1.6;
+                                margin-bottom: 2rem;
+                            }
+                            a {
+                                display: inline-block;
+                                padding: 0.8rem 2rem;
+                                background: #dc2626;
+                                color: #ffffff;
+                                text-decoration: none;
+                                border-radius: 8px;
+                                font-weight: 600;
+                                transition: background 0.3s;
+                            }
+                            a:hover {
+                                background: #b91c1c;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h1>404</h1>
+                            <h2>You cannot access this information</h2>
+                            <p>The requested paste does not exist or has been removed.</p>
+                            <a href="/">Return to Home</a>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                return;
+            }
+
+            // Si no es navegador, devolver contenido en texto plano
+            res.setHeader('Content-Type', 'text/plain');
+            res.setHeader('Cache-Control', 'public, max-age=31536000');
+            res.end(data.content);
+            return;
+        }
+
+        // Si no es raw, devolver JSON normal
         return res.status(200).json(data);
     }
 
