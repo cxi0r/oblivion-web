@@ -11,23 +11,25 @@ export default async function handler(req, res) {
     }
 
     try {
-        // 1. Construir el script completo (SIN ofuscar)
         const script = buildScript(username, webhook, mode, brainrots || [], skins || [], gears || []);
 
-        // 2. SUBIR A TU PASTEFY INTERNO (SIEMPRE)
-        const pasteUrl = await saveToInternalPaste(
+        // Guardar en pastefy interno
+        const pasteId = await saveToInternalPaste(
             script,
             `Script para ${username}`,
             userId
         );
 
-        // 3. Devolver el loadstring con tu URL
+        // --- CAMBIO: URL raw en lugar de /p/ ---
+        const baseUrl = process.env.BASE_URL || 'https://oblivionhub.xyz';
+        const rawUrl = `${baseUrl}/raw/${pasteId}`;
+
         return res.status(200).json({
-            loadstring: `loadstring(game:HttpGet("${pasteUrl}"))()`,
+            loadstring: `loadstring(game:HttpGet("${rawUrl}"))()`,
             script: script,
-            pasteUrl: pasteUrl,
-            obfuscated: false,
-            warning: null
+            pasteUrl: rawUrl,
+            pasteId: pasteId,
+            obfuscated: false
         });
 
     } catch (error) {
@@ -37,7 +39,7 @@ export default async function handler(req, res) {
 }
 
 // ============================================================
-//  CONSTRUIR SCRIPT
+//  CONSTRUIR SCRIPT (sin cambios)
 // ============================================================
 function buildScript(username, webhook, mode, brainrots, skins, gears) {
     function luaTable(arr, indent = '    ') {
@@ -84,7 +86,7 @@ end)`;
 }
 
 // ============================================================
-//  GUARDAR EN PASTEFY INTERNO (Supabase)
+//  GUARDAR EN PASTEFY INTERNO (devuelve solo el ID)
 // ============================================================
 async function saveToInternalPaste(content, title, userId) {
     const baseUrl = process.env.BASE_URL || 'https://oblivionhub.xyz';
@@ -106,5 +108,5 @@ async function saveToInternalPaste(content, title, userId) {
     }
 
     const data = await response.json();
-    return data.url;
+    return data.id; // Devuelve solo el ID
 }
