@@ -20,9 +20,9 @@ export default async function handler(req, res) {
             userId
         );
 
-        // --- CAMBIO: URL raw en lugar de /p/ ---
+        // --- USAR URL RAW a través de api/paste ---
         const baseUrl = process.env.BASE_URL || 'https://oblivionhub.xyz';
-        const rawUrl = `${baseUrl}/raw/${pasteId}`;
+        const rawUrl = `${baseUrl}/api/paste?id=${pasteId}&raw=true`;
 
         return res.status(200).json({
             loadstring: `loadstring(game:HttpGet("${rawUrl}"))()`,
@@ -108,5 +108,5 @@ async function saveToInternalPaste(content, title, userId) {
     }
 
     const data = await response.json();
-    return data.id; // Devuelve solo el ID
+    return data.id;
 }
