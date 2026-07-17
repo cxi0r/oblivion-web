@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "API para OBLIVION-HUB",
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0"
+    "@supabase/supabase-js": "^2.39.0",
+    "crypto-js": "^4.2.0"
   }
 }
