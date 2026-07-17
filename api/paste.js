@@ -7,9 +7,7 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-    // ============================================================
-    //  POST: Crear un paste
-    // ============================================================
+    // Crear un paste
     if (req.method === 'POST') {
         const { content, title, userId, public: isPublic } = req.body;
 
@@ -17,10 +15,8 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Content is required' });
         }
 
-        // Generar ID corto (6 caracteres alfanuméricos)
         const id = generateShortId();
 
-        // Guardar en Supabase
         const { data, error } = await supabase
             .from('pastes')
             .insert({
@@ -37,7 +33,6 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: error.message });
         }
 
-        // Construir URL
         const baseUrl = process.env.BASE_URL || 'https://oblivionhub.xyz';
         const url = `${baseUrl}/p/${id}`;
 
@@ -50,9 +45,7 @@ export default async function handler(req, res) {
         });
     }
 
-    // ============================================================
-    //  GET: Obtener un paste por ID
-    // ============================================================
+    // Obtener un paste por ID
     if (req.method === 'GET') {
         const { id } = req.query;
         if (!id) {
@@ -72,9 +65,7 @@ export default async function handler(req, res) {
         return res.status(200).json(data);
     }
 
-    // ============================================================
-    //  DELETE: Eliminar un paste (opcional)
-    // ============================================================
+    // Eliminar un paste (opcional)
     if (req.method === 'DELETE') {
         const { id } = req.query;
         if (!id) {
@@ -96,9 +87,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
 }
 
-// ============================================================
-//  Generar ID corto (6 caracteres)
-// ============================================================
 function generateShortId() {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let result = '';
