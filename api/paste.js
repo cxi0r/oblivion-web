@@ -7,7 +7,6 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-    // Crear un paste
     if (req.method === 'POST') {
         const { content, title, userId, public: isPublic } = req.body;
 
@@ -45,7 +44,6 @@ export default async function handler(req, res) {
         });
     }
 
-    // Obtener un paste por ID
     if (req.method === 'GET') {
         const { id } = req.query;
         if (!id) {
@@ -65,7 +63,6 @@ export default async function handler(req, res) {
         return res.status(200).json(data);
     }
 
-    // Eliminar un paste (opcional)
     if (req.method === 'DELETE') {
         const { id } = req.query;
         if (!id) {
