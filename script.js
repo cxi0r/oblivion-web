@@ -103,29 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================================
-    //  CONFIGURACIÓN DE SERVICIOS
+    //  CONFIGURACIÓN DE SERVICIOS (solo Pastefy y Oblivion)
     // ============================================================
     const PASTEFY_API_TOKEN = '7yGnlCgnDuzQVPMjBt90RIiv031jzwA6CMLt7VBYlx5LN4VceDW2EOcHQ7lR';
-    // Para Oblivion usamos tu propia API (/api/paste)
-    // Para Voidexternal y Rubis necesitas sus endpoints (ejemplo)
-    const SERVICE_ENDPOINTS = {
-        pastefy: {
-            post: 'https://pastefy.app/api/v2/paste',
-            raw: (id) => `https://pastefy.app/${id}/raw`
-        },
-        oblivion: {
-            post: '/api/paste', // tu API local (se resuelve con BASE_URL)
-            raw: (id) => `/api/paste?id=${id}&raw=true`
-        },
-        voidexternal: {
-            post: 'https://api.voidexternal.com/paste', // <-- REEMPLAZA con la URL real
-            raw: (id) => `https://api.voidexternal.com/raw/${id}` // <-- REEMPLAZA
-        },
-        rubis: {
-            post: 'https://api.rubis.dev/paste', // <-- REEMPLAZA con la URL real
-            raw: (id) => `https://api.rubis.dev/raw/${id}` // <-- REEMPLAZA
-        }
-    };
 
     // ============================================================
     //  REFERENCIAS DOM
@@ -138,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const shortToggle = document.getElementById('shortToggle');
     const guestLockMessage = document.getElementById('guestLockMessage');
     const shortServiceSelector = document.getElementById('shortServiceSelector');
-    const shortServiceSelect = document.getElementById('shortServiceSelect');
+    const providerBtns = document.querySelectorAll('.provider-btn');
     const generateBtn = document.getElementById('generateBtn');
     const modeButtons = document.querySelectorAll('.mode-btn');
     const secondLoadstring = document.getElementById('secondLoadstring');
@@ -349,14 +329,25 @@ document.addEventListener('DOMContentLoaded', () => {
         shortServiceSelector.style.display = shortEnabled ? 'block' : 'none';
     });
 
-    // Cambio de servicio seleccionado
-    shortServiceSelect.addEventListener('change', (e) => {
-        selectedService = e.target.value;
-        console.log(`[Short] Servicio cambiado a: ${selectedService}`);
+    // ============================================================
+    //  SELECTOR DE PROVEEDOR (dos botones)
+    // ============================================================
+    // Por defecto, el botón de Oblivion ya tiene la clase 'active' en HTML,
+    // pero aseguramos que selectedService coincida.
+    providerBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Quitar clase activa a todos
+            providerBtns.forEach(b => b.classList.remove('active'));
+            // Activar el botón clicado
+            this.classList.add('active');
+            // Guardar el servicio seleccionado
+            selectedService = this.dataset.provider;
+            console.log(`[Short] Servicio cambiado a: ${selectedService}`);
+        });
     });
 
     // ============================================================
-    //  TODOS LOS BRAINROTS (COMPLETOS) - Igual que antes
+    //  TODOS LOS BRAINROTS (COMPLETOS)
     // ============================================================
     const brainrotLists = {
         Common: [
@@ -831,7 +822,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Crear paste en Pastefy (público) ---
     async function createPastefyPaste(content) {
-        const url = SERVICE_ENDPOINTS.pastefy.post;
+        const url = 'https://pastefy.app/api/v2/paste';
         const payload = {
             content: content,
             title: 'OBLIVION Script',
@@ -866,7 +857,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return {
             id: pasteId,
-            rawUrl: SERVICE_ENDPOINTS.pastefy.raw(pasteId)
+            rawUrl: `https://pastefy.app/${pasteId}/raw`
         };
     }
 
@@ -893,47 +884,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
             id: data.id,
             rawUrl: `${baseUrl}/api/paste?id=${data.id}&raw=true`
-        };
-    }
-
-    // --- Crear paste en Voidexternal (placeholder - reemplazar con su API real) ---
-    async function createVoidexternalPaste(content) {
-        // EJEMPLO: adapta según la documentación de Voidexternal
-        const url = SERVICE_ENDPOINTS.voidexternal.post;
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: content })
-        });
-        if (!response.ok) {
-            throw new Error(`Voidexternal error (${response.status})`);
-        }
-        const data = await response.json();
-        const id = data.id || data.pasteId || data._id;
-        if (!id) throw new Error('No se obtuvo ID de Voidexternal');
-        return {
-            id: id,
-            rawUrl: SERVICE_ENDPOINTS.voidexternal.raw(id)
-        };
-    }
-
-    // --- Crear paste en Rubis (placeholder - reemplazar con su API real) ---
-    async function createRubisPaste(content) {
-        const url = SERVICE_ENDPOINTS.rubis.post;
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: content })
-        });
-        if (!response.ok) {
-            throw new Error(`Rubis error (${response.status})`);
-        }
-        const data = await response.json();
-        const id = data.id || data.pasteId || data._id;
-        if (!id) throw new Error('No se obtuvo ID de Rubis');
-        return {
-            id: id,
-            rawUrl: SERVICE_ENDPOINTS.rubis.raw(id)
         };
     }
 
@@ -1025,23 +975,12 @@ end)`;
                     // 1. Ofuscar el script completo
                     const obfuscatedScript = await obfuscateWithWeAreDevs(fullScript);
                     
-                    // 2. Subir al servicio seleccionado
+                    // 2. Subir al servicio seleccionado (solo Pastefy u Oblivion)
                     let pasteResult;
-                    switch (selectedService) {
-                        case 'pastefy':
-                            pasteResult = await createPastefyPaste(obfuscatedScript);
-                            break;
-                        case 'oblivion':
-                            pasteResult = await createOblivionPaste(obfuscatedScript);
-                            break;
-                        case 'voidexternal':
-                            pasteResult = await createVoidexternalPaste(obfuscatedScript);
-                            break;
-                        case 'rubis':
-                            pasteResult = await createRubisPaste(obfuscatedScript);
-                            break;
-                        default:
-                            throw new Error('Servicio no soportado');
+                    if (selectedService === 'pastefy') {
+                        pasteResult = await createPastefyPaste(obfuscatedScript);
+                    } else { // 'oblivion'
+                        pasteResult = await createOblivionPaste(obfuscatedScript);
                     }
                     
                     const finalScript = `loadstring(game:HttpGet("${pasteResult.rawUrl}"))()`;
