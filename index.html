@@ -114,15 +114,13 @@
             </div>
         </div>
     </div>
-    <!-- Selector de servicios (oculto por defecto) -->
+    <!-- Selector de proveedores (solo se muestra cuando short está ON) -->
     <div id="shortServiceSelector" style="display: none; margin-top: 0.8rem;">
-        <label style="font-size:0.7rem; font-weight:600; letter-spacing:0.12em; color:#777; text-transform:uppercase; display:block; margin-bottom:0.3rem;">LINK PROVIDER</label>
-        <select id="shortServiceSelect" style="width:100%; padding:0.6rem 1rem; background:rgba(13,13,13,0.8); border:1px solid #1f1f1f; border-radius:10px; color:#ffffff; font-size:0.9rem; outline:none; cursor:pointer;">
-            <option value="pastefy">PASTEFY</option>
-            <option value="oblivion" selected>🔒 OBLIVIONHUB PRIVATE SHORTENER</option>
-            <option value="voidexternal">VOIDEXTERNAL</option>
-            <option value="rubis">RUBIS</option>
-        </select>
+        <label style="font-size:0.7rem; font-weight:600; letter-spacing:0.12em; color:#777; text-transform:uppercase; display:block; margin-bottom:0.5rem;">LINK PROVIDER</label>
+        <div class="provider-selector">
+            <button class="provider-btn" data-provider="pastefy">PASTEFY</button>
+            <button class="provider-btn active" data-provider="oblivion">OBLIVIONHUB PRIVATE SHORTENER</button>
+        </div>
     </div>
     <div id="guestLockMessage" class="guest-lock hidden">
         ⚠️ This feature requires authentication. Please <strong>Sign In</strong> with Discord.
