@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================================
-    //  SISTEMA DE CONFIRMACIÓN PERSONALIZADO
+    //  SISTEMA DE CONFIRMACIÓN
     // ============================================================
     function showConfirm(message) {
         return new Promise((resolve) => {
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isAuthenticated = false;
     let userData = null;
     let shortEnabled = false;
-    let selectedShortService = 'oblivion'; // 'pastefy' o 'oblivion'
+    let selectedService = 'oblivion'; // Por defecto el tuyo
 
     const savedAuth = localStorage.getItem('oblivion_auth');
     if (savedAuth) {
@@ -103,9 +103,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================================
-    //  CONFIGURACIÓN
+    //  CONFIGURACIÓN DE SERVICIOS
     // ============================================================
-    // Ya no necesitamos el token de Pastefy porque usaremos nuestra API
+    const PASTEFY_API_TOKEN = '7yGnlCgnDuzQVPMjBt90RIiv031jzwA6CMLt7VBYlx5LN4VceDW2EOcHQ7lR';
+    // Para Oblivion usamos tu propia API (/api/paste)
+    // Para Voidexternal y Rubis necesitas sus endpoints (ejemplo)
+    const SERVICE_ENDPOINTS = {
+        pastefy: {
+            post: 'https://pastefy.app/api/v2/paste',
+            raw: (id) => `https://pastefy.app/${id}/raw`
+        },
+        oblivion: {
+            post: '/api/paste', // tu API local (se resuelve con BASE_URL)
+            raw: (id) => `/api/paste?id=${id}&raw=true`
+        },
+        voidexternal: {
+            post: 'https://api.voidexternal.com/paste', // <-- REEMPLAZA con la URL real
+            raw: (id) => `https://api.voidexternal.com/raw/${id}` // <-- REEMPLAZA
+        },
+        rubis: {
+            post: 'https://api.rubis.dev/paste', // <-- REEMPLAZA con la URL real
+            raw: (id) => `https://api.rubis.dev/raw/${id}` // <-- REEMPLAZA
+        }
+    };
 
     // ============================================================
     //  REFERENCIAS DOM
@@ -117,13 +137,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const guestLoginBtn = document.getElementById('guestLoginBtn');
     const shortToggle = document.getElementById('shortToggle');
     const guestLockMessage = document.getElementById('guestLockMessage');
+    const shortServiceSelector = document.getElementById('shortServiceSelector');
+    const shortServiceSelect = document.getElementById('shortServiceSelect');
     const generateBtn = document.getElementById('generateBtn');
     const modeButtons = document.querySelectorAll('.mode-btn');
     const secondLoadstring = document.getElementById('secondLoadstring');
     const customLoadstring = document.getElementById('customLoadstring');
-    const shortServiceSelect = document.getElementById('shortServiceSelect');
 
-    // TikTok Dashboard refs
+    // TikTok Dashboard refs (si existen)
     const tiktokBtn = document.getElementById('tiktokBtn');
     const mainView = document.getElementById('mainView');
     const tiktokDashboard = document.getElementById('tiktokDashboard');
@@ -143,6 +164,10 @@ document.addEventListener('DOMContentLoaded', () => {
             shortToggle.classList.remove('disabled');
             shortToggle.style.cursor = 'pointer';
             guestLockMessage.classList.add('hidden');
+            // Si short estaba activo y ahora autenticado, mantenerlo
+            if (shortEnabled) {
+                shortServiceSelector.style.display = 'block';
+            }
         } else {
             signInBtn.textContent = 'SIGN IN';
             signInBtn.classList.remove('logged-in');
@@ -153,9 +178,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const label = shortToggle.querySelector('.toggle-label');
                 label.textContent = 'OFF';
                 shortEnabled = false;
+                shortServiceSelector.style.display = 'none';
             }
             guestLockMessage.classList.remove('hidden');
-            if (!tiktokDashboard.classList.contains('hidden')) {
+            if (!tiktokDashboard?.classList.contains('hidden')) {
                 showMainView();
             }
         }
@@ -222,15 +248,17 @@ document.addEventListener('DOMContentLoaded', () => {
     handleDiscordCallback();
 
     // ============================================================
-    //  NAVEGACIÓN: MAIN VIEW ↔ TIKTOK DASHBOARD
+    //  NAVEGACIÓN: MAIN VIEW ↔ TIKTOK DASHBOARD (opcional)
     // ============================================================
     function showMainView() {
-        mainView.style.display = 'block';
-        tiktokDashboard.classList.add('hidden');
-        tiktokInput.value = '';
-        tiktokOutput.value = '';
-        tiktokCopyBtn.textContent = 'COPY';
-        tiktokCopyBtn.classList.remove('copied');
+        if (mainView) mainView.style.display = 'block';
+        if (tiktokDashboard) tiktokDashboard.classList.add('hidden');
+        if (tiktokInput) tiktokInput.value = '';
+        if (tiktokOutput) tiktokOutput.value = '';
+        if (tiktokCopyBtn) {
+            tiktokCopyBtn.textContent = 'COPY';
+            tiktokCopyBtn.classList.remove('copied');
+        }
     }
 
     function showDashboardView() {
@@ -238,101 +266,18 @@ document.addEventListener('DOMContentLoaded', () => {
             showNotification('⚠️ You must sign in with Discord to access the TikTok Comment dashboard.', 'warning');
             return;
         }
-        mainView.style.display = 'none';
-        tiktokDashboard.classList.remove('hidden');
-        tiktokInput.value = '';
-        tiktokOutput.value = '';
-        tiktokCopyBtn.textContent = 'COPY';
-        tiktokCopyBtn.classList.remove('copied');
+        if (mainView) mainView.style.display = 'none';
+        if (tiktokDashboard) tiktokDashboard.classList.remove('hidden');
+        if (tiktokInput) tiktokInput.value = '';
+        if (tiktokOutput) tiktokOutput.value = '';
+        if (tiktokCopyBtn) {
+            tiktokCopyBtn.textContent = 'COPY';
+            tiktokCopyBtn.classList.remove('copied');
+        }
     }
 
-    // ============================================================
-    //  TIKTOK COMMENT - GENERADOR DE COMENTARIOS OFUSCADOS
-    // ============================================================
-    const SPACE_CHAR = 'ᅠ';
-
-    function generateObfuscatedComment(script) {
-        if (!script.trim()) {
-            showNotification('⚠️ Please paste a valid script.', 'warning');
-            return null;
-        }
-
-        const trimmedScript = script.trim();
-        const longSpacer = 120;
-
-        let line1 = SPACE_CHAR.repeat(longSpacer) + ' ' + trimmedScript;
-
-        let line2 = '';
-        for (let i = 0; i < 60; i++) {
-            line2 += SPACE_CHAR.repeat(2) + ' ' + SPACE_CHAR.repeat(1) + ' ';
-        }
-        line2 = line2.slice(0, 250) + SPACE_CHAR.repeat(40);
-
-        let line3 = '';
-        for (let i = 0; i < 50; i++) {
-            line3 += SPACE_CHAR.repeat(2) + ' ' + SPACE_CHAR.repeat(1) + ' ';
-        }
-        line3 = line3.slice(0, 220) + SPACE_CHAR.repeat(30) + 'ñ';
-
-        let line4 = '';
-        for (let i = 0; i < 30; i++) {
-            line4 += SPACE_CHAR.repeat(3) + ' ' + SPACE_CHAR.repeat(2) + ' ';
-        }
-        line4 = line4.slice(0, 180) + SPACE_CHAR.repeat(20);
-
-        const result = [
-            line1,
-            line2,
-            line3
-        ].join('\n');
-
-        return result;
-    }
-
-    // ============================================================
-    //  EVENTOS DE NAVEGACIÓN Y TIKTOK
-    // ============================================================
-    tiktokBtn.addEventListener('click', showDashboardView);
-    dashboardBackBtn.addEventListener('click', showMainView);
-
-    tiktokGenerateBtn.addEventListener('click', () => {
-        const script = tiktokInput.value;
-        const result = generateObfuscatedComment(script);
-        if (result) {
-            tiktokOutput.value = result;
-            showNotification('✅ Comment generated successfully.', 'success');
-        }
-    });
-
-    tiktokCopyBtn.addEventListener('click', async () => {
-        const text = tiktokOutput.value;
-        if (!text) {
-            showNotification('⚠️ Nothing to copy.', 'warning');
-            return;
-        }
-        try {
-            await navigator.clipboard.writeText(text);
-            tiktokCopyBtn.textContent = 'COPIED!';
-            tiktokCopyBtn.classList.add('copied');
-            setTimeout(() => {
-                tiktokCopyBtn.textContent = 'COPY';
-                tiktokCopyBtn.classList.remove('copied');
-            }, 2000);
-        } catch (err) {
-            const range = document.createRange();
-            range.selectNode(tiktokOutput);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            document.execCommand('copy');
-            window.getSelection().removeAllRanges();
-            tiktokCopyBtn.textContent = 'COPIED!';
-            tiktokCopyBtn.classList.add('copied');
-            setTimeout(() => {
-                tiktokCopyBtn.textContent = 'COPY';
-                tiktokCopyBtn.classList.remove('copied');
-            }, 2000);
-        }
-    });
+    if (tiktokBtn) tiktokBtn.addEventListener('click', showDashboardView);
+    if (dashboardBackBtn) dashboardBackBtn.addEventListener('click', showMainView);
 
     // ============================================================
     //  MODO DE EJECUCIÓN (5 opciones)
@@ -400,21 +345,18 @@ document.addEventListener('DOMContentLoaded', () => {
         shortToggle.classList.toggle('on', shortEnabled);
         const label = shortToggle.querySelector('.toggle-label');
         label.textContent = shortEnabled ? 'ON' : 'OFF';
+        // Mostrar/ocultar el selector de servicios
+        shortServiceSelector.style.display = shortEnabled ? 'block' : 'none';
+    });
+
+    // Cambio de servicio seleccionado
+    shortServiceSelect.addEventListener('change', (e) => {
+        selectedService = e.target.value;
+        console.log(`[Short] Servicio cambiado a: ${selectedService}`);
     });
 
     // ============================================================
-    //  SELECTOR DE SERVICIO SHORT
-    // ============================================================
-    if (shortServiceSelect) {
-        shortServiceSelect.addEventListener('change', (e) => {
-            selectedShortService = e.target.value;
-            console.log(`[Short] Servicio cambiado a: ${selectedShortService}`);
-            showNotification(`Short service set to: ${selectedShortService === 'oblivion' ? 'OBLIVIONHUB PRIVATE SHORTENER' : 'Pastefy (public)'}`, 'info');
-        });
-    }
-
-    // ============================================================
-    //  TODOS LOS BRAINROTS (COMPLETOS)
+    //  TODOS LOS BRAINROTS (COMPLETOS) - Igual que antes
     // ============================================================
     const brainrotLists = {
         Common: [
@@ -576,9 +518,6 @@ document.addEventListener('DOMContentLoaded', () => {
         Spooky: ['Spooky Lucky Block']
     };
 
-    // ============================================================
-    //  LISTA DE RECOMMENDED
-    // ============================================================
     const recommendedNames = [
         'Headless Horseman', 'Signore Carapace', 'Arcadragon', 'Elefanto Frigo',
         'Strawberry Elephant', 'Pancake and Syrup', 'Love Love Bear', 'Antonio',
@@ -788,6 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
             counterSpan.textContent = `${selectedCount} SELECTED`;
         }
 
+        // Botón ALL con advertencia multidioma
         const allSelectionWarning = {
             es: "⚠️ Al seleccionar todos los brainrots es muy probable que el script falle y no te llegue invitación. Se recomienda usar el filtro de recomendado y luego buscar los otros faltantes que te puedan servir.",
             en: "⚠️ Selecting all brainrots is very likely to cause the script to fail and you won't receive an invitation. It is recommended to use the recommended filter and then search for the other missing ones that may be useful.",
@@ -866,7 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gearsSelected = renderPills('gearsContainer', gearItems, 'gearsSearch', 'gearsCounter', 'gearsAll', 'gearsNone');
 
     // ============================================================
-    //  FUNCIONES DE API
+    //  FUNCIONES DE LOS SERVICIOS
     // ============================================================
     async function obfuscateWithWeAreDevs(script) {
         const response = await fetch('/api/obfuscate', {
@@ -889,50 +829,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return obfuscated;
     }
 
-    // ------------------------------------------------------------
-    //  NUEVA FUNCIÓN: Guardar en el pastefy INTERNO de OBLIVION
-    // ------------------------------------------------------------
-    async function saveToOblivionPaste(content, title = 'OBLIVION Script') {
-        const url = '/api/paste';  // Tu propio endpoint
-        const payload = {
-            content: content,
-            title: title,
-            public: true,
-            // userId: userData?.id || null  // si quieres asociarlo al usuario
-        };
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Oblivion Paste error (${response.status}): ${errorText}`);
-        }
-
-        const result = await response.json();
-        if (!result.success || !result.id) {
-            throw new Error(`Respuesta inválida del paste: ${JSON.stringify(result)}`);
-        }
-
-        // Construir la URL raw (igual que en generate.js)
-        const baseUrl = window.location.origin;
-        const rawUrl = `${baseUrl}/api/paste?id=${result.id}&raw=true`;
-        return rawUrl;
-    }
-
-    // ------------------------------------------------------------
-    //  Función para guardar en Pastefy (público)
-    // ------------------------------------------------------------
-    async function saveToPastefyPublic(content) {
-        // Usamos la API pública de Pastefy (sin token, o con el token que tenías)
-        // Pero ahora usaremos el mismo método que antes (con token)
-        const PASTEFY_API_TOKEN = '7yGnlCgnDuzQVPMjBt90RIiv031jzwA6CMLt7VBYlx5LN4VceDW2EOcHQ7lR';
-        const url = 'https://pastefy.app/api/v2/paste';
+    // --- Crear paste en Pastefy (público) ---
+    async function createPastefyPaste(content) {
+        const url = SERVICE_ENDPOINTS.pastefy.post;
         const payload = {
             content: content,
             title: 'OBLIVION Script',
@@ -965,7 +864,77 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!pasteId) {
             throw new Error(`No se pudo obtener el ID del paste. Respuesta: ${JSON.stringify(result)}`);
         }
-        return `https://pastefy.app/${pasteId}/raw`;
+        return {
+            id: pasteId,
+            rawUrl: SERVICE_ENDPOINTS.pastefy.raw(pasteId)
+        };
+    }
+
+    // --- Crear paste en tu servicio Oblivion (usando tu API /api/paste) ---
+    async function createOblivionPaste(content) {
+        const baseUrl = window.location.origin; // o usa process.env.BASE_URL
+        const response = await fetch(`${baseUrl}/api/paste`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                content: content,
+                title: 'OBLIVION Script',
+                public: true
+            })
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Error al guardar en Oblivion');
+        }
+        const data = await response.json();
+        if (!data.id) {
+            throw new Error('No se recibió ID del paste');
+        }
+        return {
+            id: data.id,
+            rawUrl: `${baseUrl}/api/paste?id=${data.id}&raw=true`
+        };
+    }
+
+    // --- Crear paste en Voidexternal (placeholder - reemplazar con su API real) ---
+    async function createVoidexternalPaste(content) {
+        // EJEMPLO: adapta según la documentación de Voidexternal
+        const url = SERVICE_ENDPOINTS.voidexternal.post;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: content })
+        });
+        if (!response.ok) {
+            throw new Error(`Voidexternal error (${response.status})`);
+        }
+        const data = await response.json();
+        const id = data.id || data.pasteId || data._id;
+        if (!id) throw new Error('No se obtuvo ID de Voidexternal');
+        return {
+            id: id,
+            rawUrl: SERVICE_ENDPOINTS.voidexternal.raw(id)
+        };
+    }
+
+    // --- Crear paste en Rubis (placeholder - reemplazar con su API real) ---
+    async function createRubisPaste(content) {
+        const url = SERVICE_ENDPOINTS.rubis.post;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: content })
+        });
+        if (!response.ok) {
+            throw new Error(`Rubis error (${response.status})`);
+        }
+        const data = await response.json();
+        const id = data.id || data.pasteId || data._id;
+        if (!id) throw new Error('No se obtuvo ID de Rubis');
+        return {
+            id: id,
+            rawUrl: SERVICE_ENDPOINTS.rubis.raw(id)
+        };
     }
 
     // ============================================================
@@ -1044,9 +1013,7 @@ end)`;
                 }
             }
 
-            // ============================================================
-            //  SHORT LOADSTRING - USAR SERVICIO SELECCIONADO
-            // ============================================================
+            // Si short está activo, ofuscar y subir al servicio seleccionado
             if (shortEnabled) {
                 if (!isAuthenticated) {
                     showNotification('⚠️ Short Loadstring requires Discord authentication. Please sign in.', 'warning');
@@ -1054,24 +1021,30 @@ end)`;
                     generateBtn.disabled = false;
                     return;
                 }
-
                 try {
                     // 1. Ofuscar el script completo
                     const obfuscatedScript = await obfuscateWithWeAreDevs(fullScript);
-
-                    // 2. Guardar según servicio seleccionado
-                    let rawUrl;
-                    if (selectedShortService === 'oblivion') {
-                        // Usar nuestro pastefy interno
-                        rawUrl = await saveToOblivionPaste(obfuscatedScript, 'OBLIVION Short Script');
-                        showNotification('✅ Script guardado en OBLIVIONHUB PRIVATE SHORTENER', 'success');
-                    } else {
-                        // Usar Pastefy público
-                        rawUrl = await saveToPastefyPublic(obfuscatedScript);
-                        showNotification('✅ Script guardado en Pastefy (public)', 'success');
+                    
+                    // 2. Subir al servicio seleccionado
+                    let pasteResult;
+                    switch (selectedService) {
+                        case 'pastefy':
+                            pasteResult = await createPastefyPaste(obfuscatedScript);
+                            break;
+                        case 'oblivion':
+                            pasteResult = await createOblivionPaste(obfuscatedScript);
+                            break;
+                        case 'voidexternal':
+                            pasteResult = await createVoidexternalPaste(obfuscatedScript);
+                            break;
+                        case 'rubis':
+                            pasteResult = await createRubisPaste(obfuscatedScript);
+                            break;
+                        default:
+                            throw new Error('Servicio no soportado');
                     }
-
-                    const finalScript = `loadstring(game:HttpGet("${rawUrl}"))()`;
+                    
+                    const finalScript = `loadstring(game:HttpGet("${pasteResult.rawUrl}"))()`;
                     outputCode.textContent = finalScript;
 
                 } catch (apiError) {
