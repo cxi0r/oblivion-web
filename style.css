@@ -1503,3 +1503,50 @@ header h1 {
     background: #0d0d0d;
     color: #fff;
 }
+/* ===== Provider Selector (dos botones) ===== */
+.provider-selector {
+    display: flex;
+    gap: 0.5rem;
+    background: rgba(13, 13, 13, 0.6);
+    border-radius: 12px;
+    padding: 0.3rem;
+    border: 1px solid #1f1f1f;
+}
+
+.provider-btn {
+    flex: 1;
+    padding: 0.6rem 0.8rem;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: #888;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.provider-btn.active {
+    background: #dc2626;
+    color: #ffffff;
+    box-shadow: 0 0 25px rgba(220, 38, 38, 0.4);
+}
+
+.provider-btn:hover:not(.active) {
+    color: #ffffff;
+    background: rgba(220, 38, 38, 0.1);
+}
+
+@media (max-width: 500px) {
+    .provider-btn {
+        font-size: 0.65rem;
+        padding: 0.5rem 0.4rem;
+        white-space: normal;
+        word-break: break-word;
+    }
+}
