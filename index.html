@@ -105,7 +105,7 @@
     <div class="short-header">
         <div>
             <h2>SHORT LOADSTRING</h2>
-            <p class="subtitle">USE TINY DATABASE LINK (this method obfuscates the code and sends it to Pastefy)</p>
+            <p class="subtitle">USE TINY DATABASE LINK (this method obfuscates the code and sends it to selected provider)</p>
         </div>
         <div class="toggle-switch" id="shortToggle">
             <span class="toggle-label off">OFF</span>
@@ -114,26 +114,15 @@
             </div>
         </div>
     </div>
-    <!-- NUEVO SELECTOR DE SERVICIO -->
-    <div id="shortServiceSelector" style="margin-top: 0.8rem; display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;">
-        <span style="font-size: 0.75rem; color: #888888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Service:</span>
-        <select id="shortServiceSelect" style="
-            background: rgba(5,5,5,0.6);
-            border: 1px solid #1f1f1f;
-            border-radius: 8px;
-            padding: 0.4rem 0.8rem;
-            color: #ffffff;
-            font-size: 0.8rem;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-            cursor: pointer;
-            transition: all 0.25s;
-            min-width: 200px;
-        ">
-            <option value="pastefy">Pastefy (public)</option>
+    <!-- Selector de servicios (oculto por defecto) -->
+    <div id="shortServiceSelector" style="display: none; margin-top: 0.8rem;">
+        <label style="font-size:0.7rem; font-weight:600; letter-spacing:0.12em; color:#777; text-transform:uppercase; display:block; margin-bottom:0.3rem;">LINK PROVIDER</label>
+        <select id="shortServiceSelect" style="width:100%; padding:0.6rem 1rem; background:rgba(13,13,13,0.8); border:1px solid #1f1f1f; border-radius:10px; color:#ffffff; font-size:0.9rem; outline:none; cursor:pointer;">
+            <option value="pastefy">PASTEFY</option>
             <option value="oblivion" selected>🔒 OBLIVIONHUB PRIVATE SHORTENER</option>
+            <option value="voidexternal">VOIDEXTERNAL</option>
+            <option value="rubis">RUBIS</option>
         </select>
-        <span style="font-size: 0.65rem; color: #555555; font-style: italic;">(select where to store the obfuscated script)</span>
     </div>
     <div id="guestLockMessage" class="guest-lock hidden">
         ⚠️ This feature requires authentication. Please <strong>Sign In</strong> with Discord.
