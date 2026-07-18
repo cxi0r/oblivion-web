@@ -1473,3 +1473,33 @@ header h1 {
         width: 100%;
     }
 }
+/* ===== Short Service Selector ===== */
+#shortServiceSelector {
+    transition: opacity 0.3s ease;
+}
+
+#shortServiceSelector select {
+    background: rgba(13, 13, 13, 0.9);
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    color: #eee;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.7rem 1rem;
+    width: 100%;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    cursor: pointer;
+}
+
+#shortServiceSelector select:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.15);
+}
+
+#shortServiceSelector select option {
+    background: #0d0d0d;
+    color: #fff;
+}
