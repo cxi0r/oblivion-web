@@ -487,7 +487,8 @@ document.addEventListener('DOMContentLoaded', () => {
             'Trenostruzzo Turbo 4000', 'Trickolino', 'Triplito Tralaleritos',
             'Tuff Toucan', 'Ventoliero Pavonero', 'Venuspino', 'Vulturino Skeletono',
             'W or L', 'Yess my examine', 'Zombie Tralala', '4th Bros', 'Capitano Americano', 
-            'Bufalino Boomberino', 'Esok Goala', 'Los Tangcitos', 'Los Tictacs', 'Los Admins', 'Moby Bros', 'Var Var Var'
+            'Bufalino Boomberino', 'Esok Goala', 'Los Tangcitos', 'Los Tictacs', 'Los Admins', 'Moby Bros', 'Var Var Var',
+            'Noodle Noodle Poodle', 'Grabatron', 'Cangurato Gelato', 'Rubiko and Kubiko'
         ],
         OG: [
             'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
@@ -550,7 +551,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'Steakini Fattini', 'Stoppo Luminino', 'Buho de Fuego',
         'Esok Goala', 'Capitano Americano', 'Bufalino Boomberino',
         'Tuff Toucan', 'Moby Bros', 'Los Admins', 'Los Tictacs',
-        'Los Tangcitos', 'Los Fruits', 'Var Var Var'
+        'Los Tangcitos', 'Los Fruits', 'Var Var Var', 'Noodle Noodle Poodle',
+        'Grabatron', 'Cangurato Gelato', 'Rubiko and Kubiko'
     ];
 
     const brainrotData = [];
@@ -567,7 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const skinItems = [
         'Rose', 'Gingerbread', 'Halloween', 'Christmas', 'Bunny Basket',
         'Summer', 'Pot of Gold', 'Taco', 'Octo', 'Valentines',
-        'Easter', 'Lucky', 'Aquatic'
+        'Easter', 'Lucky', 'Aquatic', 'Summer', 'Tralalero'
     ];
 
     const gearItems = [
