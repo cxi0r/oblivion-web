@@ -571,7 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const skinItems = [
         'Rose', 'Gingerbread', 'Halloween', 'Christmas', 'Bunny Basket',
         'Summer', 'Pot of Gold', 'Taco', 'Octo', 'Valentines',
-        'Easter', 'Lucky', 'Aquatic', 'Summer', 'Tralalero'
+        'Easter', 'Lucky', 'Aquatic', 'Tralalero'
     ];
 
     const gearItems = [
