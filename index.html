@@ -100,12 +100,12 @@
                 <div class="items-container scrollable" id="gearsContainer"></div>
             </section>
 
-            <!-- ===== OBFUSCATE TOGGLE (nuevo) ===== -->
+            <!-- ===== OBFUSCATE TOGGLE ===== -->
             <section class="obfuscate-section">
                 <div class="short-header">
                     <div>
                         <h2>OBFUSCATE</h2>
-                        <p class="subtitle">Ofusca el código antes de generar el loadstring</p>
+                        <p class="subtitle">Obfuscate the script using WeAreDevs API</p>
                     </div>
                     <div class="toggle-switch" id="obfuscateToggle">
                         <span class="toggle-label off">OFF</span>
@@ -119,12 +119,12 @@
                 </div>
             </section>
 
-            <!-- ===== GITHUB LOADER (nuevo) ===== -->
-            <section class="github-loader-section" id="githubLoaderSection">
+            <!-- ===== GITHUB LOADER ===== -->
+            <section class="github-loader-section">
                 <div class="short-header">
                     <div>
                         <h2>GITHUB LOADER</h2>
-                        <p class="subtitle">Sube tu script ofuscado a GitHub y obtén un loadstring</p>
+                        <p class="subtitle">Upload obfuscated script to GitHub and get a loadstring</p>
                     </div>
                     <div class="toggle-switch" id="githubToggle">
                         <span class="toggle-label off">OFF</span>
@@ -134,20 +134,20 @@
                     </div>
                 </div>
                 <div id="githubNameContainer" style="display: none; margin-top: 0.8rem;">
-                    <label style="font-size:0.7rem; font-weight:600; letter-spacing:0.12em; color:#777; text-transform:uppercase; display:block; margin-bottom:0.3rem;">NOMBRE DE TU SCRIPT PARA GITHUB</label>
-                    <input type="text" id="githubScriptName" placeholder="ej: MiScript" style="width:100%; padding:0.6rem 1rem; background:rgba(5,5,5,0.6); border:1px solid #1f1f1f; border-radius:10px; color:#fff; font-size:0.9rem; outline:none;" />
+                    <label style="font-size:0.7rem; font-weight:600; letter-spacing:0.12em; color:#777; text-transform:uppercase; display:block; margin-bottom:0.3rem;">SCRIPT NAME FOR GITHUB</label>
+                    <input type="text" id="githubScriptName" placeholder="e.g. MyScript" style="width:100%; padding:0.6rem 1rem; background:rgba(5,5,5,0.6); border:1px solid #1f1f1f; border-radius:10px; color:#fff; font-size:0.9rem; outline:none;" />
                 </div>
                 <div id="githubGuestLock" class="guest-lock hidden">
                     ⚠️ This feature requires authentication. Please <strong>Sign In</strong> with Discord.
                 </div>
             </section>
 
-            <!-- ===== SHORT LOADSTRING (existente) ===== -->
-            <section class="short-loadstring-section" id="shortLoadstringSection">
+            <!-- ===== SHORT LOADSTRING ===== -->
+            <section class="short-loadstring-section">
                 <div class="short-header">
                     <div>
                         <h2>SHORT LOADSTRING</h2>
-                        <p class="subtitle">USE TINY DATABASE LINK (this method obfuscates the code and sends it to selected provider)</p>
+                        <p class="subtitle">Use a database link (Pastefy or Oblivion Private)</p>
                     </div>
                     <div class="toggle-switch" id="shortToggle">
                         <span class="toggle-label off">OFF</span>
@@ -156,12 +156,11 @@
                         </div>
                     </div>
                 </div>
-                <!-- Selector de proveedores (solo se muestra cuando short está ON) -->
                 <div id="shortServiceSelector" style="display: none; margin-top: 0.8rem;">
                     <label style="font-size:0.7rem; font-weight:600; letter-spacing:0.12em; color:#777; text-transform:uppercase; display:block; margin-bottom:0.5rem;">LINK PROVIDER</label>
                     <div class="provider-selector">
                         <button class="provider-btn" data-provider="pastefy">PASTEFY</button>
-                        <button class="provider-btn active" data-provider="oblivion">OBLIVIONHUB PRIVATE SHORTENER</button>
+                        <button class="provider-btn active" data-provider="oblivion">OBLIVIONHUB PRIVATE</button>
                     </div>
                 </div>
                 <div id="guestLockMessage" class="guest-lock hidden">
@@ -200,7 +199,7 @@
             <div class="dashboard-header">
                 <button id="dashboardBackBtn" class="dashboard-back-btn">← BACK</button>
                 <h1>TIKTOK COMMENT DASHBOARD</h1>
-                <div></div> <!-- spacer -->
+                <div></div>
             </div>
             <div class="dashboard-content">
                 <p class="dashboard-subtitle">Paste your script (loadstring) and generate an obfuscated TikTok comment.</p>
