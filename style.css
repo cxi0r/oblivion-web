@@ -95,6 +95,8 @@ header h1 {
 .mode-label,
 .target-section h2,
 .short-loadstring-section h2,
+.obfuscate-section h2,
+.github-loader-section h2,
 .output-header h2,
 .login-modal-header h2,
 .confirm-modal-header h2 {
@@ -405,7 +407,10 @@ header h1 {
     box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
 }
 
-.short-loadstring-section {
+/* ===== Secciones comunes (Short, Obfuscate, GitHub) ===== */
+.short-loadstring-section,
+.obfuscate-section,
+.github-loader-section {
     background: rgba(13, 13, 13, 0.7);
     backdrop-filter: blur(6px);
     border: 1px solid rgba(31, 31, 31, 0.6);
@@ -416,7 +421,9 @@ header h1 {
     position: relative;
 }
 
-.short-loadstring-section:hover {
+.short-loadstring-section:hover,
+.obfuscate-section:hover,
+.github-loader-section:hover {
     border-color: #2a2a2a;
 }
 
@@ -516,6 +523,40 @@ header h1 {
     color: #dc2626;
 }
 
+/* Campo de nombre para GitHub */
+#githubNameContainer {
+    margin-top: 0.8rem;
+}
+
+#githubNameContainer label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: #777777;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+#githubScriptName {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    background: rgba(5, 5, 5, 0.6);
+    border: 1px solid #1f1f1f;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 0.9rem;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    transition: border 0.3s;
+}
+
+#githubScriptName:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.1);
+}
+
+/* ===== Botón generar ===== */
 #generateBtn {
     width: 100%;
     padding: 1.2rem 0;
@@ -566,6 +607,7 @@ header h1 {
     transform: none !important;
 }
 
+/* ===== Output ===== */
 #outputSection {
     margin-top: 2rem;
     background: rgba(13, 13, 13, 0.8);
@@ -1049,203 +1091,6 @@ header h1 {
     }
 }
 
-/* ===== TikTok Modal ===== */
-.tiktok-modal-content {
-    max-width: 600px;
-    padding: 2rem;
-}
-
-.tiktok-input-group,
-.tiktok-output-group {
-    margin: 1rem 0;
-}
-
-.tiktok-input-group label,
-.tiktok-output-group label {
-    display: block;
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    color: #777777;
-    text-transform: uppercase;
-    margin-bottom: 0.4rem;
-}
-
-.tiktok-input-group textarea,
-.tiktok-output-group textarea {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    background: rgba(5, 5, 5, 0.6);
-    border: 1px solid #1f1f1f;
-    border-radius: 10px;
-    color: #ffffff;
-    font-size: 0.9rem;
-    font-family: 'JetBrains Mono', 'Courier New', monospace;
-    resize: vertical;
-    outline: none;
-    transition: border 0.2s;
-    box-sizing: border-box;
-}
-
-.tiktok-input-group textarea:focus,
-.tiktok-output-group textarea:focus {
-    border-color: #dc2626;
-}
-
-.tiktok-output-group textarea {
-    background: rgba(5, 5, 5, 0.3);
-    cursor: default;
-    color: #cccccc;
-    white-space: pre-wrap;
-    word-break: break-all;
-}
-
-.tiktok-generate-btn,
-.tiktok-copy-btn {
-    width: 100%;
-    padding: 0.7rem 0;
-    border: 1px solid #1f1f1f;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.25s;
-    font-family: 'Inter', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-top: 0.5rem;
-}
-
-.tiktok-generate-btn {
-    background: #dc2626;
-    color: #ffffff;
-    border-color: #dc2626;
-}
-
-.tiktok-generate-btn:hover {
-    background: #b91c1c;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
-}
-
-.tiktok-copy-btn {
-    background: rgba(5, 5, 5, 0.6);
-    color: #aaaaaa;
-    border-color: #1f1f1f;
-}
-
-.tiktok-copy-btn:hover {
-    border-color: #dc2626;
-    color: #ffffff;
-    background: rgba(220, 38, 38, 0.1);
-}
-
-.tiktok-copy-btn.copied {
-    border-color: #22c55e;
-    color: #22c55e;
-    background: rgba(34, 197, 94, 0.1);
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 600px) {
-    header h1 {
-        font-size: 2.8rem;
-    }
-    .mode-buttons {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    .mode-btn {
-        flex: 1;
-    }
-    .search-bar input {
-        min-width: 100%;
-    }
-    .search-bar button {
-        flex: 1;
-        text-align: center;
-    }
-    .items-container {
-        max-height: 140px;
-    }
-    .target-section,
-    .short-loadstring-section,
-    #outputSection {
-        padding: 1rem;
-    }
-    .short-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-    }
-    .toggle-switch {
-        justify-content: flex-end;
-    }
-    .rarity-filters {
-        gap: 0.3rem;
-    }
-    .filter-btn {
-        font-size: 0.6rem;
-        padding: 0.2rem 0.6rem;
-    }
-    .output-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-    }
-    #copyBtn {
-        align-self: flex-end;
-    }
-    .login-modal-content {
-        padding: 1.8rem 1.2rem;
-        margin: 1rem;
-    }
-    .confirm-modal-content {
-        padding: 1.5rem 1.2rem;
-        margin: 1rem;
-    }
-    .notification-container {
-        top: 0.5rem;
-        right: 0.5rem;
-        left: 0.5rem;
-        max-width: none;
-        width: auto;
-    }
-    .notification {
-        font-size: 0.8rem;
-        padding: 0.8rem 1rem;
-    }
-    .app-footer {
-        font-size: 0.75rem;
-        gap: 0.4rem;
-    }
-    .discord-icon {
-        width: 18px;
-        height: 18px;
-    }
-    .tiktok-modal-content {
-        max-width: 95%;
-        padding: 1.2rem;
-    }
-    .tiktok-input-group textarea,
-    .tiktok-output-group textarea {
-        font-size: 0.8rem;
-    }
-}
-
-@media (max-width: 400px) {
-    header h1 {
-        font-size: 2.2rem;
-    }
-    .pill {
-        font-size: 0.7rem;
-        padding: 0.25rem 0.9rem;
-    }
-    .sign-in-btn {
-        font-size: 0.6rem;
-        padding: 0.3rem 0.8rem;
-    }
-}
 /* ===== TikTok Dashboard ===== */
 #tiktokDashboard {
     position: fixed;
@@ -1420,90 +1265,7 @@ header h1 {
     background: rgba(34, 197, 94, 0.1);
 }
 
-/* Responsive dashboard */
-@media (max-width: 600px) {
-    .dashboard-header h1 {
-        font-size: 1.4rem;
-    }
-    .dashboard-container {
-        padding: 1rem;
-    }
-    .tiktok-input-group textarea,
-    .tiktok-output-group textarea {
-        font-size: 0.8rem;
-    }
-}
-/* ===== Short Service Selector ===== */
-#shortServiceSelector select {
-    background: rgba(5,5,5,0.6);
-    border: 1px solid #1f1f1f;
-    border-radius: 8px;
-    padding: 0.4rem 0.8rem;
-    color: #ffffff;
-    font-size: 0.8rem;
-    font-family: 'Inter', sans-serif;
-    outline: none;
-    cursor: pointer;
-    transition: all 0.25s;
-    min-width: 200px;
-}
-
-#shortServiceSelector select:hover {
-    border-color: #dc2626;
-}
-
-#shortServiceSelector select:focus {
-    border-color: #dc2626;
-    box-shadow: 0 0 15px rgba(220, 38, 38, 0.15);
-}
-
-#shortServiceSelector select option {
-    background: #0d0d0d;
-    color: #ffffff;
-}
-
-@media (max-width: 600px) {
-    #shortServiceSelector {
-        flex-direction: column;
-        align-items: stretch !important;
-        gap: 0.4rem !important;
-    }
-    #shortServiceSelector select {
-        min-width: unset;
-        width: 100%;
-    }
-}
-/* ===== Short Service Selector ===== */
-#shortServiceSelector {
-    transition: opacity 0.3s ease;
-}
-
-#shortServiceSelector select {
-    background: rgba(13, 13, 13, 0.9);
-    border: 1px solid #2a2a2a;
-    border-radius: 10px;
-    color: #eee;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    padding: 0.7rem 1rem;
-    width: 100%;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 1rem center;
-    cursor: pointer;
-}
-
-#shortServiceSelector select:focus {
-    border-color: #dc2626;
-    box-shadow: 0 0 15px rgba(220, 38, 38, 0.15);
-}
-
-#shortServiceSelector select option {
-    background: #0d0d0d;
-    color: #fff;
-}
-/* ===== Provider Selector (dos botones) ===== */
+/* ===== Provider Selector ===== */
 .provider-selector {
     display: flex;
     gap: 0.5rem;
@@ -1542,6 +1304,114 @@ header h1 {
     background: rgba(220, 38, 38, 0.1);
 }
 
+#shortServiceSelector {
+    transition: opacity 0.3s ease;
+    margin-top: 0.8rem;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 2.8rem;
+    }
+    .mode-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .mode-btn {
+        flex: 1;
+    }
+    .search-bar input {
+        min-width: 100%;
+    }
+    .search-bar button {
+        flex: 1;
+        text-align: center;
+    }
+    .items-container {
+        max-height: 140px;
+    }
+    .target-section,
+    .short-loadstring-section,
+    .obfuscate-section,
+    .github-loader-section,
+    #outputSection {
+        padding: 1rem;
+    }
+    .short-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    .toggle-switch {
+        justify-content: flex-end;
+    }
+    .rarity-filters {
+        gap: 0.3rem;
+    }
+    .filter-btn {
+        font-size: 0.6rem;
+        padding: 0.2rem 0.6rem;
+    }
+    .output-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    #copyBtn {
+        align-self: flex-end;
+    }
+    .login-modal-content {
+        padding: 1.8rem 1.2rem;
+        margin: 1rem;
+    }
+    .confirm-modal-content {
+        padding: 1.5rem 1.2rem;
+        margin: 1rem;
+    }
+    .notification-container {
+        top: 0.5rem;
+        right: 0.5rem;
+        left: 0.5rem;
+        max-width: none;
+        width: auto;
+    }
+    .notification {
+        font-size: 0.8rem;
+        padding: 0.8rem 1rem;
+    }
+    .app-footer {
+        font-size: 0.75rem;
+        gap: 0.4rem;
+    }
+    .discord-icon {
+        width: 18px;
+        height: 18px;
+    }
+    .tiktok-modal-content {
+        max-width: 95%;
+        padding: 1.2rem;
+    }
+    .tiktok-input-group textarea,
+    .tiktok-output-group textarea {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 400px) {
+    header h1 {
+        font-size: 2.2rem;
+    }
+    .pill {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.9rem;
+    }
+    .sign-in-btn {
+        font-size: 0.6rem;
+        padding: 0.3rem 0.8rem;
+    }
+}
+
 @media (max-width: 500px) {
     .provider-btn {
         font-size: 0.65rem;
@@ -1549,61 +1419,4 @@ header h1 {
         white-space: normal;
         word-break: break-word;
     }
-    /* ===== Obfuscate Section ===== */
-.obfuscate-section {
-    background: rgba(13, 13, 13, 0.7);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(31, 31, 31, 0.6);
-    border-radius: 16px;
-    padding: 1.4rem 1.2rem;
-    margin-bottom: 1.8rem;
-    transition: border-color 0.3s;
-    position: relative;
 }
-.obfuscate-section:hover {
-    border-color: #2a2a2a;
-}
-/* ===== GitHub Loader ===== */
-.github-loader-section {
-    background: rgba(13, 13, 13, 0.7);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(31, 31, 31, 0.6);
-    border-radius: 16px;
-    padding: 1.4rem 1.2rem;
-    margin-bottom: 1.8rem;
-    transition: border-color 0.3s;
-    position: relative;
-}
-.github-loader-section:hover {
-    border-color: #2a2a2a;
-}
-    /* ===== Obfuscate Section ===== */
-.obfuscate-section {
-    background: rgba(13, 13, 13, 0.7);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(31, 31, 31, 0.6);
-    border-radius: 16px;
-    padding: 1.4rem 1.2rem;
-    margin-bottom: 1.8rem;
-    transition: border-color 0.3s;
-    position: relative;
-}
-.obfuscate-section:hover {
-    border-color: #2a2a2a;
-}
-
-/* ===== GitHub Loader ===== */
-.github-loader-section {
-    background: rgba(13, 13, 13, 0.7);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(31, 31, 31, 0.6);
-    border-radius: 16px;
-    padding: 1.4rem 1.2rem;
-    margin-bottom: 1.8rem;
-    transition: border-color 0.3s;
-    position: relative;
-}
-.github-loader-section:hover {
-    border-color: #2a2a2a;
-}
-
