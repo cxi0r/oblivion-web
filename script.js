@@ -92,6 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let userData = null;
     let shortEnabled = false;
     let selectedService = 'oblivion'; // Por defecto el tuyo
+    let githubEnabled = false;
+    let obfuscateEnabled = false;
 
     const savedAuth = localStorage.getItem('oblivion_auth');
     if (savedAuth) {
@@ -124,7 +126,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const secondLoadstring = document.getElementById('secondLoadstring');
     const customLoadstring = document.getElementById('customLoadstring');
 
-    // TikTok Dashboard refs (si existen)
+    // Nuevos elementos
+    const obfuscateToggle = document.getElementById('obfuscateToggle');
+    const obfuscateGuestLock = document.getElementById('obfuscateGuestLock');
+    const githubToggle = document.getElementById('githubToggle');
+    const githubNameContainer = document.getElementById('githubNameContainer');
+    const githubScriptName = document.getElementById('githubScriptName');
+    const githubGuestLock = document.getElementById('githubGuestLock');
+
+    // TikTok Dashboard refs
     const tiktokBtn = document.getElementById('tiktokBtn');
     const mainView = document.getElementById('mainView');
     const tiktokDashboard = document.getElementById('tiktokDashboard');
@@ -141,16 +151,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isAuthenticated) {
             signInBtn.textContent = userData?.username ? `👤 ${userData.username}` : 'LOGGED IN';
             signInBtn.classList.add('logged-in');
+            // Short
             shortToggle.classList.remove('disabled');
             shortToggle.style.cursor = 'pointer';
             guestLockMessage.classList.add('hidden');
-            // Si short estaba activo y ahora autenticado, mantenerlo
+            // Obfuscate
+            obfuscateToggle.classList.remove('disabled');
+            obfuscateToggle.style.cursor = 'pointer';
+            obfuscateGuestLock.classList.add('hidden');
+            // GitHub
+            githubToggle.classList.remove('disabled');
+            githubToggle.style.cursor = 'pointer';
+            githubGuestLock.classList.add('hidden');
             if (shortEnabled) {
                 shortServiceSelector.style.display = 'block';
             }
         } else {
             signInBtn.textContent = 'SIGN IN';
             signInBtn.classList.remove('logged-in');
+            // Short
             shortToggle.classList.add('disabled');
             shortToggle.style.cursor = 'not-allowed';
             if (shortToggle.classList.contains('on')) {
@@ -161,6 +180,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 shortServiceSelector.style.display = 'none';
             }
             guestLockMessage.classList.remove('hidden');
+            // Obfuscate
+            obfuscateToggle.classList.add('disabled');
+            obfuscateToggle.style.cursor = 'not-allowed';
+            if (obfuscateToggle.classList.contains('on')) {
+                obfuscateToggle.classList.remove('on');
+                const label = obfuscateToggle.querySelector('.toggle-label');
+                label.textContent = 'OFF';
+                obfuscateEnabled = false;
+            }
+            obfuscateGuestLock.classList.remove('hidden');
+            // GitHub
+            githubToggle.classList.add('disabled');
+            githubToggle.style.cursor = 'not-allowed';
+            githubGuestLock.classList.remove('hidden');
+            if (githubToggle.classList.contains('on')) {
+                githubToggle.classList.remove('on');
+                const label = githubToggle.querySelector('.toggle-label');
+                label.textContent = 'OFF';
+                githubEnabled = false;
+                githubNameContainer.style.display = 'none';
+                githubScriptName.value = '';
+            }
             if (!tiktokDashboard?.classList.contains('hidden')) {
                 showMainView();
             }
@@ -173,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userData = { username: 'Guest', avatar: null };
         loginModal.classList.add('hidden');
         updateUIForAuth();
-        showNotification('You are now using OBLIVION as Guest. Short Loadstring is disabled.', 'info');
+        showNotification('You are now using OBLIVION as Guest. Advanced features require sign-in.', 'info');
     }
 
     function loginWithDiscord() {
@@ -228,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
     handleDiscordCallback();
 
     // ============================================================
-    //  NAVEGACIÓN: MAIN VIEW ↔ TIKTOK DASHBOARD (opcional)
+    //  NAVEGACIÓN: MAIN VIEW ↔ TIKTOK DASHBOARD
     // ============================================================
     function showMainView() {
         if (mainView) mainView.style.display = 'block';
@@ -260,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dashboardBackBtn) dashboardBackBtn.addEventListener('click', showMainView);
 
     // ============================================================
-    //  MODO DE EJECUCIÓN (5 opciones)
+    //  MODO DE EJECUCIÓN
     // ============================================================
     function updateModeUI(selectedMode) {
         const modeConfig = {
@@ -314,33 +355,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================================
+    //  OBFUSCATE TOGGLE
+    // ============================================================
+    obfuscateToggle.addEventListener('click', () => {
+        if (!isAuthenticated) {
+            showNotification('⚠️ You must sign in with Discord to use Obfuscate.', 'warning');
+            return;
+        }
+        obfuscateEnabled = !obfuscateEnabled;
+        obfuscateToggle.classList.toggle('on', obfuscateEnabled);
+        const label = obfuscateToggle.querySelector('.toggle-label');
+        label.textContent = obfuscateEnabled ? 'ON' : 'OFF';
+    });
+
+    // ============================================================
+    //  GITHUB LOADER TOGGLE
+    // ============================================================
+    githubToggle.addEventListener('click', () => {
+        if (!isAuthenticated) {
+            showNotification('⚠️ You must sign in with Discord to use GitHub Loader.', 'warning');
+            return;
+        }
+        // Si Short estaba activo, lo desactivamos (exclusión mutua)
+        if (shortEnabled) {
+            shortEnabled = false;
+            shortToggle.classList.remove('on');
+            const shortLabel = shortToggle.querySelector('.toggle-label');
+            shortLabel.textContent = 'OFF';
+            shortServiceSelector.style.display = 'none';
+        }
+        githubEnabled = !githubEnabled;
+        githubToggle.classList.toggle('on', githubEnabled);
+        const label = githubToggle.querySelector('.toggle-label');
+        label.textContent = githubEnabled ? 'ON' : 'OFF';
+        githubNameContainer.style.display = githubEnabled ? 'block' : 'none';
+        if (!githubEnabled) {
+            githubScriptName.value = '';
+        }
+    });
+
+    // ============================================================
     //  SHORT LOADSTRING TOGGLE
     // ============================================================
-    shortToggle.addEventListener('click', (e) => {
+    shortToggle.addEventListener('click', () => {
         if (!isAuthenticated) {
             showNotification('⚠️ You must sign in with Discord to use Short Loadstring.', 'warning');
             return;
+        }
+        // Si GitHub estaba activo, lo desactivamos (exclusión mutua)
+        if (githubEnabled) {
+            githubEnabled = false;
+            githubToggle.classList.remove('on');
+            const githubLabel = githubToggle.querySelector('.toggle-label');
+            githubLabel.textContent = 'OFF';
+            githubNameContainer.style.display = 'none';
+            githubScriptName.value = '';
         }
         shortEnabled = !shortEnabled;
         shortToggle.classList.toggle('on', shortEnabled);
         const label = shortToggle.querySelector('.toggle-label');
         label.textContent = shortEnabled ? 'ON' : 'OFF';
-        // Mostrar/ocultar el selector de servicios
         shortServiceSelector.style.display = shortEnabled ? 'block' : 'none';
     });
 
     // ============================================================
     //  SELECTOR DE PROVEEDOR (dos botones)
     // ============================================================
-    // Por defecto, el botón de Oblivion ya tiene la clase 'active' en HTML,
-    // pero aseguramos que selectedService coincida.
     providerBtns.forEach(btn => {
         btn.addEventListener('click', function() {
-            // Quitar clase activa a todos
             providerBtns.forEach(b => b.classList.remove('active'));
-            // Activar el botón clicado
             this.classList.add('active');
-            // Guardar el servicio seleccionado
             selectedService = this.dataset.provider;
             console.log(`[Short] Servicio cambiado a: ${selectedService}`);
         });
@@ -892,6 +976,27 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    // --- Crear archivo en GitHub (solo el contenido final) ---
+    async function createGitHubPaste(content, name) {
+        const response = await fetch('/api/github', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                content: content,
+                name: name
+            })
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Error al subir a GitHub');
+        }
+        const data = await response.json();
+        return {
+            id: data.id,
+            rawUrl: data.rawUrl
+        };
+    }
+
     // ============================================================
     //  GENERAR SCRIPT
     // ============================================================
@@ -968,36 +1073,110 @@ end)`;
                 }
             }
 
-            // Si short está activo, ofuscar y subir al servicio seleccionado
-            if (shortEnabled) {
+            // ---- LÓGICA DE GENERACIÓN ----
+            // Determinar si necesitamos ofuscar
+            let scriptToUse = fullScript;
+            if (obfuscateEnabled) {
                 if (!isAuthenticated) {
-                    showNotification('⚠️ Short Loadstring requires Discord authentication. Please sign in.', 'warning');
+                    showNotification('⚠️ Obfuscate requires authentication. Please sign in.', 'warning');
                     generateBtn.textContent = 'GENERATE SCRIPT';
                     generateBtn.disabled = false;
                     return;
                 }
                 try {
-                    // 1. Ofuscar el script completo
-                    const obfuscatedScript = await obfuscateWithWeAreDevs(fullScript);
-                    
-                    // 2. Subir al servicio seleccionado (solo Pastefy u Oblivion)
+                    scriptToUse = await obfuscateWithWeAreDevs(fullScript);
+                } catch (e) {
+                    showNotification(`Error al ofuscar: ${e.message}`, 'error');
+                    // Si falla, usamos el script sin ofuscar (o podríamos detener)
+                    scriptToUse = fullScript;
+                }
+            }
+
+            // Ahora decidir cómo entregar el script
+            if (githubEnabled) {
+                // Validar nombre
+                const scriptName = githubScriptName.value.trim();
+                if (!scriptName) {
+                    showNotification('❌ Debes ingresar un nombre para el script en GitHub.', 'error');
+                    generateBtn.textContent = 'GENERATE SCRIPT';
+                    generateBtn.disabled = false;
+                    return;
+                }
+                const sanitized = scriptName.replace(/[^a-zA-Z0-9-_]/g, '');
+                if (!sanitized) {
+                    showNotification('❌ El nombre solo puede contener letras, números, guiones y guiones bajos.', 'error');
+                    generateBtn.textContent = 'GENERATE SCRIPT';
+                    generateBtn.disabled = false;
+                    return;
+                }
+
+                if (!isAuthenticated) {
+                    showNotification('⚠️ GitHub Loader requires authentication.', 'warning');
+                    generateBtn.textContent = 'GENERATE SCRIPT';
+                    generateBtn.disabled = false;
+                    return;
+                }
+
+                // Si short también está activo, el contenido a subir a GitHub será un loadstring que apunta al paste
+                let contentToUpload = scriptToUse; // por defecto el script (ofuscado o no)
+                let finalLoadstring = '';
+
+                if (shortEnabled) {
+                    // Subir el script ofuscado (o no) al servicio seleccionado
+                    try {
+                        let pasteResult;
+                        if (selectedService === 'pastefy') {
+                            pasteResult = await createPastefyPaste(scriptToUse);
+                        } else { // oblivion
+                            pasteResult = await createOblivionPaste(scriptToUse);
+                        }
+                        // El contenido de GitHub será un loadstring que apunta al paste
+                        contentToUpload = `loadstring(game:HttpGet("${pasteResult.rawUrl}"))()`;
+                        finalLoadstring = contentToUpload; // en realidad, el loadstring final será el que apunta a GitHub
+                    } catch (e) {
+                        showNotification(`Error al crear paste intermedio: ${e.message}`, 'error');
+                        // Si falla, subimos directamente el script a GitHub (sin anidamiento)
+                        contentToUpload = scriptToUse;
+                        finalLoadstring = ''; // se definirá luego
+                    }
+                }
+
+                // Subir a GitHub (contentToUpload puede ser el script o el loadstring intermedio)
+                try {
+                    const gitResult = await createGitHubPaste(contentToUpload, sanitized);
+                    // El loadstring final apunta a GitHub
+                    finalLoadstring = `loadstring(game:HttpGet("${gitResult.rawUrl}"))()`;
+                    outputCode.textContent = finalLoadstring;
+                } catch (e) {
+                    showNotification(`Error al subir a GitHub: ${e.message}`, 'error');
+                    // Fallback: mostrar el script sin loadstring
+                    outputCode.textContent = scriptToUse;
+                }
+
+            } else if (shortEnabled) {
+                // Solo short (sin GitHub)
+                if (!isAuthenticated) {
+                    showNotification('⚠️ Short Loadstring requires authentication.', 'warning');
+                    generateBtn.textContent = 'GENERATE SCRIPT';
+                    generateBtn.disabled = false;
+                    return;
+                }
+                try {
                     let pasteResult;
                     if (selectedService === 'pastefy') {
-                        pasteResult = await createPastefyPaste(obfuscatedScript);
-                    } else { // 'oblivion'
-                        pasteResult = await createOblivionPaste(obfuscatedScript);
+                        pasteResult = await createPastefyPaste(scriptToUse);
+                    } else { // oblivion
+                        pasteResult = await createOblivionPaste(scriptToUse);
                     }
-                    
                     const finalScript = `loadstring(game:HttpGet("${pasteResult.rawUrl}"))()`;
                     outputCode.textContent = finalScript;
-
-                } catch (apiError) {
-                    showNotification(`Error en el proceso automático: ${apiError.message}\n\nSe usará la URL por defecto.`, 'error');
-                    outputCode.textContent = fullScript;
+                } catch (e) {
+                    showNotification(`Error al crear paste: ${e.message}`, 'error');
+                    outputCode.textContent = scriptToUse;
                 }
             } else {
-                // Modo normal (sin short)
-                outputCode.textContent = fullScript;
+                // Ninguna opción activa: mostrar script tal cual (puede estar ofuscado)
+                outputCode.textContent = scriptToUse;
             }
 
             outputSection.classList.remove('hidden');
