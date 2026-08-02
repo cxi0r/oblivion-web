@@ -1577,4 +1577,33 @@ header h1 {
 .github-loader-section:hover {
     border-color: #2a2a2a;
 }
+    /* ===== Obfuscate Section ===== */
+.obfuscate-section {
+    background: rgba(13, 13, 13, 0.7);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(31, 31, 31, 0.6);
+    border-radius: 16px;
+    padding: 1.4rem 1.2rem;
+    margin-bottom: 1.8rem;
+    transition: border-color 0.3s;
+    position: relative;
 }
+.obfuscate-section:hover {
+    border-color: #2a2a2a;
+}
+
+/* ===== GitHub Loader ===== */
+.github-loader-section {
+    background: rgba(13, 13, 13, 0.7);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(31, 31, 31, 0.6);
+    border-radius: 16px;
+    padding: 1.4rem 1.2rem;
+    margin-bottom: 1.8rem;
+    transition: border-color 0.3s;
+    position: relative;
+}
+.github-loader-section:hover {
+    border-color: #2a2a2a;
+}
+
