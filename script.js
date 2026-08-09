@@ -571,7 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'W or L', 'Yess my examine', 'Zombie Tralala', '4th Bros', 'Capitano Americano',
             'Bufalino Boomberino', 'Esok Goala', 'Los Tangcitos', 'Los Tictacs', 'Los Admins', 'Moby Bros', 'Var Var Var',
             'Noodle Noodle Poodle', 'Grabatron', 'Cangurato Gelato', 'Rubiko and Kubiko', 'Toro Españolo', 'Chicleteira Champeona',
-            'Examen Bros', 'Pizza and Ranch', 'Los Secret Combinasionas''Gelatina Volatina','Conetto Morsetto','Pogo Pogo Penguin',
+            'Examen Bros', 'Pizza and Ranch', 'Los Secret Combinasionas','Gelatina Volatina','Conetto Morsetto','Pogo Pogo Penguin',
             'Peschito Machito', 'Honey Honey Bear', 'Scorpino Coasterino', 'Quenn Bee', 'Smore Serat', 'Yetimactic', 'La Breakfast Combinasion',
             'Bumbatron'
         ],
