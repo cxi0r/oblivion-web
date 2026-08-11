@@ -382,6 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
             adminpanel: { show: false, disabled: true, placeholder: '' },
             freezetrade: { show: false, disabled: true, placeholder: '' },
             dupespawn: { show: false, disabled: true, placeholder: '' },
+            codesniper: { show: false, disabled: true, placeholder: '' },
             custom: { show: true, disabled: false, placeholder: '✏️ Escribe tu código personalizado aquí...' }
         };
 
