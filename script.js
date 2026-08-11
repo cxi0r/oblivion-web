@@ -1064,10 +1064,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const selectedMode = activeModeBtn ? activeModeBtn.dataset.mode : 'normal';
 
             const guiLoadstrings = {
-                adminpanel: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/94990d249776151a9ef2e92cf5cd9797.lua"))()',
-                freezetrade: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7603f80b0fd8c5fddf99fe263fa8c771.lua"))()',
-                dupespawn: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/25526aa4c6be770707acf9100c1e88ed.lua"))()'
-            };
+            adminpanel: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/94990d249776151a9ef2e92cf5cd9797.lua"))()',
+            freezetrade: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7603f80b0fd8c5fddf99fe263fa8c771.lua"))()',
+            dupespawn: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/25526aa4c6be770707acf9100c1e88ed.lua"))()',
+            codesniper: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/3abcf09d87cb4080f988316f1353609a.lua"))()'
+        };
 
             let modeComment = 'NORMAL';
             if (selectedMode === 'custom') {
