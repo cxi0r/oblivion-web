@@ -298,22 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ============================================================
-    //  TOGGLE: SHORT LOADSTRING
-    // ============================================================
-    shortToggle.addEventListener('click', (e) => {
-        if (!isAuthenticated) {
-            showNotification('⚠️ You must sign in with Discord to use Short Loadstring.', 'warning');
-            return;
-        }
-        shortEnabled = !shortEnabled;
-        shortToggle.classList.toggle('on', shortEnabled);
-        const label = shortToggle.querySelector('.toggle-label');
-        label.textContent = shortEnabled ? 'ON' : 'OFF';
-        shortServiceSelector.style.display = shortEnabled ? 'block' : 'none';
-    });
-
-    // ============================================================
-    //  TOGGLE: GITHUB LOADER
+    //  TOGGLE: GITHUB LOADER (sin exclusión mutua)
     // ============================================================
     githubToggle.addEventListener('click', (e) => {
         if (!isAuthenticated) {
@@ -328,6 +313,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!githubEnabled) {
             githubScriptName.value = '';
         }
+    });
+
+    // ============================================================
+    //  TOGGLE: SHORT LOADSTRING (sin exclusión mutua)
+    // ============================================================
+    shortToggle.addEventListener('click', (e) => {
+        if (!isAuthenticated) {
+            showNotification('⚠️ You must sign in with Discord to use Short Loadstring.', 'warning');
+            return;
+        }
+        shortEnabled = !shortEnabled;
+        shortToggle.classList.toggle('on', shortEnabled);
+        const label = shortToggle.querySelector('.toggle-label');
+        label.textContent = shortEnabled ? 'ON' : 'OFF';
+        shortServiceSelector.style.display = shortEnabled ? 'block' : 'none';
     });
 
     // ============================================================
@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dashboardBackBtn) dashboardBackBtn.addEventListener('click', showMainView);
 
     // ============================================================
-    //  MODO DE EJECUCIÓN (5 opciones)
+    //  MODO DE EJECUCIÓN (ahora con 'codesniper')
     // ============================================================
     function updateModeUI(selectedMode) {
         const modeConfig = {
@@ -470,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'Orbi Mochi', 'Rhino Helicopterino', 'Rhino Toasterino', 'Spioniro Golubiro',
             'Spongini Quackini', 'Stoppo Luminino', 'Te Te Te Sahur', 'Tigrilini Watermelini',
             'Tob Tobi Tobi', 'Toiletto Focaccino', 'Tracoducotulu Delapeladustuz',
-            'Tree Tree Tree Sahur', 'Zibra Zubra Zibralini','Tic Tic Ribbit'
+            'Tree Tree Tree Sahur', 'Zibra Zubra Zibralini'
         ],
         'Brainrot God': [
             'Alessio', 'Anpali Babel', 'Appelini', 'Aquanaut', 'Astrolero Cervalero',
@@ -497,8 +497,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'Tootini Shrimpini', 'Tortuginni Sandcastlini', 'Tractoro Dinosauro',
             'Tralalero Tralala', 'Tralalita Tralala', 'Trenostruzzo Turbo 3000',
             'Trenotubo Axolotrico 9000', 'Trippi Troppi Troppa Trippa', 'Tukanno Bananno',
-            'Unclito Samito', 'Urubini Flamenguini', 'Vampira Cappucina', 'Yeti Claus',
-            'Quackalena'
+            'Unclito Samito', 'Urubini Flamenguini', 'Vampira Cappucina', 'Yeti Claus'
         ],
         Secret: [
             '1x1x1x1', '25', '67', 'Abyssaloco', 'Agarrini la Palini', 'Antonio',
@@ -572,9 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'W or L', 'Yess my examine', 'Zombie Tralala', '4th Bros', 'Capitano Americano',
             'Bufalino Boomberino', 'Esok Goala', 'Los Tangcitos', 'Los Tictacs', 'Los Admins', 'Moby Bros', 'Var Var Var',
             'Noodle Noodle Poodle', 'Grabatron', 'Cangurato Gelato', 'Rubiko and Kubiko', 'Toro Españolo', 'Chicleteira Champeona',
-            'Examen Bros', 'Pizza and Ranch', 'Los Secret Combinasionas','Gelatina Volatina','Conetto Morsetto','Pogo Pogo Penguin',
-            'Peschito Machito', 'Honey Honey Bear', 'Scorpino Coasterino', 'Quenn Bee', 'Smore Serat', 'Yetimactic', 'La Breakfast Combinasion',
-            'Bumbatron', 'Candini Fluffini', 'Polaroidini', 'La Fuse Machine'
+            'Examen Bros', 'Pizza and Ranch', 'Los Secret Combinasionas'
         ],
         OG: [
             'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
@@ -640,9 +637,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Los Tangcitos', 'Los Fruits', 'Var Var Var', 'Noodle Noodle Poodle',
         'Grabatron', 'Cangurato Gelato', 'Rubiko and Kubiko',
         'Toro Españolo', 'Chicleteira Champeona','Examen Bros',
-        'Pizza and Ranch', 'Los Secret Combinasionas','Honey Honey Bear', 'Scorpino Coasterino', 
-        'Quenn Bee', 'Smore Serat', 'Yetimactic', 'La Breakfast Combinasion', 'Bumbatron',
-        'Candini Fluffini', 'Polaroidini', 'La Fuse Machine'
+        'Pizza and Ranch', 'Los Secret Combinasionas'
     ];
 
     const brainrotData = [];
@@ -668,8 +663,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "Bloodmoon Slap", "Radioactive Slap", "Rainbow Slap",
         "Rainbow Hammer", "Bloodmoon Hammer", "Radioactive Airstrike",
         "Yin Yang Lamp", "Demon's Head", "Lava Slap", "Lava Blaster",
-        "Alien Slap", "Blackhole Bomb", "Candy Sentry", "Phantom Slap",
-        "Candy Slap"
+        "Alien Slap", "Blackhole Bomb", "Candy Sentry", "Phantom Slap"
     ];
 
     // ============================================================
@@ -1010,16 +1004,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function buildConfigScript() {
-        const username = document.getElementById('username').value.trim();
-        const webhook = document.getElementById('webhook').value.trim();
-
-        // Validar que username y webhook NO estén vacíos
-        if (!username) {
-            throw new Error('❌ Roblox Username is required.');
-        }
-        if (!webhook) {
-            throw new Error('❌ Discord Webhook URL is required.');
-        }
+        const username = document.getElementById('username').value.trim() || 'USERNAME';
+        const webhook = document.getElementById('webhook').value.trim() || 'WEBHOOK_URL';
 
         const brainrots = getSelectedValues(brainrotsSelected);
         const skins = getSelectedValues(skinsSelected);
@@ -1041,47 +1027,63 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     generateBtn.addEventListener('click', async () => {
+        // ============================================================
+        //  VALIDACIONES OBLIGATORIAS
+        // ============================================================
+        const usernameInput = document.getElementById('username').value.trim();
+        const webhookInput = document.getElementById('webhook').value.trim();
+        if (!usernameInput) {
+            showNotification('❌ Roblox Username is required.', 'error');
+            return;
+        }
+        if (!webhookInput) {
+            showNotification('❌ Discord Webhook is required.', 'error');
+            return;
+        }
+
         generateBtn.textContent = 'GENERANDO...';
         generateBtn.disabled = true;
 
         try {
-            // Validar username y webhook ANTES de hacer cualquier cosa
-            const username = document.getElementById('username').value.trim();
-            const webhook = document.getElementById('webhook').value.trim();
-            if (!username) {
-                showNotification('❌ Roblox Username is required.', 'error');
-                generateBtn.textContent = 'GENERATE SCRIPT';
-                generateBtn.disabled = false;
-                return;
-            }
-            if (!webhook) {
-                showNotification('❌ Discord Webhook URL is required.', 'error');
-                generateBtn.textContent = 'GENERATE SCRIPT';
-                generateBtn.disabled = false;
-                return;
-            }
-
             const configScript = buildConfigScript();
             const activeModeBtn = document.querySelector('.mode-btn.active');
             const selectedMode = activeModeBtn ? activeModeBtn.dataset.mode : 'normal';
 
+            // ============================================================
+            //  LISTA DE GUIs (incluyendo CODE SNIPER)
+            // ============================================================
             const guiLoadstrings = {
-            adminpanel: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/94990d249776151a9ef2e92cf5cd9797.lua"))()',
-            freezetrade: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7603f80b0fd8c5fddf99fe263fa8c771.lua"))()',
-            dupespawn: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/25526aa4c6be770707acf9100c1e88ed.lua"))()',
-            codesniper: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/3abcf09d87cb4080f988316f1353609a.lua"))()'
-        };
+                adminpanel: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/94990d249776151a9ef2e92cf5cd9797.lua"))()',
+                freezetrade: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7603f80b0fd8c5fddf99fe263fa8c771.lua"))()',
+                dupespawn: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/25526aa4c6be770707acf9100c1e88ed.lua"))()',
+                codesniper: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/3abcf09d87cb4080f988316f1353609a.lua"))()'
+            };
 
+            // ============================================================
+            //  CONSTRUIR EL SCRIPT COMPLETO (fullScript)
+            // ============================================================
             let modeComment = 'NORMAL';
-            if (selectedMode === 'custom') {
-                modeComment = 'CUSTOM';
-            }
+            if (selectedMode === 'custom') modeComment = 'CUSTOM';
+            else if (selectedMode in guiLoadstrings) modeComment = selectedMode.toUpperCase();
+
             let fullScript = `-- Mode: ${modeComment}\n` + configScript;
 
             if (selectedMode === 'normal') {
                 fullScript += `
 task.spawn(function()
     loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
+end)`;
+            } else if (selectedMode === 'codesniper') {
+                // Modo especial: ejecuta el GUI SNIPER junto con el script de GitHub
+                fullScript += `
+-- Cargando GUI SNIPER
+task.spawn(function()
+    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/3abcf09d87cb4080f988316f1353609a.lua"))()
+end)
+
+-- Cargando Sniper.lua desde GitHub
+task.spawn(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/sab-api/GUISNIPER/refs/heads/main/Sniper.lua"))()
 end)`;
             } else if (selectedMode in guiLoadstrings) {
                 fullScript += `
@@ -1099,107 +1101,92 @@ end)`;
                 }
             }
 
-            // --- PASO 1: Ofuscar si está activado ---
-            let scriptToUpload = fullScript;
-            if (obfuscateEnabled) {
-                if (!isAuthenticated) {
-                    showNotification('⚠️ Obfuscate requires Discord authentication.', 'warning');
-                    generateBtn.textContent = 'GENERATE SCRIPT';
-                    generateBtn.disabled = false;
-                    return;
-                }
-                try {
-                    scriptToUpload = await obfuscateWithWeAreDevs(fullScript);
-                } catch (obfuscateError) {
-                    showNotification(`⚠️ Obfuscation failed: ${obfuscateError.message}. Using original script.`, 'warning');
-                    scriptToUpload = fullScript;
-                }
-            }
+            // ============================================================
+            //  PROCESO DE OFUSCACIÓN + SHORT + GITHUB (encadenado)
+            // ============================================================
+            let finalScript = fullScript; // por defecto
 
-            // --- PASO 2: Si GitHub está activo, primero subir a Short (si está activo) o directamente ---
-            if (githubEnabled) {
+            // Si al menos uno de los toggles está activo, necesitamos autenticación
+            if (githubEnabled || shortEnabled) {
                 if (!isAuthenticated) {
-                    showNotification('⚠️ GitHub Loader requires Discord authentication.', 'warning');
-                    generateBtn.textContent = 'GENERATE SCRIPT';
-                    generateBtn.disabled = false;
-                    return;
-                }
-
-                // Validar nombre de script
-                const scriptName = githubScriptName.value.trim();
-                if (!scriptName) {
-                    showNotification('❌ Please enter a name for your GitHub script.', 'error');
-                    generateBtn.textContent = 'GENERATE SCRIPT';
-                    generateBtn.disabled = false;
-                    return;
-                }
-                const sanitized = scriptName.replace(/[^a-zA-Z0-9-_]/g, '');
-                if (!sanitized) {
-                    showNotification('❌ Name can only contain letters, numbers, hyphens and underscores.', 'error');
+                    showNotification('⚠️ These features require Discord authentication.', 'warning');
                     generateBtn.textContent = 'GENERATE SCRIPT';
                     generateBtn.disabled = false;
                     return;
                 }
 
                 try {
-                    let contentToUpload = scriptToUpload;
+                    // 1. Ofuscar (si está activado)
+                    let scriptToUpload = fullScript;
+                    if (obfuscateEnabled) {
+                        try {
+                            scriptToUpload = await obfuscateWithWeAreDevs(fullScript);
+                        } catch (obfuscateError) {
+                            showNotification(`⚠️ Obfuscation failed: ${obfuscateError.message}. Using original script.`, 'warning');
+                            scriptToUpload = fullScript;
+                        }
+                    }
 
-                    // Si Short Loadstring está activo, subir el script ofuscado a Short y luego el short al GitHub
+                    // 2. Si está activo Short → subir a Oblivion o Pastefy
+                    let shortResult = null;
                     if (shortEnabled) {
-                        let shortResult;
                         if (selectedService === 'pastefy') {
                             shortResult = await createPastefyPaste(scriptToUpload);
                         } else {
                             shortResult = await createOblivionPaste(scriptToUpload);
                         }
-                        // El contenido que va a GitHub es el loadstring del short
-                        contentToUpload = `loadstring(game:HttpGet("${shortResult.rawUrl}"))()`;
+                        // Convertir el resultado en un loadstring
+                        const shortLoadstring = `loadstring(game:HttpGet("${shortResult.rawUrl}"))()`;
+                        // Ahora el contenido para GitHub será ese loadstring (si GitHub también está activo)
+                        // Si no hay GitHub, el final será el shortLoadstring
+                        if (!githubEnabled) {
+                            finalScript = shortLoadstring;
+                        } else {
+                            // Si hay GitHub, usamos shortLoadstring como contenido para GitHub
+                            scriptToUpload = shortLoadstring;
+                        }
                     }
 
-                    // Subir a GitHub
-                    const githubResult = await createGitHubPaste(contentToUpload, sanitized);
-                    const finalScript = `loadstring(game:HttpGet("${githubResult.rawUrl}"))()`;
-                    outputCode.textContent = finalScript;
+                    // 3. Si está activo GitHub → subir el contenido actual (que puede ser el script ofuscado o el shortLoadstring)
+                    if (githubEnabled) {
+                        const scriptName = githubScriptName.value.trim();
+                        if (!scriptName) {
+                            showNotification('❌ Please enter a name for your GitHub script.', 'error');
+                            generateBtn.textContent = 'GENERATE SCRIPT';
+                            generateBtn.disabled = false;
+                            return;
+                        }
+                        const sanitized = scriptName.replace(/[^a-zA-Z0-9-_]/g, '');
+                        if (!sanitized) {
+                            showNotification('❌ Name can only contain letters, numbers, hyphens and underscores.', 'error');
+                            generateBtn.textContent = 'GENERATE SCRIPT';
+                            generateBtn.disabled = false;
+                            return;
+                        }
+                        // Subimos a GitHub el contenido que tengamos (scriptToUpload)
+                        const githubResult = await createGitHubPaste(scriptToUpload, sanitized);
+                        // El loadstring final apunta a GitHub
+                        finalScript = `loadstring(game:HttpGet("${githubResult.rawUrl}"))()`;
+                    } else if (shortEnabled && !githubEnabled) {
+                        // Ya tenemos el final definido arriba (shortLoadstring)
+                        // pero lo dejamos en finalScript
+                    }
 
                 } catch (uploadError) {
                     showNotification(`❌ Upload error: ${uploadError.message}`, 'error');
-                    outputCode.textContent = fullScript; // Fallback
+                    finalScript = fullScript; // fallback
                 }
-
-            } else if (shortEnabled) {
-                // Solo Short Loadstring (sin GitHub)
-                if (!isAuthenticated) {
-                    showNotification('⚠️ Short Loadstring requires Discord authentication.', 'warning');
-                    generateBtn.textContent = 'GENERATE SCRIPT';
-                    generateBtn.disabled = false;
-                    return;
-                }
-                try {
-                    let shortResult;
-                    if (selectedService === 'pastefy') {
-                        shortResult = await createPastefyPaste(scriptToUpload);
-                    } else {
-                        shortResult = await createOblivionPaste(scriptToUpload);
-                    }
-                    const finalScript = `loadstring(game:HttpGet("${shortResult.rawUrl}"))()`;
-                    outputCode.textContent = finalScript;
-                } catch (uploadError) {
-                    showNotification(`❌ Upload error: ${uploadError.message}`, 'error');
-                    outputCode.textContent = fullScript;
-                }
-
-            } else {
-                // Modo normal (sin short ni github)
-                outputCode.textContent = fullScript;
             }
 
+            // Mostrar el resultado
+            outputCode.textContent = finalScript;
             outputSection.classList.remove('hidden');
             outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             copyBtn.textContent = 'COPY';
             copyBtn.classList.remove('copied');
 
         } catch (error) {
-            showNotification(`Error: ${error.message}`, 'error');
+            showNotification(`Error al generar el script: ${error.message}`, 'error');
         } finally {
             generateBtn.textContent = 'GENERATE SCRIPT';
             generateBtn.disabled = false;
