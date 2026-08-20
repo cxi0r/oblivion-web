@@ -571,7 +571,9 @@ document.addEventListener('DOMContentLoaded', () => {
             'W or L', 'Yess my examine', 'Zombie Tralala', '4th Bros', 'Capitano Americano',
             'Bufalino Boomberino', 'Esok Goala', 'Los Tangcitos', 'Los Tictacs', 'Los Admins', 'Moby Bros', 'Var Var Var',
             'Noodle Noodle Poodle', 'Grabatron', 'Cangurato Gelato', 'Rubiko and Kubiko', 'Toro Españolo', 'Chicleteira Champeona',
-            'Examen Bros', 'Pizza and Ranch', 'Los Secret Combinasionas'
+            'Examen Bros', 'Pizza and Ranch', 'Los Secret Combinasionas','Gelatina Volatina','Conetto Morsetto','Pogo Pogo Penguin',
+            'Peschito Machito', 'Honey Honey Bear', 'Scorpino Coasterino', 'Quenn Bee', 'Smore Serat', 'Yetimactic', 'La Breakfast Combinasion',
+            'Bumbatron', 'Candini Fluffini', 'Polaroidini', 'La Fuse Machine', 'Burrito Bat', 'Tacoturbo Tacorito', 'Nachorilla', 'Sammyni Truckini'
         ],
         OG: [
             'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
@@ -637,7 +639,9 @@ document.addEventListener('DOMContentLoaded', () => {
         'Los Tangcitos', 'Los Fruits', 'Var Var Var', 'Noodle Noodle Poodle',
         'Grabatron', 'Cangurato Gelato', 'Rubiko and Kubiko',
         'Toro Españolo', 'Chicleteira Champeona','Examen Bros',
-        'Pizza and Ranch', 'Los Secret Combinasionas'
+        'Pizza and Ranch', 'Los Secret Combinasionas','Honey Honey Bear', 'Scorpino Coasterino', 
+        'Quenn Bee', 'Smore Serat', 'Yetimactic', 'La Breakfast Combinasion', 'Bumbatron',
+        'Candini Fluffini', 'Polaroidini', 'La Fuse Machine', 'Nachorilla', 'Sammyni Truckini'
     ];
 
     const brainrotData = [];
