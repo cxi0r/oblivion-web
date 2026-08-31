@@ -660,7 +660,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const skinItems = [
         'Rose', 'Gingerbread', 'Halloween', 'Christmas', 'Bunny Basket',
         'Summer', 'Pot of Gold', 'Taco', 'Octo', 'Valentines',
-        'Easter', 'Lucky', 'Aquatic','Tralalero','Bee Emperor'
+        'Easter', 'Lucky', 'Aquatic', 'Tralalero', 'Bee Emperor',
+        'Candy', 'Cyber', 'Cursed', 'Diamond', 'Divine', 'Galaxy',
+        'Gold', 'Lava', 'Radioactive', 'Rainbow', 'Honey Bee', 'Yin Yang'
     ];
 
     const gearItems = [
@@ -669,7 +671,8 @@ document.addEventListener('DOMContentLoaded', () => {
         "Bloodmoon Slap", "Radioactive Slap", "Rainbow Slap",
         "Rainbow Hammer", "Bloodmoon Hammer", "Radioactive Airstrike",
         "Yin Yang Lamp", "Demon's Head", "Lava Slap", "Lava Blaster",
-        "Alien Slap", "Blackhole Bomb", "Candy Sentry", "Phantom Slap","Flying Bee"
+        "Alien Slap", "Blackhole Bomb", "Candy Sentry", "Phantom Slap",
+        "Flying Bee", "Crystal Slap"
     ];
 
     // ============================================================
