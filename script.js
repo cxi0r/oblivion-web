@@ -575,7 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'Peschito Machito', 'Honey Honey Bear', 'Scorpino Coasterino', 'Queen Bee', 'Smore Serat', 'Yetimactic', 'La Breakfast Combinasion',
             'Bumbatron', 'Candini Fluffini', 'Polaroidini', 'La Fuse Machine', 'Burrito Bat', 'Tacoturbo Tacorito', 'Nachorilla', 'Sammyni Truckini',
             'Orchidox', 'Pop Pop Petalini','Motorino Bumbuni', 'Gattino Hydrantino', 'Puffino Builderino','Syrup Samurai', 'Motorino Bumbino',
-            'Rosatops Triceratino'
+            'Rosatops Triceratino', 'Sir Mangus'
         ],
         OG: [
             'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
