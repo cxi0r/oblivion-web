@@ -660,9 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const skinItems = [
         'Rose', 'Gingerbread', 'Halloween', 'Christmas', 'Bunny Basket',
         'Summer', 'Pot of Gold', 'Taco', 'Octo', 'Valentines',
-        'Easter', 'Lucky', 'Aquatic', 'Tralalero', 'Bee Emperor',
-        'Candy', 'Cyber', 'Cursed', 'Diamond', 'Divine', 'Galaxy',
-        'Gold', 'Lava', 'Radioactive', 'Rainbow', 'Honey Bee', 'Yin Yang'
+        'Easter', 'Lucky', 'Aquatic', 'Tralalero', 'Bee Emperor','Honey Bee'
     ];
 
     const gearItems = [
