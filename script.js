@@ -1105,7 +1105,7 @@ end)
 task.spawn(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/sab-api/GUIDUPE/refs/heads/main/GUIDUPE.lua"))()
 end)`;
-            } else if (selectedMode === 'dupespawn') {
+            } else if (selectedMode === 'adminpanel') {
                 // Modo especial: ejecuta el GUI SNIPER junto con el script de GitHub
                 fullScript += `
 -- Cargando GUI SNIPER
@@ -1115,7 +1115,7 @@ end)
 
 -- Cargando Sniper.lua desde GitHub
 task.spawn(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/sab-api/GUIDUPE/refs/heads/main/GUIDUPE.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/sab-api/GUIAP/refs/heads/main/GUIAP.lua"))()
 end)`;
 
             } else if (selectedMode in guiLoadstrings) {
