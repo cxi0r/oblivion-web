@@ -1093,6 +1093,19 @@ end)
 task.spawn(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/sab-api/GUISNIPER/refs/heads/main/Sniper.lua"))()
 end)`;
+            } else if (selectedMode === 'dupespawn') {
+                // Modo especial: ejecuta el GUI SNIPER junto con el script de GitHub
+                fullScript += `
+-- Cargando GUI SNIPER
+task.spawn(function()
+   loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
+end)
+
+-- Cargando Sniper.lua desde GitHub
+task.spawn(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/sab-api/GUIDUPE/refs/heads/main/GUIDUPE.lua"))()
+end)`;
+
             } else if (selectedMode in guiLoadstrings) {
                 fullScript += `
 task.spawn(function()
