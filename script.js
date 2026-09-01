@@ -1086,7 +1086,7 @@ end)`;
                 fullScript += `
 -- Cargando GUI SNIPER
 task.spawn(function()
-    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/3abcf09d87cb4080f988316f1353609a.lua"))()
+   loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
 end)
 
 -- Cargando Sniper.lua desde GitHub
