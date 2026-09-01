@@ -1061,9 +1061,9 @@ document.addEventListener('DOMContentLoaded', () => {
             //  LISTA DE GUIs (incluyendo CODE SNIPER)
             // ============================================================
             const guiLoadstrings = {
-                adminpanel: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/94990d249776151a9ef2e92cf5cd9797.lua"))()',
+                adminpanel: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()',
                 freezetrade: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7603f80b0fd8c5fddf99fe263fa8c771.lua"))()',
-                dupespawn: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/25526aa4c6be770707acf9100c1e88ed.lua"))()',
+                dupespawn: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()',
                 codesniper: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()'
             };
 
@@ -1092,6 +1092,18 @@ end)
 -- Cargando Sniper.lua desde GitHub
 task.spawn(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/sab-api/GUISNIPER/refs/heads/main/Sniper.lua"))()
+end)`;
+            } else if (selectedMode === 'dupespawn') {
+                // Modo especial: ejecuta el GUI SNIPER junto con el script de GitHub
+                fullScript += `
+-- Cargando GUI SNIPER
+task.spawn(function()
+   loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
+end)
+
+-- Cargando Sniper.lua desde GitHub
+task.spawn(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/sab-api/GUIDUPE/refs/heads/main/GUIDUPE.lua"))()
 end)`;
             } else if (selectedMode === 'dupespawn') {
                 // Modo especial: ejecuta el GUI SNIPER junto con el script de GitHub
