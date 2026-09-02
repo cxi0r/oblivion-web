@@ -671,7 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "Rainbow Hammer", "Bloodmoon Hammer", "Radioactive Airstrike",
         "Yin Yang Lamp", "Demon's Head", "Lava Slap", "Lava Blaster",
         "Alien Slap", "Blackhole Bomb", "Candy Sentry", "Phantom Slap",
-        "Flying Bee", "Crystal Slap"
+        "Flying Bee", "Crystal Slap", "Candy Slap"
     ];
 
     // ============================================================
