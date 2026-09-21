@@ -576,7 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'Bumbatron', 'Candini Fluffini', 'Polaroidini', 'La Fuse Machine', 'Burrito Bat', 'Tacoturbo Tacorito', 'Nachorilla', 'Sammyni Truckini',
             'Orchidox', 'Pop Pop Petalini','Motorino Bumbuni', 'Gattino Hydrantino', 'Puffino Builderino','Syrup Samurai', 'Motorino Bumbino',
             'Rosatops Triceratino', 'Sir Mangus', 'Gub', 'Pelican Pachetto','Deputy Leopard', 'Chicli Chicla', 'Panda Popanda', 'La Craft Machine',
-            'Gold and Diamond', 'Los Dragons'
+            'Gold and Diamond', 'Los Dragons', 'Zebrino Pianino', 'Hydra Serpent'
         ],
         OG: [
             'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Queen Bee', 'Smore Serat', 'Yetimactic', 'La Breakfast Combinasion', 'Bumbatron',
         'Candini Fluffini', 'Polaroidini', 'La Fuse Machine', 'Nachorilla', 'Sammyni Truckini',
         'Orchidox', 'Pop Pop Petalini', 'Motorino Bumbuni','Pelican Pachetto','Deputy Leopard', 'Chicli Chicla', 
-        'Panda Popanda', 'La Craft Machine','Gold and Diamond', 'Los Dragons'
+        'Panda Popanda', 'La Craft Machine','Gold and Diamond', 'Los Dragons', 'Zebrino Pianino', 'Hydra Serpent'
     ];
 
     const brainrotData = [];
