@@ -431,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     //  TODOS LOS BRAINROTS (COMPLETOS)
     // ============================================================
-    const brainrotLists = {
+ const brainrotLists = {
         Common: [
             'Fluriflura', 'Holy Arepa', 'Lirilì Larilà', 'Noobini Pizzanini',
             'Noobini Santanini', 'Pipi Corni', 'Pipi Kiwi', 'Raccooni Jandelini',
@@ -576,7 +576,10 @@ document.addEventListener('DOMContentLoaded', () => {
             'Bumbatron', 'Candini Fluffini', 'Polaroidini', 'La Fuse Machine', 'Burrito Bat', 'Tacoturbo Tacorito', 'Nachorilla', 'Sammyni Truckini',
             'Orchidox', 'Pop Pop Petalini','Motorino Bumbuni', 'Gattino Hydrantino', 'Puffino Builderino','Syrup Samurai', 'Motorino Bumbino',
             'Rosatops Triceratino', 'Sir Mangus', 'Gub', 'Pelican Pachetto','Deputy Leopard', 'Chicli Chicla', 'Panda Popanda', 'La Craft Machine',
-            'Gold and Diamond', 'Los Dragons', 'Zebrino Pianino', 'Hydra Serpent'
+            'Gold and Diamond', 'Los Dragons', 'Zebrino Pianino', 'Hydra Serpent',
+            'Ranito Pepito', 'Ski Ski Skunki', 'Capibaro Celestino', 'Pin Pin Pengu',
+            'Rexino Ramino', 'Rockarino Rockara', 'Qamar Camelamp', 'Marino Submarino',
+            'Lavamanta', 'Lionello Casarello', 'Draculino'
         ],
         OG: [
             'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
@@ -646,8 +649,10 @@ document.addEventListener('DOMContentLoaded', () => {
         'Queen Bee', 'Smore Serat', 'Yetimactic', 'La Breakfast Combinasion', 'Bumbatron',
         'Candini Fluffini', 'Polaroidini', 'La Fuse Machine', 'Nachorilla', 'Sammyni Truckini',
         'Orchidox', 'Pop Pop Petalini', 'Motorino Bumbuni','Pelican Pachetto','Deputy Leopard', 'Chicli Chicla', 
-        'Panda Popanda', 'La Craft Machine','Gold and Diamond', 'Los Dragons', 'Zebrino Pianino', 'Hydra Serpent'
+        'Panda Popanda', 'La Craft Machine','Gold and Diamond', 'Los Dragons', 'Zebrino Pianino', 'Hydra Serpent',
+        'Lavamanta', 'Lionello Casarello', 'Draculino'
     ];
+
 
     const brainrotData = [];
     for (const [rarity, names] of Object.entries(brainrotLists)) {
