@@ -498,7 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'Tralalero Tralala', 'Tralalita Tralala', 'Trenostruzzo Turbo 3000',
             'Trenotubo Axolotrico 9000', 'Trippi Troppi Troppa Trippa', 'Tukanno Bananno',
             'Unclito Samito', 'Urubini Flamenguini', 'Vampira Cappucina', 'Yeti Claus', 'Vampi Ribbitini',
-            'Mummelo Bandello', 'Mortaruga'
+            'Mummelo Bandello', 'Mortaruga', 'Candi Corni'
         ],
         Secret: [
             '1x1x1x1', '25', '67', 'Abyssaloco', 'Agarrini la Palini', 'Antonio',
@@ -580,7 +580,8 @@ document.addEventListener('DOMContentLoaded', () => {
             'Gold and Diamond', 'Los Dragons', 'Zebrino Pianino', 'Hydra Serpent',
             'Ranito Pepito', 'Ski Ski Skunki', 'Capibaro Celestino', 'Pin Pin Pengu',
             'Rexino Ramino', 'Rockarino Rockara', 'Qamar Camelamp', 'Marino Submarino',
-            'Lavamanta', 'Lionello Casarello', 'Draculino', 'Los Treaters', 'Fangaro Lupino', 'Oni Oni Panda', 'Sammyni Spookyni', 'Phoenix'
+            'Lavamanta', 'Lionello Casarello', 'Draculino', 'Los Treaters', 'Fangaro Lupino', 'Oni Oni Panda', 'Sammyni Spookyni', 'Phoenix', 'Candi Corni', 'Grim Cheese', 'Zombie Bowl', 'Bananito Skelito', 'bat-in-the-Box', 
+            'Boo Boo Rocket', 'Flying Dutchman', 'Dragon Skeletonini'
         ],
         OG: [
             'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
@@ -651,7 +652,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Candini Fluffini', 'Polaroidini', 'La Fuse Machine', 'Nachorilla', 'Sammyni Truckini',
         'Orchidox', 'Pop Pop Petalini', 'Motorino Bumbuni','Pelican Pachetto','Deputy Leopard', 'Chicli Chicla', 
         'Panda Popanda', 'La Craft Machine','Gold and Diamond', 'Los Dragons', 'Zebrino Pianino', 'Hydra Serpent',
-        'Lavamanta', 'Lionello Casarello', 'Draculino', 'Oni Oni Panda', 'Sammyni Spookyni', 'Phoenix'
+        'Lavamanta', 'Lionello Casarello', 'Draculino', 'Oni Oni Panda', 'Sammyni Spookyni', 'Phoenix', 'Boo Boo Rocket', 'Flying Dutchman', 'Dragon Skeletonini'
     ];
 
 
