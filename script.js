@@ -498,7 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'Tralalero Tralala', 'Tralalita Tralala', 'Trenostruzzo Turbo 3000',
             'Trenotubo Axolotrico 9000', 'Trippi Troppi Troppa Trippa', 'Tukanno Bananno',
             'Unclito Samito', 'Urubini Flamenguini', 'Vampira Cappucina', 'Yeti Claus', 'Vampi Ribbitini',
-            'Mummelo Bandello', 'Mortaruga', 'Candi Corni','Slushi Huski
+            'Mummelo Bandello', 'Mortaruga', 'Candi Corni','Slushi Huski'
         ],
         Secret: [
             '1x1x1x1', '25', '67', 'Abyssaloco', 'Agarrini la Palini', 'Antonio',
