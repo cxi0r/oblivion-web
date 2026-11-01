@@ -582,7 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'Rexino Ramino', 'Rockarino Rockara', 'Qamar Camelamp', 'Marino Submarino',
             'Lavamanta', 'Lionello Casarello', 'Draculino', 'Los Treaters', 'Fangaro Lupino', 'Oni Oni Panda', 'Sammyni Spookyni', 'Phoenix', 'Candi Corni', 'Grim Cheese', 'Zombie Bowl', 'Bananito Skelito', 'bat-in-the-Box', 
             'Boo Boo Rocket', 'Flying Dutchman', 'Dragon Skeletonini', 'Chicken Zombie', 'Tosto Dino', 'Cobra Gelato', 'Skelly and Coffy', 'Medusini and Demonini', 'Arca Bros', 'Co Co Co Sahur', 'Skooter Skelly', 'Money Money Cat',
-            'Fang Fang Draculang', 'Pum Pum Pum', 'Spooky Spooky Sahur', 'Spooketti Tualetti'
+            'Fang Fang Draculang', 'Pum Pum Pum', 'Spooky Spooky Sahur', 'Spooketti Tualetti', 'Puppetmaster', 'Scorpi Inferni', 'Jacko Jakat', 'Spooky Kart', 'Scarino Crowino'
         ],
         OG: [
             'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
@@ -654,7 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Orchidox', 'Pop Pop Petalini', 'Motorino Bumbuni','Pelican Pachetto','Deputy Leopard', 'Chicli Chicla', 
         'Panda Popanda', 'La Craft Machine','Gold and Diamond', 'Los Dragons', 'Zebrino Pianino', 'Hydra Serpent',
         'Lavamanta', 'Lionello Casarello', 'Draculino', 'Oni Oni Panda', 'Sammyni Spookyni', 'Phoenix', 'Boo Boo Rocket', 'Flying Dutchman', 'Dragon Skeletonini', 'Tosto Dino', 'Cobra Gelato', 'Skelly and Coffy', 
-        'Medusini and Demonini', 'Arca Bros','Fang Fang Draculang', 'Pum Pum Pum', 'Spooky Spooky Sahur', 'Spooketti Tualetti'
+        'Medusini and Demonini', 'Arca Bros','Fang Fang Draculang', 'Pum Pum Pum', 'Spooky Spooky Sahur', 'Spooketti Tualetti', 'Puppetmaster', 'Scorpi Inferni', 'Jacko Jakat', 'Spooky Kart', 'Scarino Crowino'
     ];
 
 
