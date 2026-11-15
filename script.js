@@ -583,7 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'Lavamanta', 'Lionello Casarello', 'Draculino', 'Los Treaters', 'Fangaro Lupino', 'Oni Oni Panda', 'Sammyni Spookyni', 'Phoenix', 'Candi Corni', 'Grim Cheese', 'Zombie Bowl', 'Bananito Skelito', 'bat-in-the-Box', 
             'Boo Boo Rocket', 'Flying Dutchman', 'Dragon Skeletonini', 'Chicken Zombie', 'Tosto Dino', 'Cobra Gelato', 'Skelly and Coffy', 'Medusini and Demonini', 'Arca Bros', 'Co Co Co Sahur', 'Skooter Skelly', 'Money Money Cat',
             'Fang Fang Draculang', 'Pum Pum Pum', 'Spooky Spooky Sahur', 'Spooketti Tualetti', 'Puppetmaster', 'Scorpi Inferni', 'Jacko Jakat', 'Spooky Kart', 'Scarino Crowino', 'Balloon Baboon', 'Bling Luming', 'Spinny Hammy', 'Fang Fang Draculang', 
-            'Jolly Jolly Sahur', 'Noobini Santanini', 'Spinny Bros', 'Tang Bros', 'Nacho Bros', 'Tic Bros', 'Scorpi Bros', 'Machine Bros', 'Sammyni Bros', 'Cabin Bros', 'Scary Bros'
+            'Jolly Jolly Sahur','Spinny Bros', 'Tang Bros', 'Nacho Bros', 'Tic Bros', 'Scorpi Bros', 'Machine Bros', 'Sammyni Bros', 'Cabin Bros', 'Scary Bros'
         ],
         OG: [
             'Headless Horseman', 'John Pork', 'Meowl', 'Skibidi Toilet',
