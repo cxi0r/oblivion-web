@@ -674,7 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const skinItems = [
         'Rose', 'Gingerbread', 'Halloween', 'Christmas', 'Bunny Basket',
         'Summer', 'Pot of Gold', 'Taco', 'Octo', 'Valentines',
-        'Easter', 'Lucky', 'Aquatic', 'Tralalero', 'Bee Emperor','Honey Bee'
+        'Easter', 'Lucky', 'Aquatic', 'Tralalero', 'Bee Emperor','Honey Bee','Reaper'
     ];
 
     const gearItems = [
@@ -684,7 +684,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "Rainbow Hammer", "Bloodmoon Hammer", "Radioactive Airstrike",
         "Yin Yang Lamp", "Demon's Head", "Lava Slap", "Lava Blaster",
         "Alien Slap", "Blackhole Bomb", "Candy Sentry", "Phantom Slap",
-        "Flying Bee", "Crystal Slap", "Candy Slap", "Crystal Hammer"
+        "Flying Bee", "Crystal Slap", "Candy Slap", "Crystal Hammer","Skeleton Dragon"
     ];
 
     // ============================================================
