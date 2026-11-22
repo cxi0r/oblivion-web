@@ -123,11 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const customLoadstring = document.getElementById('customLoadstring');
 
     // Referencias a nuevas secciones
-    const obfuscateToggle = document.getElementById('obfuscateToggle');
     const githubToggle = document.getElementById('githubToggle');
     const githubNameContainer = document.getElementById('githubNameContainer');
     const githubScriptName = document.getElementById('githubScriptName');
-    const obfuscateGuestLock = document.getElementById('obfuscateGuestLock');
     const githubGuestLock = document.getElementById('githubGuestLock');
 
     // TikTok Dashboard refs
@@ -143,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     //  ESTADO DE LOS TOGGLES
     // ============================================================
-    let obfuscateEnabled = false;
     let githubEnabled = false;
     let shortEnabled = false;
     let selectedService = 'oblivion';
@@ -163,11 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (shortEnabled) {
                 shortServiceSelector.style.display = 'block';
             }
-
-            // Obfuscate
-            obfuscateToggle.classList.remove('disabled');
-            obfuscateToggle.style.cursor = 'pointer';
-            obfuscateGuestLock.classList.add('hidden');
 
             // GitHub
             githubToggle.classList.remove('disabled');
@@ -192,17 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 shortServiceSelector.style.display = 'none';
             }
             guestLockMessage.classList.remove('hidden');
-
-            // Obfuscate
-            obfuscateToggle.classList.add('disabled');
-            obfuscateToggle.style.cursor = 'not-allowed';
-            if (obfuscateToggle.classList.contains('on')) {
-                obfuscateToggle.classList.remove('on');
-                const label = obfuscateToggle.querySelector('.toggle-label');
-                label.textContent = 'OFF';
-                obfuscateEnabled = false;
-            }
-            obfuscateGuestLock.classList.remove('hidden');
 
             // GitHub
             githubToggle.classList.add('disabled');
@@ -282,20 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
     discordLoginBtn.addEventListener('click', loginWithDiscord);
     guestLoginBtn.addEventListener('click', loginAsGuest);
     handleDiscordCallback();
-
-    // ============================================================
-    //  TOGGLE: OBFUSCATE
-    // ============================================================
-    obfuscateToggle.addEventListener('click', (e) => {
-        if (!isAuthenticated) {
-            showNotification('⚠️ You must sign in with Discord to use Obfuscate.', 'warning');
-            return;
-        }
-        obfuscateEnabled = !obfuscateEnabled;
-        obfuscateToggle.classList.toggle('on', obfuscateEnabled);
-        const label = obfuscateToggle.querySelector('.toggle-label');
-        label.textContent = obfuscateEnabled ? 'ON' : 'OFF';
-    });
 
     // ============================================================
     //  TOGGLE: GITHUB LOADER (sin exclusión mutua)
@@ -923,7 +890,7 @@ document.addEventListener('DOMContentLoaded', () => {
             throw new Error(data.error || 'WeAreDevs devolvió success: false');
         }
         const obfuscated = data.obfuscated;
-        if (!obfuscated) {
+        if (typeof obfuscated !== 'string' || !obfuscated.trim() || obfuscated === script) {
             throw new Error(`No se pudo obtener el script ofuscado. Respuesta: ${JSON.stringify(data)}`);
         }
         return obfuscated;
@@ -1151,7 +1118,18 @@ end)`;
             // ============================================================
             //  PROCESO DE OFUSCACIÓN + SHORT + GITHUB (encadenado)
             // ============================================================
-            let finalScript = fullScript; // por defecto
+            // Clear any previous result before starting a new generation.
+            outputCode.textContent = '';
+            outputSection.classList.add('hidden');
+
+            // GitHub and Oblivion enforce obfuscation on the server.
+            // Direct output and Pastefy must be obfuscated before leaving the browser.
+            const needsClientObfuscation =
+                (!githubEnabled && !shortEnabled) ||
+                (shortEnabled && selectedService === 'pastefy');
+            let finalScript = needsClientObfuscation
+                ? await obfuscateWithWeAreDevs(fullScript)
+                : fullScript;
 
             // Si al menos uno de los toggles está activo, necesitamos autenticación
             if (githubEnabled || shortEnabled) {
@@ -1163,16 +1141,8 @@ end)`;
                 }
 
                 try {
-                    // 1. Ofuscar (si está activado)
-                    let scriptToUpload = fullScript;
-                    if (obfuscateEnabled) {
-                        try {
-                            scriptToUpload = await obfuscateWithWeAreDevs(fullScript);
-                        } catch (obfuscateError) {
-                            showNotification(`⚠️ Obfuscation failed: ${obfuscateError.message}. Using original script.`, 'warning');
-                            scriptToUpload = fullScript;
-                        }
-                    }
+                    // Only server endpoints receive source; Pastefy receives obfuscated code.
+                    let scriptToUpload = finalScript;
 
                     // 2. Si está activo Short → subir a Oblivion o Pastefy
                     let shortResult = null;
@@ -1221,7 +1191,7 @@ end)`;
 
                 } catch (uploadError) {
                     showNotification(`❌ Upload error: ${uploadError.message}`, 'error');
-                    finalScript = fullScript; // fallback
+                    return;
                 }
             }
 

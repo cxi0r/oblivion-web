@@ -21,21 +21,22 @@ export default async function handler(req, res) {
             customCode || ''
         );
 
-        const pasteId = await saveToInternalPaste(
+        const paste = await saveToInternalPaste(
             script,
             `Script para ${username}`,
             userId
         );
 
+        const pasteId = paste.id;
         const baseUrl = process.env.BASE_URL || 'https://oblivionhub.xyz';
         const rawUrl = `${baseUrl}/api/paste?id=${pasteId}&raw=true`;
 
         return res.status(200).json({
             loadstring: `loadstring(game:HttpGet("${rawUrl}"))()`,
-            script: script,
+            script: paste.content,
             pasteUrl: rawUrl,
             pasteId: pasteId,
-            obfuscated: false
+            obfuscated: true
         });
 
     } catch (error) {
@@ -243,5 +244,8 @@ async function saveToInternalPaste(content, title, userId) {
 
     const data = await response.json();
 
-    return data.id;
+    if (!data.obfuscated || typeof data.content !== 'string' || !data.content.trim()) {
+        throw new Error('Paste service did not return an obfuscated script');
+    }
+    return data;
 }
