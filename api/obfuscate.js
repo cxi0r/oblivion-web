@@ -1,31 +1,16 @@
+import { obfuscateScript } from '../lib/obfuscate.js';
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
-        return res.status(405).json({
-            success: false,
-            error: 'Method not allowed'
-        });
+        return res.status(405).json({ success: false, error: 'Method not allowed' });
     }
-
+    if (typeof req.body?.script !== 'string' || !req.body.script.trim()) {
+        return res.status(400).json({ success: false, error: 'Script is required' });
+    }
     try {
-        const response = await fetch(
-            'https://wearedevs.net/api/obfuscate',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(req.body)
-            }
-        );
-
-        const data = await response.json();
-
-        return res.status(200).json(data);
-
+        const obfuscated = await obfuscateScript(req.body.script);
+        return res.status(200).json({ success: true, obfuscated });
     } catch (error) {
-        return res.status(500).json({
-            success: false,
-            error: error.message
-        });
+        return res.status(502).json({ success: false, error: error.message });
     }
 }

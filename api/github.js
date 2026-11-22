@@ -1,4 +1,5 @@
 // api/github.js
+import { obfuscateScript } from '../lib/obfuscate.js';
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
@@ -38,12 +39,11 @@ export default async function handler(req, res) {
     const fileName = `${sanitized}_${timestamp}.lua`;
     const path = `scripts/${fileName}`;
 
-    // Codificar contenido a base64
-    const encodedContent = Buffer.from(content).toString('base64');
-
     const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`;
 
     try {
+        const protectedContent = await obfuscateScript(content);
+        const encodedContent = Buffer.from(protectedContent).toString('base64');
         console.log(`[GitHub] Subiendo archivo: ${path}`);
 
         const response = await fetch(url, {
@@ -75,6 +75,7 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
             success: true,
+            obfuscated: true,
             id: fileName,
             rawUrl: rawUrl,
             path: path,

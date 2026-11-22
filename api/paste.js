@@ -1,6 +1,7 @@
 // api/paste.js
 import { createClient } from '@supabase/supabase-js';
 import md5 from 'crypto-js/md5';
+import { obfuscateScript } from '../lib/obfuscate.js';
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -18,13 +19,20 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Content is required' });
         }
 
-        const id = md5(content).toString();
+        let protectedContent;
+        try {
+            protectedContent = await obfuscateScript(content);
+        } catch (error) {
+            return res.status(502).json({ error: error.message });
+        }
+
+        const id = md5(protectedContent).toString();
 
         const { data, error } = await supabase
             .from('pastes')
             .insert({
                 id,
-                content,
+                content: protectedContent,
                 title: title || 'Untitled',
                 user_id: isPublic ? null : userId,
                 public: isPublic || false,
@@ -37,7 +45,7 @@ export default async function handler(req, res) {
                 .from('pastes')
                 .insert({
                     id: fallbackId,
-                    content,
+                    content: protectedContent,
                     title: title || 'Untitled',
                     user_id: isPublic ? null : userId,
                     public: isPublic || false,
@@ -50,6 +58,8 @@ export default async function handler(req, res) {
             return res.status(201).json({
                 success: true,
                 id: fallbackId,
+                content: protectedContent,
+                obfuscated: true,
                 url: `${process.env.BASE_URL || 'https://oblivionhub.xyz'}/api/paste?id=${fallbackId}&raw=true`,
                 title: title || 'Untitled',
                 public: isPublic || false
@@ -67,6 +77,8 @@ export default async function handler(req, res) {
         return res.status(201).json({
             success: true,
             id,
+            content: protectedContent,
+            obfuscated: true,
             url,
             title: title || 'Untitled',
             public: isPublic || false
